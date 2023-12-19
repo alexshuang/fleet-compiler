@@ -1,7 +1,8 @@
 import os
 import argparse
 
-from tokenizer import *
+from lexer import *
+
 
 def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
