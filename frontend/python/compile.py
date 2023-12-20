@@ -1,6 +1,7 @@
 import os
 import argparse
 
+from _parser import *
 from lexer import *
 
 
@@ -23,6 +24,10 @@ def main():
         while tokenizer.peak().kind != TokenKind.EOF:
             tok = tokenizer.next()
             fp.write(f"kind={tok.kind}, data={tok.data}\n")
+
+    parser = Parser(data)
+    module = parser.parse_module()
+    module.dump("")
 
 
 if __name__ == "__main__":

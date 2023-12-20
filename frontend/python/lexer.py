@@ -1,4 +1,4 @@
-# ===- lexer.py -------------------------------------------------------------
+# ===- _lexer.py -------------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +15,27 @@
 # ===---------------------------------------------------------------------------
 
 from enum import Enum
-from lexer import *
 
 
-keywords = ['def', 'if', 'while', 'for', 'with']
+def is_keyword(data):
+    return data in ['def', 'if', 'while', 'for', 'with']
+
+def is_terminator(ch):
+    return ch == '\n' or ch == ';'
+
+def is_operator(ch):
+    return ch in ['+', '-', '*', '/', '%', '^', '&']
 
 def is_alpha(ch):
     return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z')
+
 def is_digit(ch):
     return ch >= '0' and ch <= '9'
+
 def is_separator(ch):
-    return ch == ' ' or ch == '(' or ch == ')' or ch == '#' or ch == ':' or \
-        ch == '[' or ch == ']' or ch == '=' or ch == ',' or ch == '!' or ch == '\n'
+    return ch in [' ', '(', ')', '#', ':', '[', ']', '=', ',', '!'] \
+        or is_operator(ch) \
+        or is_terminator(ch)
 
 
 class CharStream:
@@ -69,7 +78,8 @@ class TokenKind(Enum):
     IntegerLiteral = 5
     DecimalLiteral = 6
     NoneLiteral = 7
-    EOF = 8
+    Terminator = 8
+    EOF = 9
 
 
 class Token:
@@ -119,7 +129,6 @@ class Tokenizer:
             return self.parse_string_literal()
         else:
             err_msg = f"{self.stream.location_str} : Unrecognized token which start with {ch}"
-            print(err_msg)
             raise ValueError(err_msg)
 
     def parse_string_literal(self):
@@ -147,7 +156,7 @@ class Tokenizer:
                 err_msg = f"{self.stream.location_str} : Invalid identifier {data} with char {ch}"
                 raise ValueError(err_msg)
         
-        kind = TokenKind.Keyword if data in keywords else TokenKind.Identifier
+        kind = TokenKind.Keyword if is_keyword(data) else TokenKind.Identifier
         return Token(kind, data)
 
     def parse_digit(self):
@@ -171,7 +180,12 @@ class Tokenizer:
         return Token(kind, data)
 
     def parse_separator(self):
-        return Token(TokenKind.Separator, self.stream.next())
+        ch = self.stream.next()
+        tok = Token(TokenKind.Separator, ch)
+        if is_terminator(ch):
+            tok.kind = TokenKind.Terminator
+            tok.data = ""
+        return tok
 
     def skip_white_space(self):
         while self.stream.peak() == ' ':
@@ -197,3 +211,7 @@ class Tokenizer:
         
         err_msg = f"{self.stream.location_str} : Should end with ''' here"
         raise ValueError(err_msg)
+
+    @property
+    def location_str(self):
+        return f"@(line: {self.stream.line}, col: {self.stream.col})"
