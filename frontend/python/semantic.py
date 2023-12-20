@@ -14,15 +14,54 @@
 #
 # ===---------------------------------------------------------------------------
 # Semantic analysis:
-#   Reference resolution: find the target function for the function call.
+#   Reference resolution:
+#       RefVisitor() used to find the target function for the function call.
 # 
 # ===---------------------------------------------------------------------------
 
-from frontend.python.syntax import FunctionCall
+from scope import Scope
+from symbolic import *
 from syntax import *
+
+
+semantic_anlyisys_pipeline = []
 
 
 class RefDumper(AstDumper):
     def visitFunctionCall(self, node: FunctionCall):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
         print(self.prefix + f"Function Call {node.name}, args: {node.args}  {ref_str}")
+
+
+class RefVisitor(AstVisitor):
+    def __init__(self) -> None:
+        super().__init__()
+        self.scope:Scope = None
+        self.last_scope:Scope = None
+
+    def visitModule(self, node: AstModule):
+        return super().visitModule(node)
+    
+    def visitReturnStatement(self, node: ReturnStatement):
+        return super().visitReturnStatement(node)
+
+    def visitBlock(self, node: Block):
+        self.enter()
+        ret = super().visitBlock(node)
+        self.exit()
+        return ret
+    
+    def visitFunctionDecl(self, node: FunctionDecl):
+        self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
+        return super().visitFunctionDecl(node)
+    
+    def visitFunctionCall(self, node: FunctionCall):
+        node.sym = self.scope.get(node.name)
+        return super().visitFunctionCall(node)
+    
+    def enter(self):
+        self.last_scope = self.scope
+        self.scope = Scope(self.scope)
+    
+    def exit(self):
+        self.scope = self.last_scope

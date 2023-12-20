@@ -28,11 +28,13 @@ def main():
 
     parser = Parser(data)
     module = parser.parse_module()
-    ast_dumper = AstDumper()
-    ast_dumper.visit(module)
 
     ref_dumper = RefDumper()
     ref_dumper.visit(module)
+
+    RefVisitor().visit(module)
+    ref_dumper.visit(module)
+
 
 if __name__ == "__main__":
     main()
