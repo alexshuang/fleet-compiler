@@ -1,4 +1,4 @@
-# ===- _ast.py -------------------------------------------------------------
+# ===- syntax.py -------------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 from abc import ABC, abstractmethod
 
 from lexer import *
+from symbolic import FunctionSymbol
 
 
 class AstNode(ABC):
@@ -58,10 +59,11 @@ class FunctionDecl(Statement):
 
 
 class FunctionCall(Statement):
-    def __init__(self, name: str, args: list = []) -> None:
+    def __init__(self, name: str, args: list = [], sym: FunctionSymbol = None) -> None:
         super().__init__()
         self.name = name
         self.args = args
+        self.sym = sym
     
     def accept(self, visitor):
         visitor.visitFunctionCall(self)
@@ -113,25 +115,31 @@ class AstDumper(AstVisitor):
     
     def visitModule(self, node: AstModule):
         print(self.prefix + "Module:")
-        self.prefix += "  "
+        self.inc_indent()
         self.visitBlock(node.block)
-        self.prefix -= "  "
+        self.dec_indent()
     
     def visitBlock(self, node: Block):
         print(self.prefix + "Block:")
-        self.prefix += "  "
+        self.inc_indent()
         for o in node.stmts:
             self.visit(o)
-        self.prefix -= "  "
+        self.dec_indent()
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")
-        self.prefix += "  "
+        self.inc_indent()
         self.visitBlock(node.block)
-        self.prefix -= "  "
+        self.dec_indent()
     
     def visitFunctionCall(self, node: FunctionCall):
         print(self.prefix + f"Function Call {node.name}, args: {node.args}")
     
     def visitReturnStatement(self, node: ReturnStatement):
         print(self.prefix + f"Return {node.ret}")
+
+    def inc_indent(self):
+        self.prefix += "  "
+
+    def dec_indent(self):
+        self.prefix = self.prefix[:-2]
