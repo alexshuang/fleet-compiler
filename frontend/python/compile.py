@@ -1,8 +1,9 @@
 import os
 import argparse
 
-from _parser import *
 from lexer import *
+from parsing import *
+from semantic import *
 
 
 def main():
@@ -27,7 +28,7 @@ def main():
 
     parser = Parser(data)
     module = parser.parse_module()
-    module.dump("")
+    AstDumper().visit(module)
 
 
 if __name__ == "__main__":

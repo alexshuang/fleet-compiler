@@ -17,7 +17,7 @@
 # from frontend.python.lexer import *
 # from frontend.python.ast import *
 from lexer import *
-from ast import *
+from syntax import *
 
 
 class Parser:
@@ -38,7 +38,7 @@ class Parser:
         stmts = []
         while self.tokenizer.peak().kind != TokenKind.EOF:
             stmts.append(self.parse_statement())
-        return ASTModule(Block(stmts))
+        return AstModule(Block(stmts))
     
     def parse_statement(self):
         t = self.tokenizer.peak()
@@ -123,10 +123,10 @@ class Parser:
                     t = self.tokenizer.next()
                 else:
                     self.raise_error(f"Expect got ',' here, not {t.data}")
+        return args
     
     def parse_return(self):
         t = self.tokenizer.peak()
-        print(f"{t.kind}@{t.data}")
         if t.kind == TokenKind.Terminator or t.kind == TokenKind.EOF:
             self.tokenizer.next() # skip terminator
         else:
