@@ -31,6 +31,12 @@ class RefDumper(AstDumper):
     def visitFunctionCall(self, node: FunctionCall):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
         print(self.prefix + f"Function Call {node.name}, args: {node.args}  {ref_str}")
+        for o in node.args:
+            print(self.prefix + f"    {self.visit(o)}")
+
+    def visitVariable(self, node: Variable):
+        ref_str = "(resolved)" if node.sym else "(not resolved)"
+        return f'arg {node.name} {ref_str}'
 
 
 class RefVisitor(AstVisitor):
@@ -53,11 +59,35 @@ class RefVisitor(AstVisitor):
     
     def visitFunctionDecl(self, node: FunctionDecl):
         self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
-        return super().visitFunctionDecl(node)
     
     def visitFunctionCall(self, node: FunctionCall):
         node.sym = self.scope.get(node.name)
-        return super().visitFunctionCall(node)
+        for o in node.args:
+            self.visit(o)
+    
+    def visitVariableDecl(self, node: VariableDecl):
+        self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
+    
+    def visitVariable(self, node: Variable):
+        node.sym = self.scope.get(node.name)
+    
+    def visitDecimalLiteral(self, node: DecimalLiteral):
+        return super().visitDecimalLiteral(node)
+    
+    def visitEmptyStatement(self, node: EmptyStatement):
+        return super().visitEmptyStatement(node)
+    
+    def visitExpressionStatement(self, node: ExpressionStatement):
+        return super().visitExpressionStatement(node)
+    
+    def visitIntegerLiteral(self, node: IntegerLiteral):
+        return super().visitIntegerLiteral(node)
+
+    def visitNoneLiteral(self, node: NoneLiteral):
+        return super().visitNoneLiteral(node)
+    
+    def visitStringLiteral(self, node: StringLiteral):
+        return super().visitStringLiteral(node)
     
     def enter(self):
         self.last_scope = self.scope

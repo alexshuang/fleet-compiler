@@ -95,7 +95,7 @@ class VariableDecl(Statement):
 
 
 class Variable(Expression):
-    def __init__(self, name: str, sym: VariableSymbol) -> None:
+    def __init__(self, name: str, sym: VariableSymbol = None) -> None:
         super().__init__()
         self.name = name
         self.sym = sym
@@ -245,7 +245,8 @@ class AstDumper(AstVisitor):
         self.dec_indent()
     
     def visitFunctionCall(self, node: FunctionCall):
-        print(self.prefix + f"Function Call {node.name}, args: {node.args}")
+        args = [self.visit(o) for o in node.args]
+        print(self.prefix + f"Function Call {node.name}, args: {args}")
     
     def visitReturnStatement(self, node: ReturnStatement):
         print(self.prefix + f"Return {node.ret}")
@@ -270,7 +271,7 @@ class AstDumper(AstVisitor):
         return super().visitStringLiteral(node)
     
     def visitVariable(self, node: Variable):
-        return super().visitVariable(node)
+        return f'<Variable {node.name}>'
 
     def visitEmptyStatement(self, node: EmptyStatement):
         return super().visitEmptyStatement(node)

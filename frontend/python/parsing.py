@@ -28,7 +28,7 @@ class Parser:
     functionCall = Identifier '(' args ')' terminator
     returnStatement = 'return' expressionStatement
     terminator = '\n' | ';'
-    args = ( stringLiteral (',' stringLiteral)? )?
+    args = ( expression (',' expression)? )?
     variableDecl = Identifier typeAnnotation? '=' expressionStatement
     typeAnnotation = ':' typeName
     typeName = StringLiteral
@@ -154,6 +154,7 @@ class Parser:
         return args
 
     def parse_expression_statement(self):
+        self.tokenizer.next() # skip =
         exp = self.parse_expression()
         return ExpressionStatement(exp)
 
@@ -165,7 +166,6 @@ class Parser:
         unary = primary
         primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
         '''
-        self.tokenizer.next() # skip =
         return self.parse_assignment()
     
     def parse_assignment(self):
@@ -187,10 +187,13 @@ class Parser:
             return DecimalLiteral(float(t.data))
         elif t.kind == TokenKind.NoneLiteral:
             return NoneLiteral()
-        elif t.kind == TokenKind.Identifier and self.tokenizer.peak().data == '(':
-            name = t.data
-            args = self.parse_function_args()
-            return FunctionCall(name, args)
+        elif t.kind == TokenKind.Identifier:
+            if self.tokenizer.peak().data == '(':
+                name = t.data
+                args = self.parse_function_args()
+                return FunctionCall(name, args)
+            else:
+                return Variable(t.data)
         else:
             self.raise_error(f"Unsupport primary {t.kind}@{t.data}")
 
@@ -198,9 +201,7 @@ class Parser:
         args = []
         t = self.tokenizer.peak()
         while t.kind != TokenKind.EOF and t.data != ')':
-            t = self.tokenizer.next()
-            if t.kind == TokenKind.StringLiteral:
-                args.append(t.data)
+            args.append(self.parse_expression())
             t = self.tokenizer.peak()
             if t.data != ')':
                 if t.data == ',':
