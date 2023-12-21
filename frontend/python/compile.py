@@ -4,6 +4,7 @@ import argparse
 from lexer import *
 from parsing import *
 from semantic import *
+from runtime import Interpreter
 
 
 def main():
@@ -29,11 +30,18 @@ def main():
     parser = Parser(data)
     module = parser.parse_module()
 
-    ref_dumper = RefDumper()
-    ref_dumper.visit(module)
+    print("raw AST:")
+    ast_dumper = AstDumper()
+    ast_dumper.visit(module)
 
+    print("\nreferenced AST:")
+    ref_dumper = RefDumper()
     RefVisitor().visit(module)
     ref_dumper.visit(module)
+
+    print("\nrun:")
+    interpreter = Interpreter()
+    interpreter.visit(module)
 
 
 if __name__ == "__main__":
