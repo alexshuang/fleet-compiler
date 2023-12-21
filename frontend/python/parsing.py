@@ -23,7 +23,7 @@ class Parser:
     '''
     module = statementList
     statementList = statement*
-    statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement
+    statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement
     funcitonDecl = 'def' Identifier '(' ')' ':'
     functionCall = Identifier '(' args ')' terminator
     returnStatement = 'return' expressionStatement
@@ -32,6 +32,7 @@ class Parser:
     variableDecl = Identifier typeAnnotation? '=' expressionStatement
     typeAnnotation = ':' typeName
     typeName = StringLiteral
+    emptyStatement = terminator
     expressionStatement = expression terminator
     expression = assignment
     assignment = binary (assignmentOp binary)*
@@ -64,7 +65,7 @@ class Parser:
             ret = self.parse_identifier()
         elif t.kind == TokenKind.Terminator: # empty statement
             self.tokenizer.next() # skip it
-            return None
+            return EmptyStatement()
         else:
             self.raise_error(f"Unrecognized token {t.data}, kind {t.kind}")
         self.skip_terminator()

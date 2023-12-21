@@ -149,6 +149,14 @@ class ReturnStatement(Statement):
         return visitor.visitReturnStatement(self)
 
 
+class EmptyStatement(Statement):
+    def __init__(self) -> None:
+        super().__init__()
+    
+    def accept(self, visitor):
+        return visitor.visitEmptyStatement(self)
+
+
 class AstVisitor(ABC):
     def visit(self, node: AstNode):
         return node.accept(self)
@@ -207,6 +215,10 @@ class AstVisitor(ABC):
     def visitNoneLiteral(self, node: NoneLiteral):
         return None
 
+    @abstractmethod
+    def visitEmptyStatement(self, node: EmptyStatement):
+        pass
+
 
 class AstDumper(AstVisitor):
     def __init__(self, prefix="") -> None:
@@ -259,6 +271,9 @@ class AstDumper(AstVisitor):
     
     def visitVariable(self, node: Variable):
         return super().visitVariable(node)
+
+    def visitEmptyStatement(self, node: EmptyStatement):
+        return super().visitEmptyStatement(node)
 
     def inc_indent(self):
         self.prefix += "  "

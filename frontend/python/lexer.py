@@ -110,7 +110,14 @@ class Tokenizer:
             return Token()
 
         self.skip_white_space()
+
         ch = self.stream.peak()
+        if ch == '#':
+            self.skip_single_comment()
+            return self.get_token()
+        elif ch == '\'' and self.stream.peak(1) == '\'' and self.stream.peak(2) == '\'':
+            self.skip_comments()
+            return self.get_token()
 
         # parse token 
         if is_alpha(ch):
@@ -119,12 +126,6 @@ class Tokenizer:
             return self.parse_digit()
         elif is_separator(ch):
             return self.parse_separator()
-        elif ch == '#':
-            self.skip_single_comment()
-            return self.get_token()
-        elif ch == '\'' and self.stream.peak(1) == '\'' and self.stream.peak(2) == '\'':
-            self.skip_comments()
-            return self.get_token()
         elif ch == '"' or ch == '\'':
             return self.parse_string_literal()
         else:
