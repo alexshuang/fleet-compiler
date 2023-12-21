@@ -14,22 +14,33 @@
 #
 # ===---------------------------------------------------------------------------
 
-# from frontend.python.lexer import *
-# from frontend.python.ast import *
 from lexer import *
 from syntax import *
+from dtype import *
 
 
 class Parser:
     '''
     module = statementList
     statementList = statement*
-    statement = functionDecl | functionCall
-    funcitonDecl = def Identifier ( ) :
-    functionCall = Identifier ( args ) terminator
-    terminator = \n | ;
-    args = Empty | stringLiteral (, stringLiteral)?
-    stringLiteral = " StringLiteral? "
+    statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement
+    funcitonDecl = 'def' Identifier '(' ')' ':'
+    functionCall = Identifier '(' args ')' terminator
+    returnStatement = 'return' expressionStatement
+    terminator = '\n' | ';'
+    args = ( stringLiteral (',' stringLiteral)? )?
+    variableDecl = Identifier typeAnnotation? '=' expressionStatement
+    typeAnnotation = ':' typeName
+    typeName = StringLiteral
+    expressionStatement = expression terminator
+    expression = assignment
+    assignment = binary (assignmentOp binary)*
+    binary = unary (binOp unary)*
+    unary = primary
+    primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
+    binOp = '+' | '-' | '*' | '/'
+    assignmentOp = '='
+    stringLiteral = '"' StringLiteral? '"'
     '''
     def __init__(self, data="") -> None:
         self.tokenizer = Tokenizer(data)
@@ -41,16 +52,23 @@ class Parser:
         return AstModule(Block(stmts))
     
     def parse_statement(self):
+        '''
+        statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement
+        '''
         t = self.tokenizer.peak()
         if t.data == "def":
-            return self.parse_function_decl()
+            ret = self.parse_function_decl()
+        elif t.data == "return":
+            ret = self.parse_return()
         elif t.kind == TokenKind.Identifier:
-            return self.parse_identifier()
-        elif t.kind == TokenKind.Terminator:
+            ret = self.parse_identifier()
+        elif t.kind == TokenKind.Terminator: # empty statement
             self.tokenizer.next() # skip it
-            return self.parse_statement()
+            return None
         else:
             self.raise_error(f"Unrecognized token {t.data}, kind {t.kind}")
+        self.skip_terminator()
+        return ret
     
     def parse_function_decl(self):
         self.tokenizer.next() # skip def
@@ -81,34 +99,99 @@ class Parser:
         stmts = []
         while self.tokenizer.peak().kind != TokenKind.EOF:
             stmt = self.parse_statement()
-            stmts.append(stmt)
+            if stmt:
+                stmts.append(stmt)
             if isinstance(stmt, ReturnStatement):
                 break
         return Block(stmts)
 
     def parse_identifier(self):
+        '''
+        functionCall = Identifier '(' args ')' terminator
+        variableDecl = Identifier typeAnnotation? '=' expressionStatement
+        '''
         name = self.tokenizer.next().data # skip identifier
-        if name == "return":
-            return self.parse_return()
-        else:
+        t = self.tokenizer.peak()
+        if t.data == ":":
+            type = self.parse_variable_type()
             t = self.tokenizer.peak()
-            if t.data == '(':
-                self.tokenizer.next() # skip (
-                t = self.tokenizer.peak()
-                args = self.parse_args() if t.data != ')' else []
-                t = self.tokenizer.peak()
-                if t.data == ')':
-                    self.tokenizer.next() # skip )
-                    t = self.tokenizer.peak()
-                    if t.kind == TokenKind.Terminator or t.kind == TokenKind.EOF:
-                        self.tokenizer.next() # skip terminator
-                        return FunctionCall(name, args)
-                    else:
-                        self.raise_error(f"Expect got newline or ';' here, not {t.data}")
-                else:
-                    self.raise_error(f"Expect got ')' here, not {t.data}")
+            if t.data == "=":
+                init = self.parse_expression_statement()
+                return VariableDecl(name, type, init)
             else:
-                self.raise_error(f"Expect got '(' here, not {t.data}")
+                return Variable(name, type)
+        elif t.data == "=":
+            init = self.parse_expression_statement()
+            return VariableDecl(name, None, init)
+        elif t.data == "(":
+            args = self.parse_function_args()
+            return FunctionCall(name, args)
+        else:
+            self.raise_error(f"Unsupport statement which start with {t.data}")
+
+    def parse_variable_type(self):
+        self.tokenizer.next() # skip :
+        t = self.tokenizer.peak()
+        if t.kind == TokenKind.Identifier:
+            t = self.tokenizer.next()
+            if t.data in dtype_map:
+                return dtype_map[t.data.lower()]
+            else:
+                self.raise_error(f"Unsupport data type {t.data}")
+        else:
+            self.raise_error(f"Invalid data type {t.data}")
+
+    def parse_function_args(self):
+        self.tokenizer.next() # skip (
+        t = self.tokenizer.peak()
+        args = self.parse_args() if t.data != ')' else []
+        t = self.tokenizer.peak()
+        if t.data == ')':
+            self.tokenizer.next() # skip )
+        else:
+            self.raise_error(f"Expect got ')' here, not {t.data}")
+        return args
+
+    def parse_expression_statement(self):
+        exp = self.parse_expression()
+        return ExpressionStatement(exp)
+
+    def parse_expression(self):
+        '''
+        expression = assignment
+        assignment = binary (assignmentOp binary)*
+        binary = unary (binOp unary)*
+        unary = primary
+        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
+        '''
+        self.tokenizer.next() # skip =
+        return self.parse_assignment()
+    
+    def parse_assignment(self):
+        return self.parse_binary()
+
+    def parse_binary(self):
+        return self.parse_unary()
+
+    def parse_unary(self):
+        return self.parse_primary()
+    
+    def parse_primary(self):
+        t = self.tokenizer.next()
+        if t.kind == TokenKind.StringLiteral:
+            return StringLiteral(t.data)
+        elif t.kind == TokenKind.IntegerLiteral:
+            return IntegerLiteral(int(t.data))
+        elif t.kind == TokenKind.DecimalLiteral:
+            return DecimalLiteral(float(t.data))
+        elif t.kind == TokenKind.NoneLiteral:
+            return NoneLiteral()
+        elif t.kind == TokenKind.Identifier and self.tokenizer.peak().data == '(':
+            name = t.data
+            args = self.parse_function_args()
+            return FunctionCall(name, args)
+        else:
+            self.raise_error(f"Unsupport primary {t.kind}@{t.data}")
 
     def parse_args(self):
         args = []
@@ -126,12 +209,15 @@ class Parser:
         return args
     
     def parse_return(self):
+        self.tokenizer.next() # skip return
+        return ReturnStatement()
+
+    def skip_terminator(self):
         t = self.tokenizer.peak()
         if t.kind == TokenKind.Terminator or t.kind == TokenKind.EOF:
             self.tokenizer.next() # skip terminator
         else:
-            self.raise_error(f"Expect got newline or ';' here, not {t.kind}@{t.data}")
-        return ReturnStatement()
+            self.raise_error(f"Expect got newline or ';' here, not {t.data}")
 
     def raise_error(self, msg):
         raise ValueError(f"{self.tokenizer.location_str} : {msg}")

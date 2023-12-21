@@ -34,6 +34,8 @@ def main():
     ast_dumper = AstDumper()
     ast_dumper.visit(module)
 
+    return
+
     print("\nreferenced AST:")
     ref_dumper = RefDumper()
     RefVisitor().visit(module)

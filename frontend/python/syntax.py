@@ -17,7 +17,7 @@
 from abc import ABC, abstractmethod
 
 from lexer import *
-from symbolic import FunctionSymbol
+from symbolic import FunctionSymbol, VariableSymbol
 
 
 class AstNode(ABC):
@@ -26,9 +26,23 @@ class AstNode(ABC):
         pass
 
 
+class Expression(AstNode):
+    def __init__(self) -> None:
+        super().__init__()
+
+
 class Statement(AstNode):
     def __init__(self) -> None:
         super().__init__()
+
+
+class ExpressionStatement(Statement):
+    def __init__(self, exp: Expression) -> None:
+        super().__init__()
+        self.exp = exp
+    
+    def accept(self, visitor):
+        return visitor.visitExpressionStatement(self)
 
 
 class Block(Statement):
@@ -37,7 +51,7 @@ class Block(Statement):
         self.stmts = stmts
 
     def accept(self, visitor):
-        visitor.visitBlock(self)
+        return visitor.visitBlock(self)
 
 
 class AstModule(AstNode):
@@ -45,7 +59,7 @@ class AstModule(AstNode):
         self.block = block
 
     def accept(self, visitor):
-        visitor.visitModule(self)
+        return visitor.visitModule(self)
 
 
 class FunctionDecl(Statement):
@@ -55,10 +69,10 @@ class FunctionDecl(Statement):
         self.block = block
     
     def accept(self, visitor):
-        visitor.visitFunctionDecl(self)
+        return visitor.visitFunctionDecl(self)
 
 
-class FunctionCall(Statement):
+class FunctionCall(Expression):
     def __init__(self, name: str, args: list = [], sym: FunctionSymbol = None) -> None:
         super().__init__()
         self.name = name
@@ -66,7 +80,64 @@ class FunctionCall(Statement):
         self.sym = sym
     
     def accept(self, visitor):
-        visitor.visitFunctionCall(self)
+        return visitor.visitFunctionCall(self)
+
+
+class VariableDecl(Statement):
+    def __init__(self, name: str, type, init: ExpressionStatement) -> None:
+        super().__init__()
+        self.name = name
+        self.type = type
+        self.init = init
+    
+    def accept(self, visitor):
+        return visitor.visitVariableDecl(self)
+
+
+class Variable(Expression):
+    def __init__(self, name: str, sym: VariableSymbol) -> None:
+        super().__init__()
+        self.name = name
+        self.sym = sym
+    
+    def accept(self, visitor):
+        return visitor.visitVariable(self)
+
+
+class StringLiteral(Expression):
+    def __init__(self, data: str) -> None:
+        super().__init__()
+        self.data = data
+    
+    def accept(self, visitor):
+        return visitor.visitStringLiteral(self)
+
+
+class IntegerLiteral(Expression):
+    def __init__(self, value: int) -> None:
+        super().__init__()
+        self.value = value
+    
+    def accept(self, visitor):
+        return visitor.visitIntegerLiteral(self)
+
+
+class DecimalLiteral(Expression):
+    def __init__(self, value: float) -> None:
+        super().__init__()
+        self.value = value
+    
+    def accept(self, visitor):
+        return visitor.visitDecimalLiteral(self)
+
+
+class NoneLiteral(Expression):
+    def __init__(self) -> None:
+        super().__init__()
+        self.value = None
+    
+    def accept(self, visitor):
+        return visitor.visitNoneLiteral(self)
 
 
 class ReturnStatement(Statement):
@@ -75,17 +146,17 @@ class ReturnStatement(Statement):
         self.ret = ret
     
     def accept(self, visitor):
-        visitor.visitReturnStatement(self)
+        return visitor.visitReturnStatement(self)
 
 
 class AstVisitor(ABC):
     def visit(self, node: AstNode):
-        node.accept(self)
-    
+        return node.accept(self)
+
     @abstractmethod
     def visitModule(self, node: AstModule):
         return self.visitBlock(node.block)
-    
+
     @abstractmethod
     def visitBlock(self, node: Block):
         ret = None
@@ -98,15 +169,44 @@ class AstVisitor(ABC):
     @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
         return self.visitBlock(node.block)
-    
+
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
-        return
-        
+        pass
+
     @abstractmethod
     def visitReturnStatement(self, node: ReturnStatement):
         return "return"
+
+    @abstractmethod
+    def visitExpressionStatement(self, node: ExpressionStatement):
+        return self.visit(node.exp)
+
+    @abstractmethod
+    def visitVariableDecl(self, node: VariableDecl):
+        if node.init:
+            return self.visit(node.init)
     
+    @abstractmethod
+    def visitVariable(self, node: Variable):
+        pass
+
+    @abstractmethod
+    def visitStringLiteral(self, node: StringLiteral):
+        return node.data
+
+    @abstractmethod
+    def visitIntegerLiteral(self, node: IntegerLiteral):
+        return node.value
+
+    @abstractmethod
+    def visitDecimalLiteral(self, node: DecimalLiteral):
+        return node.value
+
+    @abstractmethod
+    def visitNoneLiteral(self, node: NoneLiteral):
+        return None
+
 
 class AstDumper(AstVisitor):
     def __init__(self, prefix="") -> None:
@@ -137,6 +237,28 @@ class AstDumper(AstVisitor):
     
     def visitReturnStatement(self, node: ReturnStatement):
         print(self.prefix + f"Return {node.ret}")
+
+    def visitExpressionStatement(self, node: ExpressionStatement):
+        return super().visitExpressionStatement(node)
+
+    def visitVariableDecl(self, node: VariableDecl):
+        init = self.visitExpressionStatement(node.init)
+        print(self.prefix + f"Variable Decl {node.name}, init: {init}")
+
+    def visitDecimalLiteral(self, node: DecimalLiteral):
+        return super().visitIntegerLiteral(node)
+
+    def visitIntegerLiteral(self, node: IntegerLiteral):
+        return super().visitIntegerLiteral(node)
+
+    def visitNoneLiteral(self, node: NoneLiteral):
+        return "None"
+
+    def visitStringLiteral(self, node: StringLiteral):
+        return super().visitStringLiteral(node)
+    
+    def visitVariable(self, node: Variable):
+        return super().visitVariable(node)
 
     def inc_indent(self):
         self.prefix += "  "

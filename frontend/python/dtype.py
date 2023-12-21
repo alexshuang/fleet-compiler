@@ -1,4 +1,4 @@
-# ===- symbolic.py -------------------------------------------------------------
+# ===- type.py -------------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,22 +17,15 @@
 from enum import Enum
 
 
-class SymbolKind(Enum):
-    FunctionSymbol = 1
-    VariableSymbol = 2
+class DataType(Enum):
+    String = 1
+    Int32 = 2
+    Float = 3
 
 
-class Symbol:
-    def __init__(self, kind: SymbolKind, node) -> None:
-        self.kind = kind
-        self.node = node
-
-
-class FunctionSymbol(Symbol):
-    def __init__(self, kind: SymbolKind, node) -> None:
-        super().__init__(kind, node)
-
-
-class VariableSymbol(Symbol):
-    def __init__(self, kind: SymbolKind, node) -> None:
-        super().__init__(kind, node)
+dtype_map = {
+    "float": DataType.Float,
+    "int": DataType.Int32,
+    "int32": DataType.Int32,
+    "string": DataType.String,
+}
