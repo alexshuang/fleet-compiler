@@ -1,11 +1,11 @@
 '''
 hello world sample
 '''
+msg = "Hello world!!"
+
 def foo():
-   msg = "Hello world!!!"
    print(msg)
    return
 
-msg = "Hello world!!"
 foo()
 print(msg)

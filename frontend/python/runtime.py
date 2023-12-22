@@ -66,7 +66,10 @@ class Interpreter(AstVisitor):
         self.update_variable_value(node.name, self.visit(node.init))
     
     def visitVariable(self, node: Variable):
-        return self.get_variable_value(node.name)
+        value = self.get_variable_value(node.name)
+        if value == None:
+            raise NameError(f"name {node.name} is not defined")
+        return value
 
     def visitReturnStatement(self, node: ReturnStatement):
         return super().visitReturnStatement(node)
@@ -99,8 +102,11 @@ class Interpreter(AstVisitor):
         self.call_stack.pop()
 
     def get_variable_value(self, name: str):
-        frame = self.call_stack[-1]
-        return frame.get(name) if frame else None
+        for i in range(len(self.call_stack) - 1, -1, -1):
+            value = self.call_stack[i].get(name)
+            if value:
+                break
+        return value
 
     def update_variable_value(self, name: str, value):
         frame = self.call_stack[-1]
