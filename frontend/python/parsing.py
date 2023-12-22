@@ -17,13 +17,16 @@
 from lexer import *
 from syntax import *
 from dtype import *
+from indentation import *
 
 
 class Parser:
     '''
-    module = statementList
+    module = block
+    block = statementList | BlockEnd
     statementList = statement*
-    statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement
+    statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
+    indentation = ' '*
     funcitonDecl = 'def' Identifier '(' ')' ':'
     functionCall = Identifier '(' args ')' terminator
     returnStatement = 'return' expressionStatement
@@ -45,17 +48,28 @@ class Parser:
     '''
     def __init__(self, data="") -> None:
         self.tokenizer = Tokenizer(data)
+        self.indentation = Indentation()
     
     def parse_module(self):
-        stmts = []
-        while self.tokenizer.peak().kind != TokenKind.EOF:
-            stmts.append(self.parse_statement())
-        return AstModule(Block(stmts))
+        return AstModule(self.parse_block())
     
     def parse_statement(self):
         '''
-        statement = functionDecl | functionCall | returnStatement | variableDecl | expressionStatement
+        statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
         '''
+        t = self.tokenizer.peak()
+        if t.kind != TokenKind.Indentation:
+            self.raise_error(f"Expect indentation here, not {t.kind}@{t.data}")
+        if self.indentation.match(t.data):
+            self.tokenizer.next() # skip indent
+        else:
+            if self.indentation.match_parent(t.data):
+                # implicitly add a return depending on the indentation
+                self.tokenizer.next() # skip indent
+                return BlockEnd()
+            else:
+                self.raise_error("Unexpected indentation")
+
         t = self.tokenizer.peak()
         if t.data == "def":
             ret = self.parse_function_decl()
@@ -85,6 +99,7 @@ class Parser:
                     t = self.tokenizer.peak()
                     if t.data == ':':
                         self.tokenizer.next() # skip :
+                        self.skip_terminator() # skip nl
                         func_body = self.parse_block()
                     else:
                         self.raise_error(f"Expect got ':' here, not {t.data}")
@@ -97,19 +112,21 @@ class Parser:
         return FunctionDecl(func_name, func_body)
     
     def parse_block(self):
+        self.enter()
         stmts = []
         while self.tokenizer.peak().kind != TokenKind.EOF:
             stmt = self.parse_statement()
-            if stmt:
+            if stmt and not isinstance(stmt, EmptyStatement):
                 stmts.append(stmt)
-            if isinstance(stmt, ReturnStatement):
+            if isinstance(stmt, BlockEnd):
                 break
+        self.exit()
         return Block(stmts)
 
     def parse_identifier(self):
         '''
         functionCall = Identifier '(' args ')' terminator
-        variableDecl = Identifier typeAnnotation? '=' expressionStatement
+        variableDecl = Identifier typeAnnotation? '=' expressionStatement terminator
         '''
         name = self.tokenizer.next().data # skip identifier
         t = self.tokenizer.peak()
@@ -118,17 +135,19 @@ class Parser:
             t = self.tokenizer.peak()
             if t.data == "=":
                 init = self.parse_expression_statement()
-                return VariableDecl(name, type, init)
+                ret = VariableDecl(name, type, init)
             else:
-                return Variable(name, type)
+                ret = Variable(name, type)
         elif t.data == "=":
             init = self.parse_expression_statement()
-            return VariableDecl(name, None, init)
+            ret = VariableDecl(name, None, init)
         elif t.data == "(":
             args = self.parse_function_args()
-            return FunctionCall(name, args)
+            ret = FunctionCall(name, args)
         else:
             self.raise_error(f"Unsupport statement which start with {t.data}")
+        self.skip_terminator()
+        return ret 
 
     def parse_variable_type(self):
         self.tokenizer.next() # skip :
@@ -212,14 +231,22 @@ class Parser:
     
     def parse_return(self):
         self.tokenizer.next() # skip return
+        self.skip_terminator()
         return ReturnStatement()
 
     def skip_terminator(self):
         t = self.tokenizer.peak()
-        if t.kind == TokenKind.Terminator or t.kind == TokenKind.EOF:
+        if t.kind == TokenKind.Terminator:
             self.tokenizer.next() # skip terminator
-        else:
-            self.raise_error(f"Expect got newline or ';' here, not {t.data}")
 
+    def enter(self):
+        # enter new indent
+        self.last_indentation = self.indentation
+        self.indentation = Indentation(self.indentation)
+
+    def exit(self):
+        # back to last indent
+        self.indentation = self.last_indentation
+        
     def raise_error(self, msg):
         raise ValueError(f"{self.tokenizer.location_str} : {msg}")

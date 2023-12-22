@@ -49,9 +49,18 @@ class Block(Statement):
     def __init__(self, stmts: []) -> None:
         super().__init__()
         self.stmts = stmts
+        self.indent = None
 
     def accept(self, visitor):
         return visitor.visitBlock(self)
+
+
+class BlockEnd(Statement):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def accept(self, visitor):
+        return visitor.visitBlockEnd(self)
 
 
 class AstModule(AstNode):
@@ -169,8 +178,12 @@ class AstVisitor(ABC):
     def visitBlock(self, node: Block):
         for o in node.stmts:
             ret = self.visit(o)
-            if ret == "return":
+            if isinstance(ret, BlockEnd):
                 break
+
+    @abstractmethod
+    def visitBlockEnd(self, node: BlockEnd):
+        pass
 
     @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
@@ -235,6 +248,9 @@ class AstDumper(AstVisitor):
         for o in node.stmts:
             self.visit(o)
         self.dec_indent()
+    
+    def visitBlockEnd(self, node: BlockEnd):
+        return super().visitBlockEnd(node)
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")

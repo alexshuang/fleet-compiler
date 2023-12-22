@@ -79,7 +79,8 @@ class TokenKind(Enum):
     DecimalLiteral = 6
     NoneLiteral = 7
     Terminator = 8
-    EOF = 9
+    Indentation = 9
+    EOF = 10
 
 
 class Token:
@@ -92,6 +93,7 @@ class Tokenizer:
     def __init__(self, data="") -> None:
         self.stream = CharStream(data)
         self.current_token = None
+        self.start_of_line = True
 
     def next(self):
         if self.current_token == None:
@@ -109,7 +111,11 @@ class Tokenizer:
         if self.stream.eof():
             return Token()
 
-        self.skip_white_space()
+        if self.start_of_line == True:
+            self.start_of_line = False
+            return self.parse_indentation()
+        else:
+            self.skip_white_space()
 
         ch = self.stream.peak()
         if ch == '#':
@@ -124,6 +130,8 @@ class Tokenizer:
             return self.parse_identifier()
         elif is_digit(ch) or (ch == '.' and is_digit(self.stream.peak(1))):
             return self.parse_digit()
+        elif ch == '\n':
+            return self.parse_newline()
         elif is_separator(ch):
             return self.parse_separator()
         elif ch == '"' or ch == '\'':
@@ -131,6 +139,17 @@ class Tokenizer:
         else:
             err_msg = f"{self.stream.location_str} : Unrecognized token which start with {ch}"
             raise ValueError(err_msg)
+
+    def parse_indentation(self):
+        data = ""
+        while self.stream.peak() == ' ':
+            data += self.stream.next()
+        return Token(TokenKind.Indentation, data)
+        
+    def parse_newline(self):
+        self.start_of_line = True
+        self.stream.next() # skip \n
+        return Token(TokenKind.Terminator, "")
 
     def parse_string_literal(self):
         quote = self.stream.next() # skip left quote
@@ -196,19 +215,15 @@ class Tokenizer:
         self.stream.next() # skip '#'
         while not self.stream.eof() and self.stream.peak() != '\n':
             self.stream.next()
-        if self.stream.peak() == '\n':
-            self.stream.next()
 
     def skip_comments(self):
-        for _ in range(3):
-            self.stream.next() # skip "'''"
+        for _ in range(3): # skip "'''"
+            self.stream.next()
         ch1 = self.stream.next()
         ch2 = self.stream.next()
         while not self.stream.eof():
             if self.stream.peak() == '\'' and ch1 == ch2 == '\'':
                 self.stream.next()
-                if self.stream.peak() == '\n':
-                    self.stream.next()
                 return
             else:
                 ch1 = ch2

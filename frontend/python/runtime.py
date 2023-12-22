@@ -52,6 +52,9 @@ class Interpreter(AstVisitor):
         self.exit()
         return ret
     
+    def visitBlockEnd(self, node: BlockEnd):
+        return super().visitBlockEnd(node)
+    
     def visitFunctionCall(self, node: FunctionCall):
         if node.sym:
             return self.visit(node.sym.node)
