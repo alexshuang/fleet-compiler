@@ -46,7 +46,7 @@ class ExpressionStatement(Statement):
 
 
 class Block(Statement):
-    def __init__(self, stmts) -> None:
+    def __init__(self, stmts: []) -> None:
         super().__init__()
         self.stmts = stmts
 
@@ -167,12 +167,10 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitBlock(self, node: Block):
-        ret = None
         for o in node.stmts:
             ret = self.visit(o)
             if ret == "return":
                 break
-        return ret
 
     @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
@@ -180,7 +178,7 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
-        pass
+        return [self.visit(o) for o in node.args]
 
     @abstractmethod
     def visitReturnStatement(self, node: ReturnStatement):

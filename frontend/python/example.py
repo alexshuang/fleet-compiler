@@ -2,7 +2,8 @@
 hello world sample
 '''
 def foo():
-   print("Hello world!")
+   msg = "Hello world!!!"
+   print(msg)
    return
 
 msg = "Hello world!!"

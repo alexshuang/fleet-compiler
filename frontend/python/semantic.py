@@ -59,17 +59,19 @@ class RefVisitor(AstVisitor):
     
     def visitFunctionDecl(self, node: FunctionDecl):
         self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
+        return super().visitFunctionDecl(node)
     
     def visitFunctionCall(self, node: FunctionCall):
         node.sym = self.scope.get(node.name)
-        for o in node.args:
-            self.visit(o)
+        return super().visitFunctionCall(node)
     
     def visitVariableDecl(self, node: VariableDecl):
         self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
+        return super().visitVariableDecl(node)
     
     def visitVariable(self, node: Variable):
         node.sym = self.scope.get(node.name)
+        return super().visitVariable(node)
     
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return super().visitDecimalLiteral(node)
