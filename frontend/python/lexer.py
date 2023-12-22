@@ -196,6 +196,8 @@ class Tokenizer:
         self.stream.next() # skip '#'
         while not self.stream.eof() and self.stream.peak() != '\n':
             self.stream.next()
+        if self.stream.peak() == '\n':
+            self.stream.next()
 
     def skip_comments(self):
         for _ in range(3):
@@ -205,6 +207,8 @@ class Tokenizer:
         while not self.stream.eof():
             if self.stream.peak() == '\'' and ch1 == ch2 == '\'':
                 self.stream.next()
+                if self.stream.peak() == '\n':
+                    self.stream.next()
                 return
             else:
                 ch1 = ch2
