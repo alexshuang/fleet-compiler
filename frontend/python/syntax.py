@@ -247,16 +247,14 @@ class AstDumper(AstVisitor):
         self.inc_indent()
         for o in node.stmts:
             self.visit(o)
-        self.dec_indent()
     
     def visitBlockEnd(self, node: BlockEnd):
-        return super().visitBlockEnd(node)
+        self.dec_indent()
+        print(self.prefix + "BlockEnd")
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")
-        self.inc_indent()
         self.visitBlock(node.block)
-        self.dec_indent()
     
     def visitFunctionCall(self, node: FunctionCall):
         args = [self.visit(o) for o in node.args]

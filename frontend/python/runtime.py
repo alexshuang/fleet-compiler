@@ -14,7 +14,26 @@
 #
 # ===---------------------------------------------------------------------------
 
+from enum import Enum
 from syntax import *
+
+
+class RetKind(Enum):
+    StringLiteral = 1
+    DecimalLiteral = 2
+    IntegerLiteral = 3
+    Variable = 4
+    Expression = 5
+    Retrun = 6
+    BlockEnd = 7
+
+
+class RetValue:
+    def __init__(self, kind, value) -> None:
+        self.kind = kind
+        self.value = value
+    
+    def __init__()
 
 
 class StackFrame:
@@ -39,8 +58,7 @@ class Interpreter(AstVisitor):
     def visitBlock(self, node: Block):
         def should_run(node):
             # Instructions that should be executed
-            return isinstance(node, FunctionCall) \
-                    or isinstance(node, VariableDecl)
+            return not isinstance(node, FunctionDecl)
 
         ret = None
         self.enter()
@@ -61,12 +79,14 @@ class Interpreter(AstVisitor):
         else:
             if node.name == "print":
                 args = [self.visit(o) for o in node.args]
-                return print(args)
+                print(args)
             else:
                 raise ValueError(f"Interpreter: Unsupport instruction {node.name}")
+        return super().visitFunctionCall(node)
     
     def visitVariableDecl(self, node: VariableDecl):
         self.update_variable_value(node.name, self.visit(node.init))
+        return super().visitVariableDecl(node)
     
     def visitVariable(self, node: Variable):
         value = self.get_variable_value(node.name)
