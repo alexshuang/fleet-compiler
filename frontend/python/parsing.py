@@ -230,9 +230,15 @@ class Parser:
         return args
     
     def parse_return(self):
+        ret = None
         self.tokenizer.next() # skip return
+        if self.tokenizer.peak().kind != TokenKind.Terminator:
+            ret = self.parse_return_value()
         self.skip_terminator()
-        return ReturnStatement()
+        return ReturnStatement(ret)
+
+    def parse_return_value(self):
+        return self.parse_expression()
 
     def skip_terminator(self):
         t = self.tokenizer.peak()

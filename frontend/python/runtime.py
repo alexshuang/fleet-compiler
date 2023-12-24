@@ -14,37 +14,30 @@
 #
 # ===---------------------------------------------------------------------------
 
-from enum import Enum
 from syntax import *
 
 
-class RetKind(Enum):
-    StringLiteral = 1
-    DecimalLiteral = 2
-    IntegerLiteral = 3
-    Variable = 4
-    Expression = 5
-    Retrun = 6
-    BlockEnd = 7
-
-
-class RetValue:
-    def __init__(self, kind, value) -> None:
-        self.kind = kind
+class RetVal:
+    def __init__(self, value=None) -> None:
         self.value = value
     
-    def __init__()
-
 
 class StackFrame:
     def __init__(self) -> None:
-        self.variables = {}
+        self.variables = {} # local variables
+        self.ret: RetVal = None # return value
     
     def update(self, name: str, value):
         self.variables[name] = value
 
     def get(self, name: str):
         return self.variables[name] if name in self.variables else None
+    
+    def set_ret(self, ret: RetVal):
+        self.ret = ret
+
+    def get_ret(self):
+        return self.ret
 
 
 class Interpreter(AstVisitor):
@@ -65,13 +58,15 @@ class Interpreter(AstVisitor):
         for o in node.stmts:
             if should_run(o):
                 ret = self.visit(o)
-                if ret == "return":
+                if isinstance(ret, RetVal):
                     break
         self.exit()
-        return ret
+
+        if isinstance(ret, RetVal) and ret.value:
+            self.set_ret(ret.value)
     
     def visitBlockEnd(self, node: BlockEnd):
-        return super().visitBlockEnd(node)
+        return RetVal()
     
     def visitFunctionCall(self, node: FunctionCall):
         if node.sym:
@@ -82,20 +77,17 @@ class Interpreter(AstVisitor):
                 print(args)
             else:
                 raise ValueError(f"Interpreter: Unsupport instruction {node.name}")
-        return super().visitFunctionCall(node)
     
     def visitVariableDecl(self, node: VariableDecl):
         self.update_variable_value(node.name, self.visit(node.init))
         return super().visitVariableDecl(node)
     
     def visitVariable(self, node: Variable):
-        value = self.get_variable_value(node.name)
-        if value == None:
-            raise NameError(f"name {node.name} is not defined")
-        return value
+        return self.get_variable_value(node.name)
 
     def visitReturnStatement(self, node: ReturnStatement):
-        return super().visitReturnStatement(node)
+        value = self.visit(node.ret) if node.ret else None
+        return RetVal(value)
 
     def visitFunctionDecl(self, node: FunctionDecl):
         return super().visitFunctionDecl(node)
@@ -125,13 +117,21 @@ class Interpreter(AstVisitor):
         self.call_stack.pop()
 
     def get_variable_value(self, name: str):
+        value = None
         for i in range(len(self.call_stack) - 1, -1, -1):
             value = self.call_stack[i].get(name)
             if value:
                 break
+        if value == None:
+            raise NameError(f"name {name} is not defined")
         return value
 
     def update_variable_value(self, name: str, value):
         frame = self.call_stack[-1]
         if frame:
             frame.update(name, value)
+
+    def set_ret(self, value):
+        frame = self.call_stack[-1]
+        if frame:
+            frame.set_ret(value)

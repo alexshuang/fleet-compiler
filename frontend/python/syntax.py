@@ -150,7 +150,7 @@ class NoneLiteral(Expression):
 
 
 class ReturnStatement(Statement):
-    def __init__(self, ret: str = "") -> None:
+    def __init__(self, ret: Expression = None) -> None:
         super().__init__()
         self.ret = ret
     
@@ -177,9 +177,7 @@ class AstVisitor(ABC):
     @abstractmethod
     def visitBlock(self, node: Block):
         for o in node.stmts:
-            ret = self.visit(o)
-            if isinstance(ret, BlockEnd):
-                break
+            self.visit(o)
 
     @abstractmethod
     def visitBlockEnd(self, node: BlockEnd):
@@ -187,16 +185,18 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
-        return self.visitBlock(node.block)
+        self.visitBlock(node.block)
 
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
-        return [self.visit(o) for o in node.args]
+        for o in node.args:
+            self.visit(o) 
 
     @abstractmethod
     def visitReturnStatement(self, node: ReturnStatement):
-        return "return"
-
+        if node.ret:
+            self.visit(node.ret)
+    
     @abstractmethod
     def visitExpressionStatement(self, node: ExpressionStatement):
         return self.visit(node.exp)
@@ -204,7 +204,7 @@ class AstVisitor(ABC):
     @abstractmethod
     def visitVariableDecl(self, node: VariableDecl):
         if node.init:
-            return self.visit(node.init)
+            self.visit(node.init)
     
     @abstractmethod
     def visitVariable(self, node: Variable):
@@ -254,15 +254,17 @@ class AstDumper(AstVisitor):
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")
+        self.inc_indent()
         self.visitBlock(node.block)
+        self.dec_indent()
     
     def visitFunctionCall(self, node: FunctionCall):
         args = [self.visit(o) for o in node.args]
         print(self.prefix + f"Function Call {node.name}, args: {args}")
     
     def visitReturnStatement(self, node: ReturnStatement):
-        print(self.prefix + f"Return {node.ret}")
-
+        print(self.prefix + f"Return {self.visit(node.ret) if node.ret else None}")
+    
     def visitExpressionStatement(self, node: ExpressionStatement):
         return super().visitExpressionStatement(node)
 

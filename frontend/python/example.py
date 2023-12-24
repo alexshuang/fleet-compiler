@@ -4,8 +4,7 @@ hello world sample
 msg = "Hello world!!"
 
 def foo():
-   return
-   msg = "new hello"
+   msg = "Hello world!!!"
    print(msg)
 
 foo()

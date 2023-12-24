@@ -50,16 +50,15 @@ class RefVisitor(AstVisitor):
     
     def visitReturnStatement(self, node: ReturnStatement):
         return super().visitReturnStatement(node)
-
+    
     def visitBlock(self, node: Block):
         self.enter()
-        ret = super().visitBlock(node)
+        super().visitBlock(node)
         self.exit()
-        return ret
     
     def visitBlockEnd(self, node: BlockEnd):
         return super().visitBlockEnd(node)
-    
+
     def visitFunctionDecl(self, node: FunctionDecl):
         self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
         return super().visitFunctionDecl(node)
