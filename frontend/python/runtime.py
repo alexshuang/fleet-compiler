@@ -109,7 +109,17 @@ class Interpreter(AstVisitor):
 
     def visitStringLiteral(self, node: StringLiteral):
         return super().visitStringLiteral(node)
+    
+    def visitSignature(self, node: Signature):
+        return super().visitSignature(node)
+    
+    def visitParameterList(self, node: ParameterList):
+        return super().visitParameterList(node)
 
+    def visitParameterDecl(self, node: ParameterDecl):
+        self.update_variable_value(node.name, self.visit(node.init))
+        return super().visitParameterDecl(node)
+    
     def enter(self):
         self.call_stack.append(StackFrame())
     

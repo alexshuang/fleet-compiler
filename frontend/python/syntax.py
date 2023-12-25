@@ -36,6 +36,35 @@ class Statement(AstNode):
         super().__init__()
 
 
+class ParameterDecl(AstNode):
+    def __init__(self, name: str, type=None, init: Expression = None) -> None:
+        super().__init__()
+        self.name = name
+        self.type = type
+        self.init = init
+
+    def accept(self, visitor):
+        return visitor.visitParameterDecl(self)
+
+
+class ParameterList(AstNode):
+    def __init__(self, params: list) -> None:
+        super().__init__()
+        self.params = params
+
+    def accept(self, visitor):
+        return visitor.visitParameterList(self)
+
+
+class Signature(AstNode):
+    def __init__(self, param_list: ParameterList) -> None:
+        super().__init__()
+        self.param_list = param_list
+
+    def accept(self, visitor):
+        return visitor.visitSignature(self)
+    
+
 class ExpressionStatement(Statement):
     def __init__(self, exp: Expression) -> None:
         super().__init__()
@@ -46,7 +75,7 @@ class ExpressionStatement(Statement):
 
 
 class Block(Statement):
-    def __init__(self, stmts: []) -> None:
+    def __init__(self, stmts: list) -> None:
         super().__init__()
         self.stmts = stmts
         self.indent = None
@@ -72,9 +101,10 @@ class AstModule(AstNode):
 
 
 class FunctionDecl(Statement):
-    def __init__(self, name: str, block: Block) -> None:
+    def __init__(self, name: str, signautre: Signature, block: Block) -> None:
         super().__init__()
         self.name = name
+        self.signature = signautre
         self.block = block
     
     def accept(self, visitor):
@@ -185,7 +215,21 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
+        self.visitSignature(node.signature)
         self.visitBlock(node.block)
+    
+    @abstractmethod
+    def visitSignature(self, node: Signature):
+        self.visitParameterList(node.param_list)
+
+    @abstractmethod
+    def visitParameterList(self, node: ParameterList):
+        for p in node.params:
+            self.visitParameterDecl(p)
+    
+    @abstractmethod
+    def visitParameterDecl(self, node: ParameterDecl):
+        pass
 
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
@@ -250,14 +294,33 @@ class AstDumper(AstVisitor):
     
     def visitBlockEnd(self, node: BlockEnd):
         self.dec_indent()
-        print(self.prefix + "BlockEnd")
+        # print(self.prefix + "BlockEnd")
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")
         self.inc_indent()
+        self.visitSignature(node.signature)
         self.visitBlock(node.block)
         self.dec_indent()
     
+    def visitSignature(self, node: Signature):
+        print(self.prefix + f"Signature")
+        self.inc_indent()
+        print(self.prefix + f"{self.visitParameterList(node.param_list)}")
+        self.dec_indent()
+    
+    def visitParameterList(self, node: ParameterList):
+        return [self.visitParameterDecl(p) for p in node.params]
+
+    def visitParameterDecl(self, node: ParameterDecl):
+        data = f"<Variable {node.name}"
+        if node.type:
+            data += f":{node.type}"
+        if node.init:
+            data += f"={self.visit(node.init)}"
+        data += ">"
+        return data
+
     def visitFunctionCall(self, node: FunctionCall):
         args = [self.visit(o) for o in node.args]
         print(self.prefix + f"Function Call {node.name}, args: {args}")

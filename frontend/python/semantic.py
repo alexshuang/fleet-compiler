@@ -37,6 +37,9 @@ class RefDumper(AstDumper):
     def visitVariable(self, node: Variable):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
         return f'arg {node.name} {ref_str}'
+    
+    def visitFunctionDecl(self, node: FunctionDecl):
+        return super().visitFunctionDecl(node)
 
 
 class RefVisitor(AstVisitor):
@@ -46,22 +49,26 @@ class RefVisitor(AstVisitor):
         self.last_scope:Scope = None
 
     def visitModule(self, node: AstModule):
-        return super().visitModule(node)
+        self.enter()
+        ret = super().visitModule(node)
+        self.exit()
+        return ret
     
     def visitReturnStatement(self, node: ReturnStatement):
         return super().visitReturnStatement(node)
     
     def visitBlock(self, node: Block):
-        self.enter()
         super().visitBlock(node)
-        self.exit()
     
     def visitBlockEnd(self, node: BlockEnd):
         return super().visitBlockEnd(node)
 
     def visitFunctionDecl(self, node: FunctionDecl):
         self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
-        return super().visitFunctionDecl(node)
+        self.enter()
+        ret = super().visitFunctionDecl(node)
+        self.exit()
+        return ret
     
     def visitFunctionCall(self, node: FunctionCall):
         node.sym = self.scope.get(node.name)
@@ -70,6 +77,16 @@ class RefVisitor(AstVisitor):
     def visitVariableDecl(self, node: VariableDecl):
         self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
         return super().visitVariableDecl(node)
+    
+    def visitSignature(self, node: Signature):
+        return super().visitSignature(node)
+    
+    def visitParameterList(self, node: ParameterList):
+        return super().visitParameterList(node)
+    
+    def visitParameterDecl(self, node: ParameterDecl):
+        self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
+        return super().visitParameterDecl(node)
     
     def visitVariable(self, node: Variable):
         node.sym = self.scope.get(node.name)

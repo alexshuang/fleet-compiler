@@ -23,15 +23,17 @@ from indentation import *
 class Parser:
     '''
     module = block
-    block = statementList | BlockEnd
+    block = statementList
     statementList = statement*
     statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
     indentation = ' '*
-    funcitonDecl = 'def' Identifier '(' ')' ':'
+    funcitonDecl = 'def' Identifier signature ':'
     functionCall = Identifier '(' args ')' terminator
+    signature = '(' parameterDecl? (',' parameterDecl)? ')' (-> Identifier)?
+    parameterDecl = Identifier typeAnnotation? ('=' expressionStatement)?
     returnStatement = 'return' expressionStatement
     terminator = '\n' | ';'
-    args = ( expression (',' expression)? )?
+    args = expression (',' expression)*
     variableDecl = Identifier typeAnnotation? '=' expressionStatement
     typeAnnotation = ':' typeName
     typeName = StringLiteral
@@ -92,25 +94,57 @@ class Parser:
             func_name = self.tokenizer.next().data # skip identifier
             t = self.tokenizer.peak()
             if t.data == '(':
-                self.tokenizer.next() # skip (
+                signature = self.parse_signature()
                 t = self.tokenizer.peak()
-                if t.data == ')':
-                    self.tokenizer.next() # skip )
-                    t = self.tokenizer.peak()
-                    if t.data == ':':
-                        self.tokenizer.next() # skip :
-                        self.skip_terminator() # skip nl
-                        func_body = self.parse_block()
-                    else:
-                        self.raise_error(f"Expect got ':' here, not {t.data}")
+                if t.data == ':':
+                    self.tokenizer.next() # skip :
+                    self.skip_terminator() # skip nl
+                    func_body = self.parse_block()
                 else:
-                    self.raise_error(f"Expect got ')' here, not {t.data}")
+                    self.raise_error(f"Expect got ':' here, not {t.data}")
             else:
                 self.raise_error(f"Expect got '(' here, not {t.data}")
         else:
             self.raise_error(f"Expect got identifier here, not {t.data}")
-        return FunctionDecl(func_name, func_body)
+        return FunctionDecl(func_name, signature, func_body)
     
+    def parse_signature(self):
+        self.tokenizer.next() # skip (
+        param_list = self.parse_parameter_list()
+        t = self.tokenizer.peak()
+        if t.data == ')':
+            self.tokenizer.next() # skip )
+        else:
+            self.raise_error(f"Expect got ')' here, not {t.data}")
+        return Signature(param_list)
+
+    def parse_parameter_list(self):
+        params = []
+        t = self.tokenizer.peak()
+        while t.kind != TokenKind.EOF and t.data != ')':
+            params.append(self.parse_parameter_decl())
+            t = self.tokenizer.peak()
+            if t.data != ')':
+                if t.data == ',':
+                    t = self.tokenizer.next()
+                else:
+                    self.raise_error(f"Expect got ',' here, not {t.data}")
+        return ParameterList(params)
+    
+    def parse_parameter_decl(self):
+        # parameterDecl = Identifier typeAnnotation? ('=' expressionStatement)?
+        name = self.tokenizer.next().data
+        type = init = None
+        
+        t = self.tokenizer.peak()
+        if t.data == ":":
+            type = self.parse_variable_type()
+            t = self.tokenizer.peak()
+        if t.data == "=":
+            init = self.parse_expression_statement()
+
+        return ParameterDecl(name, type, init)
+        
     def parse_block(self):
         self.enter()
         stmts = []
@@ -255,4 +289,4 @@ class Parser:
         self.indentation = self.last_indentation
         
     def raise_error(self, msg):
-        raise ValueError(f"{self.tokenizer.location_str} : {msg}")
+        raise SyntaxError(f"{self.tokenizer.location_str} : {msg}")
