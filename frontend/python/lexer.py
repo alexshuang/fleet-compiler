@@ -257,8 +257,8 @@ class CheckPoint:
         self.start_of_line = self.tokenizer.start_of_line
     
     def load(self):
-        self.tokenizer.pos = self.pos
-        self.tokenizer.line = self.line
-        self.tokenizer.col = self.col
+        self.tokenizer.stream.pos = self.pos
+        self.tokenizer.stream.line = self.line
+        self.tokenizer.stream.col = self.col
         self.tokenizer.start_of_line = self.start_of_line
         self.tokenizer.current_token = None
