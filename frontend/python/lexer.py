@@ -97,6 +97,7 @@ class Tokenizer:
         self.pos = 0
         self.line = 1
         self.col = 1
+        self.checkpoint = {}
 
     def next(self):
         if self.current_token == None:
@@ -241,24 +242,19 @@ class Tokenizer:
         self.col = self.stream.col
         self.pos = self.stream.pos
     
+    def save_checkpoint(self):
+        self.checkpoint['pos'] = self.pos
+        self.checkpoint['line'] = self.line
+        self.checkpoint['col'] = self.col
+        self.checkpoint['start_of_line'] = self.start_of_line
+    
+    def load_checkpoint(self):
+        self.stream.pos = self.checkpoint['pos']
+        self.stream.line = self.checkpoint['line']
+        self.stream.col = self.checkpoint['col']
+        self.start_of_line = self.checkpoint['start_of_line']
+        self.current_token = None
+
     @property
     def location_str(self):
         return f"@(line: {self.line}, col: {self.col})"
-
-
-class CheckPoint:
-    def __init__(self, tokenizer: Tokenizer) -> None:
-        self.tokenizer = tokenizer
-
-    def save(self):
-        self.pos = self.tokenizer.pos
-        self.line = self.tokenizer.line
-        self.col = self.tokenizer.col
-        self.start_of_line = self.tokenizer.start_of_line
-    
-    def load(self):
-        self.tokenizer.stream.pos = self.pos
-        self.tokenizer.stream.line = self.line
-        self.tokenizer.stream.col = self.col
-        self.tokenizer.start_of_line = self.start_of_line
-        self.tokenizer.current_token = None

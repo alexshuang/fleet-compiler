@@ -51,7 +51,6 @@ class Parser:
     def __init__(self, data="") -> None:
         self.tokenizer = Tokenizer(data)
         self.indentation = Indentation()
-        self.checkpoint = CheckPoint(self.tokenizer)
     
     def parse_module(self):
         return AstModule(self.parse_block())
