@@ -50,15 +50,13 @@ class RefVisitor(AstVisitor):
 
     def visitModule(self, node: AstModule):
         self.enter()
-        ret = super().visitModule(node)
-        self.exit()
-        return ret
+        return super().visitModule(node)
     
     def visitReturnStatement(self, node: ReturnStatement):
         return super().visitReturnStatement(node)
     
     def visitBlock(self, node: Block):
-        super().visitBlock(node)
+        return super().visitBlock(node)
     
     def visitBlockEnd(self, node: BlockEnd):
         return super().visitBlockEnd(node)
@@ -66,17 +64,8 @@ class RefVisitor(AstVisitor):
     def visitFunctionDecl(self, node: FunctionDecl):
         self.scope.update(node.name, FunctionSymbol(SymbolKind.FunctionSymbol, node))
         self.enter()
-        ret = super().visitFunctionDecl(node)
+        super().visitFunctionDecl(node)
         self.exit()
-        return ret
-    
-    def visitFunctionCall(self, node: FunctionCall):
-        node.sym = self.scope.get(node.name)
-        return super().visitFunctionCall(node)
-    
-    def visitVariableDecl(self, node: VariableDecl):
-        self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
-        return super().visitVariableDecl(node)
     
     def visitSignature(self, node: Signature):
         return super().visitSignature(node)
@@ -87,6 +76,14 @@ class RefVisitor(AstVisitor):
     def visitParameterDecl(self, node: ParameterDecl):
         self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
         return super().visitParameterDecl(node)
+    
+    def visitFunctionCall(self, node: FunctionCall):
+        node.sym = self.scope.get(node.name)
+        return super().visitFunctionCall(node)
+    
+    def visitVariableDecl(self, node: VariableDecl):
+        self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
+        return super().visitVariableDecl(node)
     
     def visitVariable(self, node: Variable):
         node.sym = self.scope.get(node.name)

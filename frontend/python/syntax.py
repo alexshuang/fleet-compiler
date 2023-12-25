@@ -229,7 +229,8 @@ class AstVisitor(ABC):
     
     @abstractmethod
     def visitParameterDecl(self, node: ParameterDecl):
-        pass
+        if node.init:
+            self.visit(node.init)
 
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):

@@ -20,13 +20,13 @@ from syntax import *
 class RetVal:
     def __init__(self, value=None) -> None:
         self.value = value
-    
+
 
 class StackFrame:
     def __init__(self) -> None:
         self.variables = {} # local variables
         self.ret: RetVal = None # return value
-    
+
     def update(self, name: str, value):
         self.variables[name] = value
 
