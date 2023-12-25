@@ -128,13 +128,18 @@ class Parser:
                 if t.data == ',':
                     t = self.tokenizer.next()
                 else:
-                    self.raise_error(f"Expect got ',' here, not {t.data}")
+                    self.raise_error(f"Expect got ',' or ')' here, not {t.data}")
         return ParameterList(params)
     
     def parse_parameter_decl(self):
         # parameterDecl = Identifier typeAnnotation? ('=' expressionStatement)?
-        name = self.tokenizer.next().data
+        t = self.tokenizer.peak()
+        if t.kind != TokenKind.Identifier:
+            self.raise_error(f"Expect got Identifier here, not {t.data}")
+
+        name = t.data
         type = init = None
+        self.tokenizer.next() # skip identifier
         
         t = self.tokenizer.peak()
         if t.data == ":":

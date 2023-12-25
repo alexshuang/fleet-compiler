@@ -20,7 +20,7 @@ print(bar())
 msg = "hello world"
 
 # def foo(msg = "hello world"):
-def foo(msg=msg):
+def foo(msg=msg,):
    print(msg)
 
 foo()

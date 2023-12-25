@@ -94,11 +94,15 @@ class Tokenizer:
         self.stream = CharStream(data)
         self.current_token = None
         self.start_of_line = True
+        self.pos = 0
+        self.line = 1
+        self.col = 1
 
     def next(self):
         if self.current_token == None:
             self.current_token = self.get_token()
         ret = self.current_token
+        self.update_cursor()
         self.current_token = self.get_token()
         return ret
 
@@ -232,6 +236,29 @@ class Tokenizer:
         err_msg = f"{self.stream.location_str} : Should end with ''' here"
         raise ValueError(err_msg)
 
+    def update_cursor(self):
+        self.line = self.stream.line
+        self.col = self.stream.col
+        self.pos = self.stream.pos
+    
     @property
     def location_str(self):
-        return f"@(line: {self.stream.line}, col: {self.stream.col})"
+        return f"@(line: {self.line}, col: {self.col})"
+
+
+class CheckPoint:
+    def __init__(self, tokenizer: Tokenizer) -> None:
+        self.tokenizer = tokenizer
+
+    def save(self):
+        self.pos = self.tokenizer.pos
+        self.line = self.tokenizer.line
+        self.col = self.tokenizer.col
+        self.start_of_line = self.tokenizer.start_of_line
+    
+    def load(self):
+        self.tokenizer.pos = self.pos
+        self.tokenizer.line = self.line
+        self.tokenizer.col = self.col
+        self.tokenizer.start_of_line = self.start_of_line
+        self.tokenizer.current_token = None
