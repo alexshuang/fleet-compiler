@@ -111,8 +111,42 @@ class FunctionDecl(Statement):
         return visitor.visitFunctionDecl(self)
 
 
+class ArgumentList(AstNode):
+    def __init__(self, args: list) -> None:
+        super().__init__()
+        self.args = args
+
+    def accept(self, visitor):
+        return visitor.visitArgumentList(self)
+
+
+class Argument(AstNode):
+    def __init__(self) -> None:
+        super().__init__()
+
+
+class PositionalArgument(Argument):
+    def __init__(self, index: int, value: Expression) -> None:
+        super().__init__()
+        self.index = index
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visitPositionalArgument(self)
+
+
+class KeywordArgument(Argument):
+    def __init__(self, name: str, value: Expression) -> None:
+        super().__init__()
+        self.name = name
+        self.value = value
+
+    def accept(self, visitor):
+        return visitor.visitKeywordArgument(self)
+
+
 class FunctionCall(Expression):
-    def __init__(self, name: str, args: list = [], sym: FunctionSymbol = None) -> None:
+    def __init__(self, name: str, args: ArgumentList, sym: FunctionSymbol = None) -> None:
         super().__init__()
         self.name = name
         self.args = args
@@ -238,10 +272,20 @@ class AstVisitor(ABC):
             self.visit(o) 
 
     @abstractmethod
+    def visitPositionalArgument(self, node: PositionalArgument):
+        if node.value:
+            return self.visit(node.value)
+
+    @abstractmethod
+    def visitKeywordArgument(self, node: KeywordArgument):
+        if node.value:
+            return self.visit(node.value)
+
+    @abstractmethod
     def visitReturnStatement(self, node: ReturnStatement):
         if node.ret:
             self.visit(node.ret)
-    
+
     @abstractmethod
     def visitExpressionStatement(self, node: ExpressionStatement):
         return self.visit(node.exp)
@@ -257,7 +301,7 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitStringLiteral(self, node: StringLiteral):
-        return node.data
+        return '"' + node.data + '"'
 
     @abstractmethod
     def visitIntegerLiteral(self, node: IntegerLiteral):
@@ -326,6 +370,12 @@ class AstDumper(AstVisitor):
         args = [self.visit(o) for o in node.args]
         print(self.prefix + f"Function Call {node.name}, args: {args}")
     
+    def visitPositionalArgument(self, node: PositionalArgument):
+        return f'<Arg {node.index} = {self.visit(node.value)}>'
+
+    def visitKeywordArgument(self, node: KeywordArgument):
+        return f'<Arg {node.name} = {self.visit(node.value)}>'
+
     def visitReturnStatement(self, node: ReturnStatement):
         print(self.prefix + f"Return {self.visit(node.ret) if node.ret else None}")
     

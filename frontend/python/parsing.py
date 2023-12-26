@@ -51,6 +51,7 @@ class Parser:
     def __init__(self, data="") -> None:
         self.tokenizer = Tokenizer(data)
         self.indentation = Indentation()
+        self.pos_idx = 0 # positional argument index 
     
     def parse_module(self):
         return AstModule(self.parse_block())
@@ -257,9 +258,10 @@ class Parser:
 
     def parse_args(self):
         args = []
+        self.pos_idx = 0
         t = self.tokenizer.peak()
         while t.kind != TokenKind.EOF and t.data != ')':
-            args.append(self.parse_expression())
+            args.append(self.parse_argument())
             t = self.tokenizer.peak()
             if t.data != ')':
                 if t.data == ',':
@@ -268,6 +270,26 @@ class Parser:
                     self.raise_error(f"Expect got ',' here, not {t.data}")
         return args
     
+    def parse_argument(self):
+        '''
+        positionalArgument = expression
+        keywordArgumentList = keywordArgument (',' keywordArgument)*
+        keywordArgument = Identifier '=' expression
+        '''
+        ret = None
+        self.tokenizer.save_checkpoint()
+        t = self.tokenizer.next()
+        if t.kind == TokenKind.Identifier and self.tokenizer.peak().data == "=":
+            self.tokenizer.next() # skip =
+            value = self.parse_expression()
+            ret = KeywordArgument(t.data, value)
+        else:
+            self.tokenizer.load_checkpoint()
+            value = self.parse_expression()
+            ret = PositionalArgument(self.pos_idx, value)
+        self.pos_idx += 1
+        return ret
+
     def parse_return(self):
         ret = None
         self.tokenizer.next() # skip return
