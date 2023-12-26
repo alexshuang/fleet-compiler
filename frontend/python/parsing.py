@@ -19,6 +19,17 @@ from syntax import *
 from dtype import *
 from indentation import *
 
+class PositionalArgumentIndex:
+    def __init__(self, parent=None) -> None:
+        self.parent = parent
+        self.value = 0
+    
+    def get(self):
+        return self.value
+    
+    def inc(self):
+        self.value += 1
+
 
 class Parser:
     '''
@@ -50,8 +61,8 @@ class Parser:
     '''
     def __init__(self, data="") -> None:
         self.tokenizer = Tokenizer(data)
-        self.indentation = Indentation()
-        self.pos_idx = 0 # positional argument index 
+        self.indentation = None
+        self.pos_arg_idx = None
     
     def parse_module(self):
         return AstModule(self.parse_block())
@@ -60,18 +71,28 @@ class Parser:
         '''
         statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
         '''
+        # indentation
+        # There should be no indentation in the first scope
         t = self.tokenizer.peak()
-        if t.kind != TokenKind.Indentation:
-            self.raise_error(f"Expect indentation here, not {t.kind}@{t.data}")
-        if self.indentation.match(t.data):
-            self.tokenizer.next() # skip indent
-        else:
-            if self.indentation.match_parent(t.data):
-                # implicitly add a return depending on the indentation
+        if self.indentation:
+            if t.kind != TokenKind.Indentation:
+                # main scope doesn't have indentation
+                if not self.indentation.parent:
+                    return BlockEnd()
+                else:
+                    self.raise_error(f"Expect indentation here, not {t.kind}@{t.data}")
+            if self.indentation.match(t.data):
                 self.tokenizer.next() # skip indent
-                return BlockEnd()
             else:
-                self.raise_error("Unexpected indentation")
+                if self.indentation.match_parent(t.data):
+                    # implicitly add a return depending on the indentation
+                    self.tokenizer.next() # skip indent
+                    return BlockEnd()
+                else:
+                    self.raise_error(f"Unexpected indentation, got {len(t.data)} blanks")
+        else:
+            if t.kind == TokenKind.Indentation:
+                self.raise_error(f"Unexpected indentation, got {len(t.data)} blanks")
 
         t = self.tokenizer.peak()
         if t.data == "def":
@@ -100,7 +121,9 @@ class Parser:
                 if t.data == ':':
                     self.tokenizer.next() # skip :
                     self.skip_terminator() # skip nl
+                    self.enter()
                     func_body = self.parse_block()
+                    self.exit()
                 else:
                     self.raise_error(f"Expect got ':' here, not {t.data}")
             else:
@@ -152,7 +175,6 @@ class Parser:
         return ParameterDecl(name, type, init)
         
     def parse_block(self):
-        self.enter()
         stmts = []
         while self.tokenizer.peak().kind != TokenKind.EOF:
             stmt = self.parse_statement()
@@ -160,7 +182,6 @@ class Parser:
                 stmts.append(stmt)
             if isinstance(stmt, BlockEnd):
                 break
-        self.exit()
         return Block(stmts)
 
     def parse_identifier(self):
@@ -226,7 +247,7 @@ class Parser:
         return self.parse_primary()
     
     def parse_primary(self):
-        t = self.tokenizer.next()
+        t = self.tokenizer.next() # skip identifier
         if t.kind == TokenKind.StringLiteral:
             return StringLiteral(t.data)
         elif t.kind == TokenKind.IntegerLiteral:
@@ -247,7 +268,7 @@ class Parser:
 
     def parse_arg_list(self):
         args = []
-        self.pos_idx = 0
+        self.pos_arg_idx = PositionalArgumentIndex(self.pos_arg_idx)
         self.tokenizer.next() # skip (
         t = self.tokenizer.peak()
         while t.kind != TokenKind.EOF and t.data != ')':
@@ -261,12 +282,14 @@ class Parser:
         t = self.tokenizer.peak()
         if t.data == ')':
             self.tokenizer.next() # skip )
+            self.pos_arg_idx = self.pos_arg_idx.parent
         else:
             self.raise_error(f"Expect got ')' here, not {t.data}")
         return ArgumentList(args)
 
     def parse_argument(self):
         '''
+        positionalArgumentList = positionalArgument (',' positionalArgument)*
         positionalArgument = expression
         keywordArgumentList = keywordArgument (',' keywordArgument)*
         keywordArgument = Identifier '=' expression
@@ -281,8 +304,8 @@ class Parser:
         else:
             self.tokenizer.load_checkpoint()
             value = self.parse_expression()
-            ret = PositionalArgument(self.pos_idx, value)
-        self.pos_idx += 1
+            ret = PositionalArgument(self.pos_arg_idx.get(), value)
+        self.pos_arg_idx.inc()
         return ret
 
     def parse_return(self):
@@ -303,12 +326,11 @@ class Parser:
 
     def enter(self):
         # enter new indent
-        self.last_indentation = self.indentation
         self.indentation = Indentation(self.indentation)
 
     def exit(self):
         # back to last indent
-        self.indentation = self.last_indentation
+        self.indentation = self.indentation.parent
         
     def raise_error(self, msg):
         raise SyntaxError(f"{self.tokenizer.location_str} : {msg}")

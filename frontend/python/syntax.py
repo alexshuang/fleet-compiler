@@ -43,6 +43,15 @@ class ParameterDecl(AstNode):
         self.type = type
         self.init = init
 
+    # def __str__(self):
+    #     data = f"<Parameter {node.name}"
+    #     if node.type:
+    #         data += f":{node.type}"
+    #     if node.init:
+    #         data += f"={self.visit(node.init)}"
+    #     data += ">"
+        
+        
     def accept(self, visitor):
         return visitor.visitParameterDecl(self)
 
@@ -126,8 +135,9 @@ class Argument(AstNode):
 
 
 class PositionalArgument(Argument):
-    def __init__(self, index: int, value: Expression) -> None:
+    def __init__(self, index, value: Expression) -> None:
         super().__init__()
+        print(f"pos_arg: index = {index}, value = {value}")
         self.index = index
         self.value = value
 
@@ -340,11 +350,10 @@ class AstDumper(AstVisitor):
         print(self.prefix + "Block:")
         self.inc_indent()
         for o in node.stmts:
-            self.visit(o)
+            print(self.prefix + f"{self.visit(o)}")
     
     def visitBlockEnd(self, node: BlockEnd):
         self.dec_indent()
-        # print(self.prefix + "BlockEnd")
 
     def visitFunctionDecl(self, node: FunctionDecl):
         print(self.prefix + f"Function Decl {node.name}")
@@ -373,7 +382,7 @@ class AstDumper(AstVisitor):
 
     def visitFunctionCall(self, node: FunctionCall):
         args = self.visitArgumentList(node.arg_list)
-        print(self.prefix + f"Function Call {node.name}, args: {args}")
+        return f"Function Call {node.name}, args: {args}"
     
     def visitArgumentList(self, node: ArgumentList):
         return [self.visit(o) for o in node.args]

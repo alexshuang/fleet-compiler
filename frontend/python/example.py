@@ -18,14 +18,19 @@ print(bar())
 '''
 
 def foo(msg, msg2=" nested"):
-   print(msg, msg2)
+   def bar():
+      return "hello bar"
+   
+   print(msg, bar())
 
-msg = "hello world"
 foo(msg="hello world2")
-foo(msg=msg)
-foo(msg)
-foo(msg2="not nested", msg=msg)
-msg1 = "hello world!!!"
-print(msg1)
-foo(msg2=msg1, msg=msg)
-foo(msg=msg1, msg2=msg)
+
+# msg = "hello world"
+# foo(msg="hello world2")
+# foo(msg=msg)
+# foo(msg)
+# foo(msg2="not nested", msg=msg)
+# msg1 = "hello world!!!"
+# print(msg1)
+# foo(msg2=msg1, msg=msg)
+# foo(msg=msg1, msg2=msg)

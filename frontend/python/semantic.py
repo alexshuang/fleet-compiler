@@ -30,10 +30,9 @@ semantic_anlyisys_pipeline = []
 class RefDumper(AstDumper):
     def visitFunctionCall(self, node: FunctionCall):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
-        print(self.prefix + f"Function Call {node.name}, arg_list: {node.arg_list}  {ref_str}")
-        if node.arg_list:
-            for o in node.arg_list.args:
-                print(self.prefix + f"    {self.visit(o)}")
+        args = [self.visit(o) for o in node.arg_list.args]
+        msg = f"Function Call {node.name}, arg_list: {args}  {ref_str}"
+        return self.prefix + msg
 
     def visitVariable(self, node: Variable):
         ref_str = "(resolved)" if node.sym else "(not resolved)"

@@ -33,7 +33,7 @@ class StackFrame:
     def get(self, name: str):
         return self.variables[name] if name in self.variables else None
     
-    def set_ret(self, ret: RetVal):
+    def set_ret(self, ret):
         self.ret = ret
 
     def get_ret(self):
@@ -94,10 +94,11 @@ class Interpreter(AstVisitor):
                 self.update_variable_value(k, v)
 
             # body
-            ret = self.visit(node.sym.node)
+            self.visit(node.sym.node)
 
             self.exit()
-            return ret
+
+            return self.get_ret()
         else:
             if node.name == "print":
                 args = self.visitArgumentList(node.arg_list)
@@ -179,6 +180,12 @@ class Interpreter(AstVisitor):
             frame.update(name, value)
 
     def set_ret(self, value):
-        frame = self.call_stack[-1]
+        # frame = self.call_stack[-1]
+        frame = self.call_stack[-2]
         if frame:
             frame.set_ret(value)
+    
+    def get_ret(self):
+        frame = self.call_stack[-1]
+        if frame:
+            return frame.get_ret()

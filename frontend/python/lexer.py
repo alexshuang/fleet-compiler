@@ -117,8 +117,11 @@ class Tokenizer:
             return Token()
 
         if self.start_of_line == True:
+            while self.stream.peak() == '\n':
+                self.stream.next()
             self.start_of_line = False
-            return self.parse_indentation()
+            if self.stream.peak() == ' ':
+                return self.parse_indentation()
         else:
             self.skip_white_space()
 
