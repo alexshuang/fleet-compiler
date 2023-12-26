@@ -146,10 +146,10 @@ class KeywordArgument(Argument):
 
 
 class FunctionCall(Expression):
-    def __init__(self, name: str, args: ArgumentList, sym: FunctionSymbol = None) -> None:
+    def __init__(self, name: str, arg_list: ArgumentList, sym: FunctionSymbol = None) -> None:
         super().__init__()
         self.name = name
-        self.args = args
+        self.arg_list = arg_list
         self.sym = sym
     
     def accept(self, visitor):
@@ -268,9 +268,14 @@ class AstVisitor(ABC):
 
     @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
-        for o in node.args:
-            self.visit(o) 
+        if node.arg_list:
+            self.visitArgumentList(node.arg_list) 
 
+    @abstractmethod
+    def visitArgumentList(self, node: ArgumentList):
+        for o in node.args:
+            self.visit(o)
+        
     @abstractmethod
     def visitPositionalArgument(self, node: PositionalArgument):
         if node.value:
@@ -367,8 +372,11 @@ class AstDumper(AstVisitor):
         return data
 
     def visitFunctionCall(self, node: FunctionCall):
-        args = [self.visit(o) for o in node.args]
+        args = self.visitArgumentList(node.arg_list)
         print(self.prefix + f"Function Call {node.name}, args: {args}")
+    
+    def visitArgumentList(self, node: ArgumentList):
+        return [self.visit(o) for o in node.args]
     
     def visitPositionalArgument(self, node: PositionalArgument):
         return f'<Arg {node.index} = {self.visit(node.value)}>'

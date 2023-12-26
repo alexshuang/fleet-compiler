@@ -50,14 +50,14 @@ def main():
     ast_dumper = AstDumper()
     ast_dumper.visit(module)
 
-    # print("\nreferenced AST:")
-    # ref_dumper = RefDumper()
-    # RefVisitor().visit(module)
-    # ref_dumper.visit(module)
+    print("\nreferenced AST:")
+    ref_dumper = RefDumper()
+    RefVisitor().visit(module)
+    ref_dumper.visit(module)
 
-    # print("\nrun:")
-    # interpreter = Interpreter()
-    # interpreter.visit(module)
+    print("\nrun:")
+    interpreter = Interpreter()
+    interpreter.visit(module)
 
 
 if __name__ == "__main__":

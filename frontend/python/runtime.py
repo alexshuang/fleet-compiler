@@ -46,6 +46,7 @@ class Interpreter(AstVisitor):
         self.call_stack = []
     
     def visitModule(self, node: AstModule):
+        self.enter()
         return super().visitModule(node)
 
     def visitBlock(self, node: Block):
@@ -54,13 +55,11 @@ class Interpreter(AstVisitor):
             return not isinstance(node, FunctionDecl)
 
         ret = None
-        self.enter()
         for o in node.stmts:
             if should_run(o):
                 ret = self.visit(o)
                 if isinstance(ret, RetVal):
                     break
-        self.exit()
 
         if isinstance(ret, RetVal) and ret.value:
             self.set_ret(ret.value)
@@ -70,14 +69,52 @@ class Interpreter(AstVisitor):
     
     def visitFunctionCall(self, node: FunctionCall):
         if node.sym:
-            return self.visit(node.sym.node)
+            self.enter()
+
+            # args
+            func = node.sym.node
+            params = func.signature.param_list.params
+            args = node.arg_list.args
+            num_args = len(args)
+            num_params = len(params)
+            if num_params < num_args:
+                raise TypeError(f"Interpreter: Expect {num_params} arguments but got {num_args}")
+
+            names, values = [], []
+            for i, arg in enumerate(args):
+                names.append(params[i].name if isinstance(arg, PositionalArgument) else arg.name)
+                values.append(self.visit(arg.value))
+            # args with default-value
+            for p in params[num_args:]:
+                names.append(p.name)
+                values.append(self.visit(p.init))
+
+            # set variable values
+            for k, v in zip(names, values):
+                self.update_variable_value(k, v)
+
+            # body
+            ret = self.visit(node.sym.node)
+
+            self.exit()
+            return ret
         else:
             if node.name == "print":
-                args = [self.visit(o) for o in node.args]
+                args = self.visitArgumentList(node.arg_list)
                 print(args)
             else:
-                raise ValueError(f"Interpreter: Unsupport instruction {node.name}")
+                raise TypeError(f"Interpreter: Unsupport operation or function {node.name}")
     
+    def visitArgumentList(self, node: ArgumentList):
+        args = [self.visit(o) for o in node.args if o]
+        return args if len(args) > 0 else ""
+    
+    def visitPositionalArgument(self, node: PositionalArgument):
+        return super().visitPositionalArgument(node)
+
+    def visitKeywordArgument(self, node: KeywordArgument):
+        return super().visitKeywordArgument(node)
+
     def visitVariableDecl(self, node: VariableDecl):
         self.update_variable_value(node.name, self.visit(node.init))
         return super().visitVariableDecl(node)
@@ -90,7 +127,7 @@ class Interpreter(AstVisitor):
         return RetVal(value)
 
     def visitFunctionDecl(self, node: FunctionDecl):
-        return super().visitFunctionDecl(node)
+        return super().visitBlock(node.block)
     
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return super().visitDecimalLiteral(node)

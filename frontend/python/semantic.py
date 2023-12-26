@@ -30,17 +30,15 @@ semantic_anlyisys_pipeline = []
 class RefDumper(AstDumper):
     def visitFunctionCall(self, node: FunctionCall):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
-        print(self.prefix + f"Function Call {node.name}, args: {node.args}  {ref_str}")
-        for o in node.args:
-            print(self.prefix + f"    {self.visit(o)}")
+        print(self.prefix + f"Function Call {node.name}, arg_list: {node.arg_list}  {ref_str}")
+        if node.arg_list:
+            for o in node.arg_list.args:
+                print(self.prefix + f"    {self.visit(o)}")
 
     def visitVariable(self, node: Variable):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
         return f'arg {node.name} {ref_str}'
     
-    def visitFunctionDecl(self, node: FunctionDecl):
-        return super().visitFunctionDecl(node)
-
 
 class RefVisitor(AstVisitor):
     def __init__(self) -> None:
@@ -69,35 +67,44 @@ class RefVisitor(AstVisitor):
     
     def visitSignature(self, node: Signature):
         return super().visitSignature(node)
-    
+
     def visitParameterList(self, node: ParameterList):
         return super().visitParameterList(node)
-    
+
     def visitParameterDecl(self, node: ParameterDecl):
         self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
         return super().visitParameterDecl(node)
-    
+
     def visitFunctionCall(self, node: FunctionCall):
         node.sym = self.scope.get(node.name)
         return super().visitFunctionCall(node)
+
+    def visitArgumentList(self, node: ArgumentList):
+        return super().visitArgumentList(node)
     
+    def visitPositionalArgument(self, node: PositionalArgument):
+        return super().visitPositionalArgument(node)
+
+    def visitKeywordArgument(self, node: KeywordArgument):
+        return super().visitKeywordArgument(node)
+
     def visitVariableDecl(self, node: VariableDecl):
         self.scope.update(node.name, VariableSymbol(SymbolKind.VariableSymbol, node))
         return super().visitVariableDecl(node)
-    
+
     def visitVariable(self, node: Variable):
         node.sym = self.scope.get(node.name)
         return super().visitVariable(node)
-    
+
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return super().visitDecimalLiteral(node)
-    
+
     def visitEmptyStatement(self, node: EmptyStatement):
         return super().visitEmptyStatement(node)
-    
+
     def visitExpressionStatement(self, node: ExpressionStatement):
         return super().visitExpressionStatement(node)
-    
+
     def visitIntegerLiteral(self, node: IntegerLiteral):
         return super().visitIntegerLiteral(node)
 

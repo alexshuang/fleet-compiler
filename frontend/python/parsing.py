@@ -182,8 +182,8 @@ class Parser:
             init = self.parse_expression_statement()
             ret = VariableDecl(name, None, init)
         elif t.data == "(":
-            args = self.parse_function_args()
-            ret = FunctionCall(name, args)
+            arg_list = self.parse_arg_list()
+            ret = FunctionCall(name, arg_list)
         else:
             self.raise_error(f"Unsupport statement which start with {t.data}")
         self.skip_terminator()
@@ -200,17 +200,6 @@ class Parser:
                 self.raise_error(f"Unsupport data type {t.data}")
         else:
             self.raise_error(f"Invalid data type {t.data}")
-
-    def parse_function_args(self):
-        self.tokenizer.next() # skip (
-        t = self.tokenizer.peak()
-        args = self.parse_args() if t.data != ')' else []
-        t = self.tokenizer.peak()
-        if t.data == ')':
-            self.tokenizer.next() # skip )
-        else:
-            self.raise_error(f"Expect got ')' here, not {t.data}")
-        return args
 
     def parse_expression_statement(self):
         self.tokenizer.next() # skip =
@@ -249,16 +238,17 @@ class Parser:
         elif t.kind == TokenKind.Identifier:
             if self.tokenizer.peak().data == '(':
                 name = t.data
-                args = self.parse_function_args()
-                return FunctionCall(name, args)
+                arg_list = self.parse_arg_list()
+                return FunctionCall(name, arg_list)
             else:
                 return Variable(t.data)
         else:
             self.raise_error(f"Unsupport primary {t.kind}@{t.data}")
 
-    def parse_args(self):
+    def parse_arg_list(self):
         args = []
         self.pos_idx = 0
+        self.tokenizer.next() # skip (
         t = self.tokenizer.peak()
         while t.kind != TokenKind.EOF and t.data != ')':
             args.append(self.parse_argument())
@@ -268,8 +258,13 @@ class Parser:
                     t = self.tokenizer.next()
                 else:
                     self.raise_error(f"Expect got ',' here, not {t.data}")
-        return args
-    
+        t = self.tokenizer.peak()
+        if t.data == ')':
+            self.tokenizer.next() # skip )
+        else:
+            self.raise_error(f"Expect got ')' here, not {t.data}")
+        return ArgumentList(args)
+
     def parse_argument(self):
         '''
         positionalArgument = expression
