@@ -43,15 +43,6 @@ class ParameterDecl(AstNode):
         self.type = type
         self.init = init
 
-    # def __str__(self):
-    #     data = f"<Parameter {node.name}"
-    #     if node.type:
-    #         data += f":{node.type}"
-    #     if node.init:
-    #         data += f"={self.visit(node.init)}"
-    #     data += ">"
-        
-        
     def accept(self, visitor):
         return visitor.visitParameterDecl(self)
 
@@ -137,7 +128,6 @@ class Argument(AstNode):
 class PositionalArgument(Argument):
     def __init__(self, index, value: Expression) -> None:
         super().__init__()
-        print(f"pos_arg: index = {index}, value = {value}")
         self.index = index
         self.value = value
 
@@ -350,7 +340,9 @@ class AstDumper(AstVisitor):
         print(self.prefix + "Block:")
         self.inc_indent()
         for o in node.stmts:
-            print(self.prefix + f"{self.visit(o)}")
+            ret = self.visit(o)
+            if ret:
+                print(self.prefix + f"{ret}")
     
     def visitBlockEnd(self, node: BlockEnd):
         self.dec_indent()
@@ -372,11 +364,11 @@ class AstDumper(AstVisitor):
         return [self.visitParameterDecl(p) for p in node.params]
 
     def visitParameterDecl(self, node: ParameterDecl):
-        data = f"<Variable {node.name}"
+        data = f"<Parameter {node.name}"
         if node.type:
-            data += f":{node.type}"
+            data += f": {node.type}"
         if node.init:
-            data += f"={self.visit(node.init)}"
+            data += f" = {self.visit(node.init)}"
         data += ">"
         return data
 
@@ -394,14 +386,14 @@ class AstDumper(AstVisitor):
         return f'<Arg {node.name} = {self.visit(node.value)}>'
 
     def visitReturnStatement(self, node: ReturnStatement):
-        print(self.prefix + f"Return {self.visit(node.ret) if node.ret else None}")
+        return f"Return {self.visit(node.ret) if node.ret else None}"
     
     def visitExpressionStatement(self, node: ExpressionStatement):
         return super().visitExpressionStatement(node)
 
     def visitVariableDecl(self, node: VariableDecl):
         init = self.visitExpressionStatement(node.init)
-        print(self.prefix + f"Variable Decl {node.name}, init: {init}")
+        return f"Variable Decl {node.name}, init: {init}"
 
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return super().visitIntegerLiteral(node)

@@ -31,8 +31,7 @@ class RefDumper(AstDumper):
     def visitFunctionCall(self, node: FunctionCall):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
         args = [self.visit(o) for o in node.arg_list.args]
-        msg = f"Function Call {node.name}, arg_list: {args}  {ref_str}"
-        return self.prefix + msg
+        return f"Function Call {node.name}, arg_list: {args}  {ref_str}"
 
     def visitVariable(self, node: Variable):
         ref_str = "(resolved)" if node.sym else "(not resolved)"
