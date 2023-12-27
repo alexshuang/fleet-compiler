@@ -283,7 +283,7 @@ class AstVisitor:
 
     def visitKeywordArgument(self, node: KeywordArgument):
         if node.value:
-            return self.visit(node.value)
+            return {node.name, self.visit(node.value)}
 
     def visitReturnStatement(self, node: ReturnStatement):
         if node.ret:

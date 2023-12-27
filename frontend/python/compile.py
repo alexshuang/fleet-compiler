@@ -54,20 +54,12 @@ def main():
     pipeline = Pipeline()
     pipeline.add(ReferenceResolvePass())
     pipeline.add(ReplaceAliasOperationNamePass())
+    pipeline.add(BuiltinReferenceResolvePass())
     pipeline.run(module, True)
 
-    # print("\nreferenced AST:")
-    # ref_dumper = RefDumper()
-    # RefVisitor().visit(module)
-    # ref_dumper.visit(module)
-
-    # print("\nreplaced function name AST:")
-    # ImportVisitor().visit(module)
-    # ref_dumper.visit(module)
-
-    # print("\nrun:")
-    # interpreter = Interpreter()
-    # interpreter.visit(module)
+    print("\nrun:")
+    interpreter = Interpreter()
+    interpreter.visit(module)
 
 
 if __name__ == "__main__":

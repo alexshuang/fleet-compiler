@@ -83,9 +83,28 @@ class ReplaceAliasOperationNamePass(Pass):
 
     def visitFunctionCall(self, node: FunctionCall):
         # replace function name
-        if '.' in node.name:
-            alias = node.name.split('.')[0]
-            if alias in self.alias_tab:
-                node.name = '.'.join([self.alias_tab[alias]] + \
-                    node.name.split('.')[1:])
+        if node.sym is None:
+            if '.' in node.name:
+                alias = node.name.split('.')[0]
+                if alias in self.alias_tab:
+                    node.name = '.'.join([self.alias_tab[alias]] + \
+                        node.name.split('.')[1:])
+        return super().visitFunctionCall(node)
+
+
+class BuiltinReferenceResolvePass(Pass):
+    '''
+    find the target built-in function for unsolved function call.
+    '''
+    def __init__(self) -> None:
+        super().__init__()
+        self.builtins = ['print']
+
+    def visitFunctionCall(self, node: FunctionCall):
+        # replace function name
+        if node.sym is None:
+            parts = node.name.split('.')
+            pkg_or_func = parts[0]
+            if pkg_or_func in self.builtins:
+                node.name = 'python.' + '.'.join(parts[:-1]) + "_" + parts[-1]
         return super().visitFunctionCall(node)

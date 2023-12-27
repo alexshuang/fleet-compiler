@@ -15,6 +15,7 @@
 # ===---------------------------------------------------------------------------
 
 from syntax import *
+from ops import Operation
 
 
 class RetVal:
@@ -38,6 +39,7 @@ class Interpreter(AstVisitor):
     def __init__(self) -> None:
         super().__init__()
         self.call_stack = []
+        self.ops = Operation()
     
     def visitModule(self, node: AstModule):
         self.enter()
@@ -61,7 +63,7 @@ class Interpreter(AstVisitor):
         return RetVal()
     
     def visitFunctionCall(self, node: FunctionCall):
-        if node.sym:
+        if node.sym: # function decl
             self.enter() # push
 
             # args
@@ -90,14 +92,20 @@ class Interpreter(AstVisitor):
             ret = self.visitBlock(func.block)
 
             self.exit() # pop
-
-            return ret
         else:
-            if node.name == "print":
-                args = self.visitArgumentList(node.arg_list)
-                print(args)
+            # third-party or built-in operators
+            arg_list = self.visitArgumentList(node.arg_list)
+            args, kwargs = [], {}
+            for o in arg_list:
+                if isinstance(o, dict):
+                    kwargs.update(o)
+                else:
+                    args.append(o)
+            if self.ops.has(node.name):
+                ret = self.ops.lookup(node.name)(args, kwargs)
             else:
-                raise TypeError(f"Interpreter: Unsupport operation or function {node.name}")
+                raise TypeError(f"Interpreter: Unsupport operation {node.name}")
+        return ret
     
     def visitArgumentList(self, node: ArgumentList):
         args = [self.visit(o) for o in node.args if o]
@@ -161,9 +169,9 @@ class Interpreter(AstVisitor):
         value = None
         for i in range(len(self.call_stack) - 1, -1, -1):
             value = self.call_stack[i].get(name)
-            if value:
+            if value is not None:
                 break
-        if value == None:
+        if value is None:
             raise NameError(f"name {name} is not defined")
         return value
 
