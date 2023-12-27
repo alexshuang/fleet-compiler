@@ -65,6 +65,16 @@ class Signature(AstNode):
         return visitor.visitSignature(self)
     
 
+class ImportStatement(Statement):
+    def __init__(self, package: str, alias: str = "") -> None:
+        super().__init__()
+        self.package = package
+        self.alias = alias
+    
+    def accept(self, visitor):
+        return visitor.visitImportStatement(self)
+
+
 class ExpressionStatement(Statement):
     def __init__(self, exp: Expression) -> None:
         super().__init__()
@@ -324,6 +334,10 @@ class AstVisitor(ABC):
     def visitEmptyStatement(self, node: EmptyStatement):
         pass
 
+    @abstractmethod
+    def visitImportStatement(self, node: ImportStatement):
+        pass
+
 
 class AstDumper(AstVisitor):
     def __init__(self, prefix="") -> None:
@@ -412,6 +426,9 @@ class AstDumper(AstVisitor):
 
     def visitEmptyStatement(self, node: EmptyStatement):
         return super().visitEmptyStatement(node)
+
+    def visitImportStatement(self, node: ImportStatement):
+        return f"Import {node.package} as {node.alias}"
 
     def inc_indent(self):
         self.prefix += "  "

@@ -55,9 +55,13 @@ def main():
     RefVisitor().visit(module)
     ref_dumper.visit(module)
 
-    print("\nrun:")
-    interpreter = Interpreter()
-    interpreter.visit(module)
+    print("\nreplaced function name AST:")
+    ImportVisitor().visit(module)
+    ref_dumper.visit(module)
+
+    # print("\nrun:")
+    # interpreter = Interpreter()
+    # interpreter.visit(module)
 
 
 if __name__ == "__main__":

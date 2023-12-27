@@ -112,9 +112,93 @@ class RefVisitor(AstVisitor):
     def visitStringLiteral(self, node: StringLiteral):
         return super().visitStringLiteral(node)
     
+    def visitImportStatement(self, node: ImportStatement):
+        return super().visitImportStatement(node)
+
     def enter(self):
         self.last_scope = self.scope
         self.scope = Scope(self.scope)
     
     def exit(self):
         self.scope = self.last_scope
+
+
+class ImportVisitor(AstVisitor):
+    '''
+    Replace the function name of the imported alias package with the original package.
+    for example, replace 'np.matmul' with 'numpy.matmul' while 'import numpy as np'.
+    '''
+    def __init__(self) -> None:
+        super().__init__()
+        self.alias_tab = {}
+
+    def visitImportStatement(self, node: ImportStatement):
+        if node.alias != "":
+            self.alias_tab[node.alias] = node.package
+
+    def visitFunctionCall(self, node: FunctionCall):
+        # replace function name
+        # import pdb; pdb.set_trace()
+        if '.' in node.name:
+            alias = node.name.split('.')[0]
+            if alias in self.alias_tab:
+                node.name = '.'.join([self.alias_tab[alias]] + \
+                    node.name.split('.')[1:])
+        return super().visitFunctionCall(node)
+
+    def visitModule(self, node: AstModule):
+        return super().visitModule(node)
+    
+    def visitReturnStatement(self, node: ReturnStatement):
+        return super().visitReturnStatement(node)
+    
+    def visitBlock(self, node: Block):
+        return super().visitBlock(node)
+    
+    def visitBlockEnd(self, node: BlockEnd):
+        return super().visitBlockEnd(node)
+
+    def visitFunctionDecl(self, node: FunctionDecl):
+        return super().visitFunctionDecl(node)
+    
+    def visitSignature(self, node: Signature):
+        return super().visitSignature(node)
+
+    def visitParameterList(self, node: ParameterList):
+        return super().visitParameterList(node)
+
+    def visitParameterDecl(self, node: ParameterDecl):
+        return super().visitParameterDecl(node)
+
+    def visitArgumentList(self, node: ArgumentList):
+        return super().visitArgumentList(node)
+    
+    def visitPositionalArgument(self, node: PositionalArgument):
+        return super().visitPositionalArgument(node)
+
+    def visitKeywordArgument(self, node: KeywordArgument):
+        return super().visitKeywordArgument(node)
+
+    def visitVariableDecl(self, node: VariableDecl):
+        return super().visitVariableDecl(node)
+
+    def visitVariable(self, node: Variable):
+        return super().visitVariable(node)
+
+    def visitDecimalLiteral(self, node: DecimalLiteral):
+        return super().visitDecimalLiteral(node)
+
+    def visitEmptyStatement(self, node: EmptyStatement):
+        return super().visitEmptyStatement(node)
+
+    def visitExpressionStatement(self, node: ExpressionStatement):
+        return super().visitExpressionStatement(node)
+
+    def visitIntegerLiteral(self, node: IntegerLiteral):
+        return super().visitIntegerLiteral(node)
+
+    def visitNoneLiteral(self, node: NoneLiteral):
+        return super().visitNoneLiteral(node)
+    
+    def visitStringLiteral(self, node: StringLiteral):
+        return super().visitStringLiteral(node)

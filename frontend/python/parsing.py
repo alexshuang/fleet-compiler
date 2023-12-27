@@ -36,7 +36,8 @@ class Parser:
     module = block
     block = statementList
     statementList = statement*
-    statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
+    statement = indentation (functionDecl | functionCall | returnStatement | \
+        variableDecl | expressionStatement | emptyStatement | importStatement)
     indentation = ' '*
     funcitonDecl = 'def' Identifier signature ':'
     functionCall = Identifier '(' args ')' terminator
@@ -49,6 +50,8 @@ class Parser:
     typeAnnotation = ':' typeName
     typeName = StringLiteral
     emptyStatement = terminator
+    importStatement = 'import' package ('as' Identifier)? terminator
+    package = Identifier ('.' Identifier)*
     expressionStatement = expression terminator
     expression = assignment
     assignment = binary (assignmentOp binary)*
@@ -102,6 +105,8 @@ class Parser:
             ret = self.parse_function_decl()
         elif t.data == "return":
             ret = self.parse_return()
+        elif t.data == "import":
+            ret = self.parse_import()
         elif t.kind == TokenKind.Identifier:
             ret = self.parse_identifier()
         elif t.kind == TokenKind.Terminator: # empty statement
@@ -111,6 +116,19 @@ class Parser:
             self.raise_error(f"Unrecognized token {t.data}, kind {t.kind}")
         self.skip_terminator()
         return ret
+    
+    def parse_import(self):
+        alias = ""
+        self.tokenizer.next() # skip import
+        t = self.tokenizer.peak()
+        if t.kind == TokenKind.Identifier:
+            pkg = self.tokenizer.next().data
+            if self.tokenizer.peak().data == 'as':
+                self.tokenizer.next() # skip as
+                alias = self.tokenizer.next().data
+            return ImportStatement(pkg, alias)
+        else:
+            self.raise_error(f"Expect got identifier here, not {t.data}")
     
     def parse_function_decl(self):
         self.tokenizer.next() # skip def

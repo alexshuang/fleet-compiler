@@ -17,6 +17,7 @@ print(msg)
 print(bar())
 '''
 
+'''
 def foo(msg, msg2=" nested"):
    def bar():
       return "hello bar"
@@ -40,3 +41,11 @@ msg1 = "hello world!!!"
 print(msg1)
 foo(msg2=msg1, msg=msg)
 foo(msg=msg1, msg2=msg)
+'''
+
+import numpy as np
+
+a = np.random.randn(3, 3)
+b = np.random.randn(3, 5)
+c = np.matmul(a, b)
+print(c)

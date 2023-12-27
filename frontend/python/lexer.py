@@ -177,7 +177,7 @@ class Tokenizer:
 
     def parse_identifier(self):
         def is_valid(ch):
-            return is_alpha(ch) or is_digit(ch) or ch == '_'
+            return is_alpha(ch) or is_digit(ch) or ch == '_' or ch == '.'
         
         data = ""
         while not self.stream.eof() and not is_separator(self.stream.peak()):
