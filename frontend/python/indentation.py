@@ -18,7 +18,7 @@ class Indentation:
     def __init__(self, parent=None) -> None:
         self.data = None
         self.parent = parent # parent scope
-    
+
     def match(self, data: str):
         if self.data:
             if self.data != data:
@@ -27,8 +27,8 @@ class Indentation:
             self.data = data
         return True
     
-    def match_parent(self, data: str):
-        if self.parent:
-            if self.parent.data == data:
-                return True
-        return False
+    def match_parents(self, data: str):
+        if self.parent.data == data:
+            return True
+        else:
+            return self.parent.match_parents(data) if self.parent else None

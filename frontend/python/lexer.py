@@ -80,7 +80,8 @@ class TokenKind(Enum):
     NoneLiteral = 7
     Terminator = 8
     Indentation = 9
-    EOF = 10
+    Newline = 10
+    EOF = 11
 
 
 class Token:
@@ -117,8 +118,10 @@ class Tokenizer:
             return Token()
 
         if self.start_of_line == True:
-            while self.stream.peak() == '\n':
+            if self.stream.peak() == '\n':
                 self.stream.next()
+                return Token(TokenKind.Newline)
+
             self.start_of_line = False
             if self.stream.peak() == ' ':
                 return self.parse_indentation()

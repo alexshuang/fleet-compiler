@@ -63,38 +63,41 @@ class Parser:
         self.tokenizer = Tokenizer(data)
         self.indentation = None
         self.pos_arg_idx = None
+        self.not_allow_indent = True # not allow indent in main phase
     
     def parse_module(self):
         return AstModule(self.parse_block())
     
     def parse_statement(self):
         '''
-        statement = indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
+        statement = newline | indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
         '''
-        # indentation
-        # There should be no indentation in the first scope
+        # import pdb; pdb.set_trace()
         t = self.tokenizer.peak()
-        if self.indentation:
-            if t.kind != TokenKind.Indentation:
-                # main scope doesn't have indentation
-                if not self.indentation.parent:
-                    return BlockEnd()
-                else:
-                    self.raise_error(f"Expect indentation here, not {t.kind}@{t.data}")
-            if self.indentation.match(t.data):
-                self.tokenizer.next() # skip indent
-            else:
-                if self.indentation.match_parent(t.data):
-                    # implicitly add a return depending on the indentation
-                    self.tokenizer.next() # skip indent
-                    return BlockEnd()
-                else:
-                    self.raise_error(f"Unexpected indentation, got {len(t.data)} blanks")
+        if t.kind == TokenKind.Newline:
+            self.tokenizer.next() # skip \n
+            return self.parse_statement()
+        
+        # If it is not an indentation, then should go directly to main_phase,
+        # which not_allow_indent = True. Otherwise, it will rollback indent and 
+        # determine the boundary of the block
+        if t.kind != TokenKind.Indentation:
+            self.indentation = None
+            if not self.not_allow_indent:
+                self.not_allow_indent = True
+                return BlockEnd()
         else:
-            if t.kind == TokenKind.Indentation:
-                self.raise_error(f"Unexpected indentation, got {len(t.data)} blanks")
-
-        t = self.tokenizer.peak()
+            if self.not_allow_indent:
+                self.raise_error(f"Unexpected indentation")
+            elif self.indentation.match(t.data):
+                self.tokenizer.next() # skip indent
+                t = self.tokenizer.peak()
+            elif self.indentation.match_parents(t.data):
+                self.exit_indent()
+                return BlockEnd()
+            else:
+                self.raise_error(f"Unexpected indentation")
+        
         if t.data == "def":
             ret = self.parse_function_decl()
         elif t.data == "return":
@@ -121,9 +124,9 @@ class Parser:
                 if t.data == ':':
                     self.tokenizer.next() # skip :
                     self.skip_terminator() # skip nl
-                    self.enter()
+                    self.enter_indent()
                     func_body = self.parse_block()
-                    self.exit()
+                    # self.exit_indent()
                 else:
                     self.raise_error(f"Expect got ':' here, not {t.data}")
             else:
@@ -324,11 +327,12 @@ class Parser:
         if t.kind == TokenKind.Terminator:
             self.tokenizer.next() # skip terminator
 
-    def enter(self):
+    def enter_indent(self):
         # enter new indent
         self.indentation = Indentation(self.indentation)
+        self.not_allow_indent = False
 
-    def exit(self):
+    def exit_indent(self):
         # back to last indent
         self.indentation = self.indentation.parent
         

@@ -20,7 +20,7 @@ print(bar())
 def foo(msg, msg2=" nested"):
    def bar():
       return "hello bar"
-   
+
    print(msg, bar())
 
 foo(msg="hello world2")
@@ -28,7 +28,7 @@ foo(msg="hello world2")
 def foo(msg, msg2=" nested"):
    def bar():
       return "hello bar"
-   
+
    print(msg, msg2)
 
 msg = "hello world"
