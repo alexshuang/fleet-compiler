@@ -240,101 +240,80 @@ class EmptyStatement(Statement):
         return visitor.visitEmptyStatement(self)
 
 
-class AstVisitor(ABC):
+class AstVisitor:
     def visit(self, node: AstNode):
         return node.accept(self)
 
-    @abstractmethod
     def visitModule(self, node: AstModule):
         return self.visitBlock(node.block)
 
-    @abstractmethod
     def visitBlock(self, node: Block):
         for o in node.stmts:
             self.visit(o)
 
-    @abstractmethod
     def visitBlockEnd(self, node: BlockEnd):
         pass
 
-    @abstractmethod
     def visitFunctionDecl(self, node: FunctionDecl):
         self.visitSignature(node.signature)
         self.visitBlock(node.block)
     
-    @abstractmethod
     def visitSignature(self, node: Signature):
         self.visitParameterList(node.param_list)
 
-    @abstractmethod
     def visitParameterList(self, node: ParameterList):
         for p in node.params:
             self.visitParameterDecl(p)
     
-    @abstractmethod
     def visitParameterDecl(self, node: ParameterDecl):
         if node.init:
             self.visit(node.init)
 
-    @abstractmethod
     def visitFunctionCall(self, node: FunctionCall):
         if node.arg_list:
             self.visitArgumentList(node.arg_list) 
 
-    @abstractmethod
     def visitArgumentList(self, node: ArgumentList):
         for o in node.args:
             self.visit(o)
         
-    @abstractmethod
     def visitPositionalArgument(self, node: PositionalArgument):
         if node.value:
             return self.visit(node.value)
 
-    @abstractmethod
     def visitKeywordArgument(self, node: KeywordArgument):
         if node.value:
             return self.visit(node.value)
 
-    @abstractmethod
     def visitReturnStatement(self, node: ReturnStatement):
         if node.ret:
             self.visit(node.ret)
 
-    @abstractmethod
     def visitExpressionStatement(self, node: ExpressionStatement):
         return self.visit(node.exp)
 
-    @abstractmethod
     def visitVariableDecl(self, node: VariableDecl):
         if node.init:
             self.visit(node.init)
     
-    @abstractmethod
     def visitVariable(self, node: Variable):
         pass
 
-    @abstractmethod
     def visitStringLiteral(self, node: StringLiteral):
         return '"' + node.data + '"'
 
-    @abstractmethod
     def visitIntegerLiteral(self, node: IntegerLiteral):
         return node.value
 
-    @abstractmethod
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return node.value
 
-    @abstractmethod
     def visitNoneLiteral(self, node: NoneLiteral):
         return None
 
-    @abstractmethod
     def visitEmptyStatement(self, node: EmptyStatement):
         pass
 
-    @abstractmethod
     def visitImportStatement(self, node: ImportStatement):
         pass
 
@@ -388,7 +367,8 @@ class AstDumper(AstVisitor):
 
     def visitFunctionCall(self, node: FunctionCall):
         args = self.visitArgumentList(node.arg_list)
-        return f"Function Call {node.name}, args: {args}"
+        ref_str = "(resolved)" if node.sym else "(not resolved)"
+        return f"Function Call {node.name}, arg_list: {args}  {ref_str}"
     
     def visitArgumentList(self, node: ArgumentList):
         return [self.visit(o) for o in node.args]
@@ -402,30 +382,16 @@ class AstDumper(AstVisitor):
     def visitReturnStatement(self, node: ReturnStatement):
         return f"Return {self.visit(node.ret) if node.ret else None}"
     
-    def visitExpressionStatement(self, node: ExpressionStatement):
-        return super().visitExpressionStatement(node)
-
     def visitVariableDecl(self, node: VariableDecl):
         init = self.visitExpressionStatement(node.init)
         return f"Variable Decl {node.name}, init: {init}"
 
-    def visitDecimalLiteral(self, node: DecimalLiteral):
-        return super().visitIntegerLiteral(node)
-
-    def visitIntegerLiteral(self, node: IntegerLiteral):
-        return super().visitIntegerLiteral(node)
-
     def visitNoneLiteral(self, node: NoneLiteral):
         return "None"
 
-    def visitStringLiteral(self, node: StringLiteral):
-        return super().visitStringLiteral(node)
-    
     def visitVariable(self, node: Variable):
-        return f'<Variable {node.name}>'
-
-    def visitEmptyStatement(self, node: EmptyStatement):
-        return super().visitEmptyStatement(node)
+        ref_str = "(resolved)" if node.sym else "(not resolved)"
+        return f'Variable {node.name} {ref_str}'
 
     def visitImportStatement(self, node: ImportStatement):
         return f"Import {node.package} as {node.alias}"

@@ -20,6 +20,7 @@ import argparse
 from lexer import *
 from parsing import *
 from semantic import *
+from pass_manager import *
 from runtime import Interpreter
 
 
@@ -50,14 +51,19 @@ def main():
     ast_dumper = AstDumper()
     ast_dumper.visit(module)
 
-    print("\nreferenced AST:")
-    ref_dumper = RefDumper()
-    RefVisitor().visit(module)
-    ref_dumper.visit(module)
+    pipeline = Pipeline()
+    pipeline.add(ReferenceResolvePass())
+    pipeline.add(ReplaceAliasOperationNamePass())
+    pipeline.run(module, True)
 
-    print("\nreplaced function name AST:")
-    ImportVisitor().visit(module)
-    ref_dumper.visit(module)
+    # print("\nreferenced AST:")
+    # ref_dumper = RefDumper()
+    # RefVisitor().visit(module)
+    # ref_dumper.visit(module)
+
+    # print("\nreplaced function name AST:")
+    # ImportVisitor().visit(module)
+    # ref_dumper.visit(module)
 
     # print("\nrun:")
     # interpreter = Interpreter()
