@@ -14,7 +14,7 @@
 #
 # ===---------------------------------------------------------------------------
 
-from enum import Enum
+from enum import Enum, auto
 
 
 def is_keyword(data):
@@ -24,7 +24,7 @@ def is_terminator(ch):
     return ch == '\n' or ch == ';'
 
 def is_operator(ch):
-    return ch in ['+', '-', '*', '/', '%', '^', '&']
+    return ch in ['+', '-', '*', '/', '%', '^', '&', '=', '!', '@']
 
 def is_alpha(ch):
     return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z')
@@ -33,8 +33,7 @@ def is_digit(ch):
     return ch >= '0' and ch <= '9'
 
 def is_separator(ch):
-    return ch in [' ', '(', ')', '#', ':', '[', ']', '=', ',', '!'] \
-        or is_operator(ch) \
+    return ch in [' ', '(', ')', '#', ':', '[', ']', ','] \
         or is_terminator(ch)
 
 
@@ -81,13 +80,57 @@ class TokenKind(Enum):
     Terminator = 8
     Indentation = 9
     Newline = 10
-    EOF = 11
+    OP = 11
+    EOF = 12
+
+
+class Op(Enum):
+    Assign = 0               # =
+    MultiplyAssign = auto()  # *=
+    MinusAssign = auto()     # -=
+    PlusAssign = auto()      # +=
+    DivideAssign = auto()    # /=
+
+    Plus = auto()      # +
+    Minus = auto()     # -
+    Multiply = auto()  # *
+    Divide = auto()    # /
+    AT = auto()       # @
+
+    GT = auto()      # >
+    GE = auto()      # >=
+    LT = auto()      # <
+    LE = auto()      # <=
+    EQ = auto()      # ==
+    NE = auto()      # !=
+
+
+op_str2code = {
+    '=': Op.Assign,
+    '*=': Op.MultiplyAssign,
+    '-=': Op.MinusAssign,
+    '+=': Op.PlusAssign,
+    '/=': Op.DivideAssign,
+    '+': Op.Plus,
+    '-': Op.Minus,
+    '*': Op.Multiply,
+    '/': Op.Divide,
+    '@': Op.AT,
+    '>': Op.GT,
+    '>=': Op.GE,
+    '<': Op.LT,
+    '<=': Op.LE,
+    '==': Op.EQ,
+    '!=': Op.NE,
+}
+op_code2str = [k for k in op_str2code.keys()]
 
 
 class Token:
-    def __init__(self, kind=TokenKind.EOF, data="") -> None:
+    def __init__(self, kind=TokenKind.EOF, data="", code=-1) -> None:
         self.kind = kind
         self.data = data
+        self.code = code
     
 
 class Tokenizer:
@@ -143,14 +186,44 @@ class Tokenizer:
             return self.parse_digit()
         elif ch == '\n':
             return self.parse_newline()
+        elif is_operator(ch):
+            return self.parse_operator()
         elif is_separator(ch):
             return self.parse_separator()
         elif ch == '"' or ch == '\'':
             return self.parse_string_literal()
         else:
-            err_msg = f"{self.stream.location_str} : Unrecognized token which start with {ch}"
-            raise ValueError(err_msg)
+            self.raise_error(f"Unrecognized token which start with {ch}")
 
+    def parse_operator(self):
+        data = self.stream.next()
+        if data == '=':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '*':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '-':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '/':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '+':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '>':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '<':
+            if self.stream.peak() in ['=']:
+                data += self.stream.next()
+        elif data == '!':
+            if self.stream.peak() != '=':
+                self.raise_error(f"Unsupported operator {data + self.stream.peak()} here")
+        
+        return Token(TokenKind.OP, data, op_str2code[data])
+        
     def parse_indentation(self):
         data = ""
         while self.stream.peak() == ' ':
@@ -169,8 +242,7 @@ class Tokenizer:
             data += self.stream.next()
         
         if self.stream.eof():
-            err_msg = f"{self.stream.location_str} : Should end with {quote} here"
-            raise ValueError(err_msg)
+            self.raise_error(f"Should end with {quote} here")
         
         self.stream.next() # skip right quote
         return Token(TokenKind.StringLiteral, data)
@@ -184,8 +256,7 @@ class Tokenizer:
             ch = self.stream.next()
             data += ch
             if not is_valid(ch):
-                err_msg = f"{self.stream.location_str} : Invalid identifier {data} with char {ch}"
-                raise ValueError(err_msg)
+                self.raise_error(f"Invalid identifier {data} with char {ch}")
         
         kind = TokenKind.Keyword if is_keyword(data) else TokenKind.Identifier
         return Token(kind, data)
@@ -200,12 +271,10 @@ class Tokenizer:
             ch = self.stream.next()
             data += ch
             if not is_valid(ch):
-                err_msg = f"{self.stream.location_str} : Invalid number {data}"
-                raise ValueError(err_msg)
+                self.raise_error(f"Invalid number {data}")
             if ch == '.':
                 if dot_cnt > 0:
-                    err_msg = f"{self.stream.location_str} : Redundant decimal point {data}"
-                    raise ValueError(err_msg)
+                    self.raise_error(f"Redundant decimal point {data}")
                 dot_cnt += 1
         kind = TokenKind.DecimalLiteral if dot_cnt > 0 else TokenKind.IntegerLiteral
         return Token(kind, data)
@@ -239,9 +308,7 @@ class Tokenizer:
             else:
                 ch1 = ch2
                 ch2 = self.stream.next()
-        
-        err_msg = f"{self.stream.location_str} : Should end with ''' here"
-        raise ValueError(err_msg)
+        self.raise_error(f"Should end with ''' here")
 
     def update_cursor(self):
         self.line = self.stream.line
@@ -264,3 +331,7 @@ class Tokenizer:
     @property
     def location_str(self):
         return f"@(line: {self.line}, col: {self.col})"
+    
+    def raise_error(self, msg):
+        raise SyntaxError(f"{self.stream.location_str} : {msg}")
+        

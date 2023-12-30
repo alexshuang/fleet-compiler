@@ -31,6 +31,29 @@ class PositionalArgumentIndex:
         self.value += 1
 
 
+OpPriority = {
+    Op.Assign: 2,
+    Op.MultiplyAssign: 2,
+    Op.MinusAssign: 2,
+    Op.PlusAssign: 2,
+    Op.DivideAssign: 2,
+    Op.GT: 4,
+    Op.GE: 4,
+    Op.LT: 4,
+    Op.LE: 4,
+    Op.EQ: 4,
+    Op.NE: 4,
+    Op.Plus: 5,
+    Op.Minus: 5,
+    Op.Multiply: 6,
+    Op.Divide: 6,
+    Op.AT: 7,
+}
+
+def get_op_priority(op):
+    return OpPriority[op] if isinstance(op, Op) and op in OpPriority else -1
+
+
 class Parser:
     '''
     module = block
@@ -224,8 +247,7 @@ class Parser:
             init = self.parse_expression_statement()
             ret = VariableDecl(name, None, init)
         elif t.data == "(":
-            arg_list = self.parse_arg_list()
-            ret = FunctionCall(name, arg_list)
+            ret = self.parse_function_call(name)
         else:
             self.raise_error(f"Unsupport statement which start with {t.data}")
         self.skip_terminator()
@@ -242,6 +264,10 @@ class Parser:
                 self.raise_error(f"Unsupport data type {t.data}")
         else:
             self.raise_error(f"Invalid data type {t.data}")
+    
+    def parse_function_call(self, name: str):
+        arg_list = self.parse_arg_list()
+        return FunctionCall(name, arg_list)
 
     def parse_expression_statement(self):
         self.tokenizer.next() # skip =
@@ -251,37 +277,69 @@ class Parser:
     def parse_expression(self):
         '''
         expression = assignment
-        assignment = binary (assignmentOp binary)*
-        binary = unary (binOp unary)*
-        unary = primary
-        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
         '''
         return self.parse_assignment()
     
     def parse_assignment(self):
-        return self.parse_binary()
+        '''
+        assignment = binary (assignmentOp binary)*
+        '''
+        op_list, exp_list = [], []
+        exp_list.append(self.parse_binary(get_op_priority(Op.Assign)))
+        while self.tokenizer.peak().data == '=':
+            op_list.append(self.tokenizer.next().code) # skip =
+            exp_list.append(self.parse_binary(get_op_priority(Op.Assign)))
+        assert(len(exp_list) > 0)
+        exp = exp_list.pop()
+        assert(len(exp_list) == len(op_list))
+        while len(exp_list) > 0:
+            exp = Binary(op_list.pop(), exp_list.pop(), exp)
+        return exp
 
-    def parse_binary(self):
-        return self.parse_unary()
+    def parse_binary(self, prev_pri: int):
+        '''
+        binary = unary (binOp unary)*
+        '''
+        exp1 = self.parse_unary()
+        t = self.tokenizer.peak()
+        pri = get_op_priority(t.code)
+        while t.kind == TokenKind.OP and pri > prev_pri:
+            self.tokenizer.next() # skip op
+            exp2 = self.parse_binary(pri)
+            exp1 = Binary(t.code, exp1, exp2)
+            t = self.tokenizer.peak()
+            pri = get_op_priority(t.code)
+        return exp1
 
     def parse_unary(self):
-        return self.parse_primary()
+        '''
+        unary = primary
+        '''
+        return Unary(self.parse_primary())
     
     def parse_primary(self):
-        t = self.tokenizer.next() # skip identifier
+        '''
+        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
+        '''
+        ret = None
+        t = self.tokenizer.peak()
         if t.kind == TokenKind.StringLiteral:
-            return StringLiteral(t.data)
+            ret = StringLiteral(t.data)
         elif t.kind == TokenKind.IntegerLiteral:
-            return IntegerLiteral(int(t.data))
+            ret = IntegerLiteral(int(t.data))
         elif t.kind == TokenKind.DecimalLiteral:
-            return DecimalLiteral(float(t.data))
+            ret = DecimalLiteral(float(t.data))
         elif t.kind == TokenKind.NoneLiteral:
-            return NoneLiteral()
-        elif t.kind == TokenKind.Identifier:
+            ret = NoneLiteral()
+        
+        if ret:
+            self.tokenizer.next()
+            return ret
+            
+        if t.kind == TokenKind.Identifier:
+            self.tokenizer.next()
             if self.tokenizer.peak().data == '(':
-                name = t.data
-                arg_list = self.parse_arg_list()
-                return FunctionCall(name, arg_list)
+                return self.parse_function_call(t.data)
             else:
                 return Variable(t.data)
         else:

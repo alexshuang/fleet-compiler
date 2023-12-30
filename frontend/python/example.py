@@ -45,7 +45,12 @@ foo(msg=msg1, msg2=msg)
 
 import numpy as np
 
+np.random.seed(42)
 a = np.random.randn(3, 3)
 b = np.random.randn(3, 5)
-c = np.matmul(a, b)
+c = np.random.randn(3, 5)
+alpha = np.random.randn(3, 5)
+beta = np.random.randn(3, 5)
+c = a @ b + c
+c = alpha * c
 print(c)

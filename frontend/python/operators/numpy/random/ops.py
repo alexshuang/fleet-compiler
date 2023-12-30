@@ -18,3 +18,6 @@ import numpy.random as random
 
 def randn(args, kwargs):
     return random.randn(*args, **kwargs)
+
+def seed(args, kwargs):
+    random.seed(*args, **kwargs)

@@ -223,6 +223,26 @@ class NoneLiteral(Expression):
         return visitor.visitNoneLiteral(self)
 
 
+class Unary(Expression):
+    def __init__(self, exp: Expression) -> None:
+        super().__init__()
+        self.exp = exp
+    
+    def accept(self, visitor):
+        return visitor.visitUnary(self)
+
+
+class Binary(Expression):
+    def __init__(self, op: Op, exp1: Unary, exp2: Unary) -> None:
+        super().__init__()
+        self.op = op
+        self.exp1 = exp1
+        self.exp2 = exp2
+    
+    def accept(self, visitor):
+        return visitor.visitBinary(self)
+
+
 class ReturnStatement(Statement):
     def __init__(self, ret: Expression = None) -> None:
         super().__init__()
@@ -316,6 +336,12 @@ class AstVisitor:
 
     def visitImportStatement(self, node: ImportStatement):
         pass
+    
+    def visitUnary(self, node: Unary):
+        return self.visit(node.exp)
+    
+    def visitBinary(self, node: Binary):
+        return self.visit(node.exp1), self.visit(node.exp2)
 
 
 class AstDumper(AstVisitor):
@@ -395,6 +421,12 @@ class AstDumper(AstVisitor):
 
     def visitImportStatement(self, node: ImportStatement):
         return f"Import {node.package} as {node.alias}"
+    
+    def visitBinary(self, node: Binary):
+        return f"<Binary {node.op}: {self.visit(node.exp1)}, {self.visit(node.exp2)}>"
+    
+    def visitUnary(self, node: Unary):
+        return self.visit(node.exp)
 
     def inc_indent(self):
         self.prefix += "  "

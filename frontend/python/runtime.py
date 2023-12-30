@@ -14,6 +14,7 @@
 #
 # ===---------------------------------------------------------------------------
 
+from lexer import Op
 from syntax import *
 from ops import Operation
 
@@ -111,15 +112,8 @@ class Interpreter(AstVisitor):
         args = [self.visit(o) for o in node.args if o]
         return args if len(args) > 0 else ""
     
-    def visitPositionalArgument(self, node: PositionalArgument):
-        return super().visitPositionalArgument(node)
-
-    def visitKeywordArgument(self, node: KeywordArgument):
-        return super().visitKeywordArgument(node)
-
     def visitVariableDecl(self, node: VariableDecl):
         self.update_variable_value(node.name, self.visit(node.init))
-        return super().visitVariableDecl(node)
     
     def visitVariable(self, node: Variable):
         return self.get_variable_value(node.name)
@@ -128,36 +122,25 @@ class Interpreter(AstVisitor):
         value = self.visit(node.ret) if node.ret else None
         return RetVal(value)
 
-    def visitFunctionDecl(self, node: FunctionDecl):
-        return super().visitBlock(node.block)
-    
-    def visitDecimalLiteral(self, node: DecimalLiteral):
-        return super().visitDecimalLiteral(node)
-    
-    def visitEmptyStatement(self, node: EmptyStatement):
-        return super().visitEmptyStatement(node)
-    
-    def visitExpressionStatement(self, node: ExpressionStatement):
-        return super().visitExpressionStatement(node)
-    
-    def visitIntegerLiteral(self, node: IntegerLiteral):
-        return super().visitIntegerLiteral(node)
-    
-    def visitNoneLiteral(self, node: NoneLiteral):
-        return super().visitNoneLiteral(node)
-
-    def visitStringLiteral(self, node: StringLiteral):
-        return super().visitStringLiteral(node)
-    
-    def visitSignature(self, node: Signature):
-        return super().visitSignature(node)
-    
-    def visitParameterList(self, node: ParameterList):
-        return super().visitParameterList(node)
-
     def visitParameterDecl(self, node: ParameterDecl):
         self.update_variable_value(node.name, self.visit(node.init))
         return super().visitParameterDecl(node)
+    
+    def visitBinary(self, node: Binary):
+        if node.op == Op.Assign:
+            return self.visit(node.exp2)
+        elif node.op == Op.Plus:
+            return self.visit(node.exp1) + self.visit(node.exp2)
+        elif node.op == Op.Minus:
+            return self.visit(node.exp1) - self.visit(node.exp2)
+        elif node.op == Op.Multiply:
+            return self.visit(node.exp1) * self.visit(node.exp2)
+        elif node.op == Op.Divide:
+            return self.visit(node.exp1) / self.visit(node.exp2)
+        elif node.op == Op.AT:
+            return self.visit(node.exp1) @ self.visit(node.exp2)
+        else:
+            raise TypeError(f"Interpreter: Unsupport operator {node.op}")
     
     def enter(self):
         self.call_stack.append(StackFrame())
