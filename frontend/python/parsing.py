@@ -80,7 +80,7 @@ class Parser:
     assignment = binary (assignmentOp binary)*
     binary = unary (binOp unary)*
     unary = primary
-    primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
+    primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall | '(' expression ')'
     binOp = '+' | '-' | '*' | '/'
     assignmentOp = '='
     stringLiteral = '"' StringLiteral? '"'
@@ -319,7 +319,7 @@ class Parser:
     
     def parse_primary(self):
         '''
-        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall
+        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall | '(' expression ')'
         '''
         ret = None
         t = self.tokenizer.peak()
@@ -331,12 +331,16 @@ class Parser:
             ret = DecimalLiteral(float(t.data))
         elif t.kind == TokenKind.NoneLiteral:
             ret = NoneLiteral()
+        elif t.data == '(':
+            self.tokenizer.next() # skip '('
+            ret = self.parse_expression()
+            self.tokenizer.next() # skip ')'
         
         if ret:
             self.tokenizer.next()
             return ret
-            
-        if t.kind == TokenKind.Identifier:
+        
+        elif t.kind == TokenKind.Identifier:
             self.tokenizer.next()
             if self.tokenizer.peak().data == '(':
                 return self.parse_function_call(t.data)

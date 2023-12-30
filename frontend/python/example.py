@@ -53,4 +53,5 @@ alpha = np.random.randn(3, 5)
 beta = np.random.randn(3, 5)
 c = a @ b + c
 c = alpha * c
+c = c + c * 3 - (c / 2 + 3)
 print(c)
