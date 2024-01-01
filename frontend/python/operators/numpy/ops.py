@@ -18,3 +18,9 @@ import numpy as np
 
 def matmul(args, kwargs):
     return np.matmul(*args, **kwargs)
+
+def sqrt(args, kwargs):
+    return np.sqrt(*args, **kwargs)
+
+def tanh(args, kwargs):
+    return np.tanh(*args, **kwargs)

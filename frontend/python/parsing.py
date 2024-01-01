@@ -33,10 +33,6 @@ class PositionalArgumentIndex:
 
 OpPriority = {
     Op.Assign: 2,
-    Op.MultiplyAssign: 2,
-    Op.MinusAssign: 2,
-    Op.PlusAssign: 2,
-    Op.DivideAssign: 2,
     Op.GT: 4,
     Op.GE: 4,
     Op.LT: 4,
@@ -48,6 +44,7 @@ OpPriority = {
     Op.Multiply: 6,
     Op.Divide: 6,
     Op.AT: 7,
+    Op.Power: 10,
 }
 
 def get_op_priority(op):
@@ -80,7 +77,8 @@ class Parser:
     assignment = binary (assignmentOp binary)*
     binary = unary (binOp unary)*
     unary = primary
-    primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall | '(' expression ')'
+    primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral |
+        BooleanLiteral | functionCall | '(' expression ')'
     binOp = '+' | '-' | '*' | '/'
     assignmentOp = '='
     stringLiteral = '"' StringLiteral? '"'
@@ -319,7 +317,8 @@ class Parser:
     
     def parse_primary(self):
         '''
-        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral | functionCall | '(' expression ')'
+        primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral |
+            BooleanLiteral | functionCall | '(' expression ')'
         '''
         ret = None
         t = self.tokenizer.peak()
@@ -329,12 +328,14 @@ class Parser:
             ret = IntegerLiteral(int(t.data))
         elif t.kind == TokenKind.DecimalLiteral:
             ret = DecimalLiteral(float(t.data))
+        elif t.kind == TokenKind.BooleanLiteral:
+            ret = BooleanLiteral(True if t.data == 'True' else False)
         elif t.kind == TokenKind.NoneLiteral:
             ret = NoneLiteral()
         elif t.data == '(':
             self.tokenizer.next() # skip '('
             ret = self.parse_expression()
-            self.tokenizer.next() # skip ')'
+            assert(self.tokenizer.peak().data == ')')
         
         if ret:
             self.tokenizer.next()

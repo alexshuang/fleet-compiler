@@ -17,8 +17,11 @@
 from enum import Enum, auto
 
 
+def is_boolean(data):
+    return data in ['True', 'False']
+
 def is_keyword(data):
-    return data in ['def', 'if', 'while', 'for', 'with']
+    return data in ['def']
 
 def is_terminator(ch):
     return ch == '\n' or ch == ';'
@@ -33,8 +36,7 @@ def is_digit(ch):
     return ch >= '0' and ch <= '9'
 
 def is_separator(ch):
-    return ch in [' ', '(', ')', '#', ':', '[', ']', ','] \
-        or is_terminator(ch)
+    return ch in [' ', '(', ')', '#', ':', '[', ']', ',']
 
 
 class CharStream:
@@ -70,32 +72,30 @@ class CharStream:
     
 
 class TokenKind(Enum):
-    Keyword = 1
-    Identifier = 2
-    Separator = 3
-    StringLiteral = 4
-    IntegerLiteral = 5
-    DecimalLiteral = 6
-    NoneLiteral = 7
-    Terminator = 8
-    Indentation = 9
-    Newline = 10
-    OP = 11
-    EOF = 12
+    Keyword = 0
+    Identifier = auto()
+    Separator = auto()
+    StringLiteral = auto()
+    IntegerLiteral = auto()
+    DecimalLiteral = auto()
+    NoneLiteral = auto()
+    BooleanLiteral = auto()
+    Terminator = auto()
+    Indentation = auto()
+    Newline = auto()
+    OP = auto()
+    EOF = auto()
 
 
 class Op(Enum):
     Assign = 0               # =
-    MultiplyAssign = auto()  # *=
-    MinusAssign = auto()     # -=
-    PlusAssign = auto()      # +=
-    DivideAssign = auto()    # /=
 
     Plus = auto()      # +
     Minus = auto()     # -
     Multiply = auto()  # *
     Divide = auto()    # /
-    AT = auto()       # @
+    AT = auto()        # @
+    Power = auto()     # **
 
     GT = auto()      # >
     GE = auto()      # >=
@@ -107,15 +107,12 @@ class Op(Enum):
 
 op_str2code = {
     '=': Op.Assign,
-    '*=': Op.MultiplyAssign,
-    '-=': Op.MinusAssign,
-    '+=': Op.PlusAssign,
-    '/=': Op.DivideAssign,
     '+': Op.Plus,
     '-': Op.Minus,
     '*': Op.Multiply,
     '/': Op.Divide,
     '@': Op.AT,
+    '**': Op.Power,
     '>': Op.GT,
     '>=': Op.GE,
     '<': Op.LT,
@@ -123,7 +120,6 @@ op_str2code = {
     '==': Op.EQ,
     '!=': Op.NE,
 }
-op_code2str = [k for k in op_str2code.keys()]
 
 
 class Token:
@@ -182,7 +178,8 @@ class Tokenizer:
         # parse token 
         if is_alpha(ch):
             return self.parse_identifier()
-        elif is_digit(ch) or (ch == '.' and is_digit(self.stream.peak(1))):
+        elif is_digit(ch) or (ch == '.' and is_digit(self.stream.peak(1))) \
+            or (ch == '-' and is_digit(self.stream.peak(1))):
             return self.parse_digit()
         elif ch == '\n':
             return self.parse_newline()
@@ -190,6 +187,8 @@ class Tokenizer:
             return self.parse_operator()
         elif is_separator(ch):
             return self.parse_separator()
+        elif is_terminator(ch):
+            return self.parse_terminator()
         elif ch == '"' or ch == '\'':
             return self.parse_string_literal()
         else:
@@ -201,16 +200,7 @@ class Tokenizer:
             if self.stream.peak() in ['=']:
                 data += self.stream.next()
         elif data == '*':
-            if self.stream.peak() in ['=']:
-                data += self.stream.next()
-        elif data == '-':
-            if self.stream.peak() in ['=']:
-                data += self.stream.next()
-        elif data == '/':
-            if self.stream.peak() in ['=']:
-                data += self.stream.next()
-        elif data == '+':
-            if self.stream.peak() in ['=']:
+            if self.stream.peak() in ['*']:
                 data += self.stream.next()
         elif data == '>':
             if self.stream.peak() in ['=']:
@@ -221,7 +211,6 @@ class Tokenizer:
         elif data == '!':
             if self.stream.peak() != '=':
                 self.raise_error(f"Unsupported operator {data + self.stream.peak()} here")
-        
         return Token(TokenKind.OP, data, op_str2code[data])
         
     def parse_indentation(self):
@@ -252,40 +241,58 @@ class Tokenizer:
             return is_alpha(ch) or is_digit(ch) or ch == '_' or ch == '.'
         
         data = ""
-        while not self.stream.eof() and not is_separator(self.stream.peak()):
-            ch = self.stream.next()
-            data += ch
+        ch = self.stream.peak()
+        while not self.stream.eof() and not (is_separator(ch) or is_operator(ch) or is_terminator(ch)):
             if not is_valid(ch):
                 self.raise_error(f"Invalid identifier {data} with char {ch}")
+            data += ch
+            self.stream.next()
+            ch = self.stream.peak()
         
-        kind = TokenKind.Keyword if is_keyword(data) else TokenKind.Identifier
+        kind = TokenKind.Identifier
+        if is_keyword(data):
+            kind = TokenKind.Keyword
+        elif is_boolean(data):
+            kind = TokenKind.BooleanLiteral
+        elif data == 'None':
+            kind = TokenKind.NoneLiteral
+            
         return Token(kind, data)
 
     def parse_digit(self):
         def is_valid(ch):
-            return is_digit(ch) or ch == '.'
+            return is_digit(ch) or ch == '.' or ch == '-'
 
         data = ""
         dot_cnt = 0
-        while not self.stream.eof() and not is_separator(self.stream.peak()):
-            ch = self.stream.next()
+        ch = self.stream.peak()
+
+        # sign
+        if ch == '-':
             data += ch
+            self.stream.next()
+            ch = self.stream.peak()
+
+        while not self.stream.eof() and not (is_separator(ch) or is_operator(ch) or is_terminator(ch)):
             if not is_valid(ch):
                 self.raise_error(f"Invalid number {data}")
+            data += ch
             if ch == '.':
                 if dot_cnt > 0:
                     self.raise_error(f"Redundant decimal point {data}")
                 dot_cnt += 1
+            self.stream.next()
+            ch = self.stream.peak()
         kind = TokenKind.DecimalLiteral if dot_cnt > 0 else TokenKind.IntegerLiteral
         return Token(kind, data)
 
     def parse_separator(self):
         ch = self.stream.next()
-        tok = Token(TokenKind.Separator, ch)
-        if is_terminator(ch):
-            tok.kind = TokenKind.Terminator
-            tok.data = ""
-        return tok
+        return Token(TokenKind.Separator, ch)
+    
+    def parse_terminator(self):
+        ch = self.stream.next()
+        return Token(TokenKind.Terminator, ch)
 
     def skip_white_space(self):
         while self.stream.peak() == ' ':

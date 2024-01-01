@@ -214,6 +214,15 @@ class DecimalLiteral(Expression):
         return visitor.visitDecimalLiteral(self)
 
 
+class BooleanLiteral(Expression):
+    def __init__(self, value: bool) -> None:
+        super().__init__()
+        self.value = value
+    
+    def accept(self, visitor):
+        return visitor.visitBooleanLiteral(self)
+
+
 class NoneLiteral(Expression):
     def __init__(self) -> None:
         super().__init__()
@@ -328,6 +337,9 @@ class AstVisitor:
     def visitDecimalLiteral(self, node: DecimalLiteral):
         return node.value
 
+    def visitBooleanLiteral(self, node: BooleanLiteral):
+        return node.value
+
     def visitNoneLiteral(self, node: NoneLiteral):
         return None
 
@@ -411,6 +423,9 @@ class AstDumper(AstVisitor):
     def visitVariableDecl(self, node: VariableDecl):
         init = self.visitExpressionStatement(node.init)
         return f"Variable Decl {node.name}, init: {init}"
+
+    def visitBooleanLiteral(self, node: BooleanLiteral):
+        return "True" if node.value else "False"
 
     def visitNoneLiteral(self, node: NoneLiteral):
         return "None"

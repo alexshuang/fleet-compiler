@@ -139,6 +139,8 @@ class Interpreter(AstVisitor):
             return self.visit(node.exp1) / self.visit(node.exp2)
         elif node.op == Op.AT:
             return self.visit(node.exp1) @ self.visit(node.exp2)
+        elif node.op == Op.Power:
+            return self.visit(node.exp1) ** self.visit(node.exp2)
         else:
             raise TypeError(f"Interpreter: Unsupport operator {node.op}")
     
