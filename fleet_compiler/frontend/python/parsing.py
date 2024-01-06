@@ -18,6 +18,7 @@ from .lexer import *
 from .syntax import *
 from .dtype import *
 from .indentation import *
+from .error import SyntaxException, SyntaxErrorCode
 
 class PositionalArgumentIndex:
     def __init__(self, parent=None) -> None:
@@ -111,7 +112,7 @@ class Parser:
                 return BlockEnd()
         else:
             if self.not_allow_indent:
-                self.raise_error(f"Unexpected indentation")
+                self.raise_indent_error(f"Unexpected indentation")
             elif self.indentation.match(t.data):
                 self.tokenizer.next() # skip indent
                 t = self.tokenizer.peak()
@@ -119,7 +120,7 @@ class Parser:
                 self.exit_indent()
                 return BlockEnd()
             else:
-                self.raise_error(f"Unexpected indentation")
+                self.raise_indent_error(f"Unexpected indentation")
         
         if t.data == "def":
             ret = self.parse_function_decl()
@@ -135,7 +136,7 @@ class Parser:
         elif t.kind == TokenKind.EOF: # EOF
             return EmptyStatement()
         else:
-            self.raise_error(f"Unrecognized token {t.data}, kind {t.kind}")
+            self.raise_statement_error(f"Unrecognized token {t.data}, kind {t.kind}")
         self.skip_terminator()
         return ret
     
@@ -150,7 +151,7 @@ class Parser:
                 alias = self.tokenizer.next().data
             return ImportStatement(pkg, alias)
         else:
-            self.raise_error(f"Expect got identifier here, not {t.data}")
+            self.raise_import_error(f"Expect got identifier here, not {t.data}")
     
     def parse_function_decl(self):
         self.tokenizer.next() # skip def
@@ -168,11 +169,11 @@ class Parser:
                     func_body = self.parse_block()
                     # self.exit_indent()
                 else:
-                    self.raise_error(f"Expect got ':' here, not {t.data}")
+                    self.raise_func_decl_error(f"Expect got ':' here, not {t.data}")
             else:
-                self.raise_error(f"Expect got '(' here, not {t.data}")
+                self.raise_func_decl_error(f"Expect got '(' here, not {t.data}")
         else:
-            self.raise_error(f"Expect got identifier here, not {t.data}")
+            self.raise_func_decl_error(f"Expect got identifier here, not {t.data}")
         return FunctionDecl(func_name, signature, func_body)
     
     def parse_signature(self):
@@ -182,7 +183,7 @@ class Parser:
         if t.data == ')':
             self.tokenizer.next() # skip )
         else:
-            self.raise_error(f"Expect got ')' here, not {t.data}")
+            self.raise_param_error(f"Expect got ')' here, not {t.data}")
         return Signature(param_list)
 
     def parse_parameter_list(self):
@@ -195,14 +196,14 @@ class Parser:
                 if t.data == ',':
                     t = self.tokenizer.next()
                 else:
-                    self.raise_error(f"Expect got ',' or ')' here, not {t.data}")
+                    self.raise_param_error(f"Expect got ',' or ')' here, not {t.data}")
         return ParameterList(params)
     
     def parse_parameter_decl(self):
         # parameterDecl = Identifier typeAnnotation? ('=' expressionStatement)?
         t = self.tokenizer.peak()
         if t.kind != TokenKind.Identifier:
-            self.raise_error(f"Expect got Identifier here, not {t.data}")
+            self.raise_param_error(f"Expect got Identifier here, not {t.data}")
 
         name = t.data
         type = init = None
@@ -248,7 +249,7 @@ class Parser:
         elif t.data == "(":
             ret = self.parse_function_call(name)
         else:
-            self.raise_error(f"Unsupport statement which start with {t.data}")
+            self.raise_statement_error(f"Unsupport statement which start with {t.data}")
         self.skip_terminator()
         return ret 
 
@@ -260,9 +261,9 @@ class Parser:
             if t.data in dtype_map:
                 return dtype_map[t.data.lower()]
             else:
-                self.raise_error(f"Unsupport data type {t.data}")
+                self.raise_type_error(f"Unsupport data type {t.data}")
         else:
-            self.raise_error(f"Invalid data type {t.data}")
+            self.raise_type_error(f"Invalid data type {t.data}")
     
     def parse_function_call(self, name: str):
         arg_list = self.parse_arg_list()
@@ -349,7 +350,7 @@ class Parser:
             else:
                 return Variable(t.data)
         else:
-            self.raise_error(f"Unsupport primary {t.kind}@{t.data}")
+            self.raise_error(SyntaxErrorCode.Primary, f"Unsupport primary {t.kind}@{t.data}")
 
     def parse_arg_list(self):
         args = []
@@ -363,13 +364,13 @@ class Parser:
                 if t.data == ',':
                     t = self.tokenizer.next()
                 else:
-                    self.raise_error(f"Expect got ',' here, not {t.data}")
+                    self.raise_arg_error(f"Expect got ',' here, not {t.data}")
         t = self.tokenizer.peak()
         if t.data == ')':
             self.tokenizer.next() # skip )
             self.pos_arg_idx = self.pos_arg_idx.parent
         else:
-            self.raise_error(f"Expect got ')' here, not {t.data}")
+            self.raise_arg_error(f"Expect got ')' here, not {t.data}")
         return ArgumentList(args)
 
     def parse_argument(self):
@@ -418,5 +419,26 @@ class Parser:
         # back to last indent
         self.indentation = self.indentation.parent
         
-    def raise_error(self, msg):
-        raise SyntaxError(f"{self.tokenizer.location_str} : {msg}")
+    def raise_error(self, code, msg):
+        raise SyntaxException(code, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_func_decl_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.FunctionDecl, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_indent_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Indentation, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_statement_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Statement, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_import_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Import, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_type_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Type, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_param_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Parament, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_arg_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.Argument, f"{self.tokenizer.location_str} : {msg}")
