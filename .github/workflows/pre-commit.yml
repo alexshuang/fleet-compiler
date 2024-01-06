@@ -1,0 +1,39 @@
+name: pre-commit
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+
+      - name: filter changed files
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            changed:
+              - '**'
+
+      - name: save changed files to env
+        run: |
+          echo “CHANGED_FILES=${{ steps.filter.outputs.changed_files }}” >> $GITHUB_ENV
+      
+      - name: show changed files
+        run: |
+          echo "changed files: $CHANGE_FILES"
+          
+      - name: install pre-commit
+        run: |
+          pip install pre-commit
+
+      - name: run pre-commit
+        run: |
+          echo $CHANGED_FILES | xargs pre-commit run --show-diff-on-failure --verbose --files
