@@ -14,10 +14,10 @@
 #
 # ===---------------------------------------------------------------------------
 
-from lexer import *
-from syntax import *
-from dtype import *
-from indentation import *
+from .lexer import *
+from .syntax import *
+from .dtype import *
+from .indentation import *
 
 class PositionalArgumentIndex:
     def __init__(self, parent=None) -> None:
@@ -96,7 +96,6 @@ class Parser:
         '''
         statement = newline | indentation (functionDecl | functionCall | returnStatement | variableDecl | expressionStatement | emptyStatement)
         '''
-        # import pdb; pdb.set_trace()
         t = self.tokenizer.peak()
         if t.kind == TokenKind.Newline:
             self.tokenizer.next() # skip \n
@@ -132,6 +131,8 @@ class Parser:
             ret = self.parse_identifier()
         elif t.kind == TokenKind.Terminator: # empty statement
             self.tokenizer.next() # skip it
+            return EmptyStatement()
+        elif t.kind == TokenKind.EOF: # EOF
             return EmptyStatement()
         else:
             self.raise_error(f"Unrecognized token {t.data}, kind {t.kind}")

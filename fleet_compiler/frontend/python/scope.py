@@ -14,8 +14,8 @@
 #
 # ===---------------------------------------------------------------------------
 
-from syntax import *
-from symbolic import *
+from .syntax import *
+from .symbolic import *
 
 
 class Scope:

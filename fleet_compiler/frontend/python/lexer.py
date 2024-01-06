@@ -39,11 +39,68 @@ def is_separator(ch):
     return ch in [' ', '(', ')', '#', ':', '[', ']', ',']
 
 
+def legalize_data(data: str):
+    '''
+    1. Unindent all statements in the main scope, that is,
+       the main scope are not allowed indentation
+    2. delete empty lines
+    '''
+    def get_tab_len(data):
+        tab = ""
+        for i in range(len(data)):
+            if data[i] == '\n':
+                i += 1
+                while data[i] == ' ':
+                    tab += ' '
+                    i += 1
+                break
+        return len(tab)
+    
+    def the_next_is_empty_line(data):
+        for o in data:
+            if o != ' ':
+                if o == '\n':
+                    return True
+                else:
+                    return False
+        return True
+    
+    res = ""
+    indent_phase = True
+    tab_len = get_tab_len(data)
+    i = 0
+    while i < len(data):
+        if data[i] == '\n':
+            indent_phase = True
+            res += data[i]
+            i += 1
+            if the_next_is_empty_line(data[i:]):
+                while i < len(data) - 1:
+                    if data[i] != '\n':
+                        i += 1
+                    else:
+                        break
+            else:
+                if tab_len > 0:
+                    assert data[i:i+tab_len].isspace(), "Unexpected indent"
+                    i += tab_len
+        elif data[i] != ' ':
+            indent_phase = False
+            res += data[i]
+            i += 1
+        else:
+            if not indent_phase:
+                res += data[i]
+            i += 1
+            
+    return res
+
 class CharStream:
     def __init__(self, data="") -> None:
+        # self.data = legalize_data(data)
         self.data = data
         self.pos = 0
-        self.len = len(data)
+        self.len = len(self.data)
         self.line = 1
         self.col = 1
 
@@ -341,4 +398,3 @@ class Tokenizer:
     
     def raise_error(self, msg):
         raise SyntaxError(f"{self.stream.location_str} : {msg}")
-        

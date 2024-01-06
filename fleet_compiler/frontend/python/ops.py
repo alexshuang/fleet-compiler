@@ -17,9 +17,9 @@
 import re
 import os
 
-import operators.python.ops
-import operators.numpy.ops
-import operators.numpy.random.ops
+import fleet_compiler.frontend.python.operators.python.ops
+import fleet_compiler.frontend.python.operators.numpy.ops
+import fleet_compiler.frontend.python.operators.numpy.random.ops
 
 
 def get_function_names(file_path):
@@ -31,7 +31,9 @@ def get_function_names(file_path):
 
 def find_ops_paths(root_directory='operators', file_name='ops.py'):
     ops_paths = []
-    for root, dirs, files in os.walk(root_directory):
+    current_directory = os.path.dirname(os.path.realpath(__file__))
+    current_directory += f'/{root_directory}' 
+    for root, dirs, files in os.walk(current_directory):
         if file_name in files:
             ops_paths.append(os.path.join(root, file_name))
     return ops_paths
@@ -43,14 +45,16 @@ class Operation:
         self.register_operators()
 
     def register_operators(self):
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+        current_directory_parts = [o for o in current_directory.split('/') if o != '']
+        clip_len = len(current_directory_parts) - 3 # fleet_compiler/frontend/python/...
         for file_path in find_ops_paths():
             func_names = get_function_names(file_path)
-            pkg = file_path.replace('/', '.')[:-3] # cut .py
-            path_parts = pkg.split('.')
-            # insert op
+            path_parts = [o for o in file_path.split('/') if o != '']
+            path_parts[-1] = path_parts[-1][:-3] # cut .py from ops.py
             for op in func_names:
-                key = f"{'.'.join(path_parts[1:-1])}.{op}"
-                impl = eval(f"{'.'.join(path_parts)}.{op}")
+                key = f"{'.'.join(path_parts[len(current_directory_parts)+1:-1])}.{op}"
+                impl = eval(f"{'.'.join(path_parts[clip_len:])}.{op}")
                 self.op_tab[key] = impl
 
     def lookup(self, key: str):

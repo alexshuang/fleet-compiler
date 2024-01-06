@@ -16,8 +16,8 @@
 
 from abc import ABC, abstractmethod
 
-from lexer import *
-from symbolic import FunctionSymbol, VariableSymbol
+from .lexer import *
+from .symbolic import FunctionSymbol, VariableSymbol
 
 
 class AstNode(ABC):

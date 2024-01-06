@@ -16,3 +16,6 @@
 
 def _print(args, kwargs):
     return print(*args, **kwargs)
+
+def _assert(args, kwargs):
+    assert(args[0])

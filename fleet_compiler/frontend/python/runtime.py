@@ -14,9 +14,9 @@
 #
 # ===---------------------------------------------------------------------------
 
-from lexer import Op
-from syntax import *
-from ops import Operation
+from .lexer import Op
+from .syntax import *
+from .ops import Operation
 
 
 class RetVal:
@@ -141,6 +141,18 @@ class Interpreter(AstVisitor):
             return self.visit(node.exp1) @ self.visit(node.exp2)
         elif node.op == Op.Power:
             return self.visit(node.exp1) ** self.visit(node.exp2)
+        elif node.op == Op.EQ:
+            return self.visit(node.exp1) == self.visit(node.exp2)
+        elif node.op == Op.NE:
+            return self.visit(node.exp1) != self.visit(node.exp2)
+        elif node.op == Op.GT:
+            return self.visit(node.exp1) > self.visit(node.exp2)
+        elif node.op == Op.GE:
+            return self.visit(node.exp1) >= self.visit(node.exp2)
+        elif node.op == Op.LT:
+            return self.visit(node.exp1) < self.visit(node.exp2)
+        elif node.op == Op.LE:
+            return self.visit(node.exp1) <= self.visit(node.exp2)
         else:
             raise TypeError(f"Interpreter: Unsupport operator {node.op}")
     

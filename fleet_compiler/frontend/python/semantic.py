@@ -19,10 +19,10 @@
 # 
 # ===---------------------------------------------------------------------------
 
-from syntax import *
-from scope import Scope
-from symbolic import *
-from pass_manager import *
+from .syntax import *
+from .scope import Scope
+from .symbolic import *
+from .pass_manager import *
 
 
 class ReferenceResolvePass(Pass):
@@ -98,7 +98,7 @@ class BuiltinReferenceResolvePass(Pass):
     '''
     def __init__(self) -> None:
         super().__init__()
-        self.builtins = ['print']
+        self.builtins = ['print', 'assert']
 
     def visitFunctionCall(self, node: FunctionCall):
         # replace function name
