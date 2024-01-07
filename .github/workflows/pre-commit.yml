@@ -3,7 +3,7 @@ name: pre-commit
 on:
   pull_request:
     branches:
-      - ci_cd_test
+      - main
 
 jobs:
   pre-commit:
