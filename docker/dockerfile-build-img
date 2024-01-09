@@ -1,0 +1,30 @@
+ARG base_image=ubuntu:22.04
+FROM $base_image
+
+LABEL maintainer="alexhu@graphcore.ai"
+
+# Install dependent packages
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    wget \
+    vim \
+    git \
+    python3-pip \
+    ninja-build \
+    pkg-config \
+    librdmacm-dev \
+    cmake \
+    make \
+    g++ \
+    python3-dev \
+    libjpeg-dev \
+    libpng-dev \
+    && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/lib/x86_64-linux-gnu/libedit.so.2 /usr/lib/x86_64-linux-gnu/libedit.so.0
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+#RUN pip install numpy pybind11 pyyaml
+
+WORKDIR /work
