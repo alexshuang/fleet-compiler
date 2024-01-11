@@ -22,13 +22,9 @@ jobs:
             changed:
               - '**'
 
-      - name: save changed files to env
-        run: |
-          echo “CHANGED_FILES=${{ steps.filter.outputs.changed_files }}” >> $GITHUB_ENV
-
       - name: show changed files
         run: |
-          echo "changed files: $CHANGE_FILES"
+          echo "changed files: ${{ steps.filter.outputs.changed_files }}"
 
       - name: install pre-commit
         run: |
@@ -36,4 +32,4 @@ jobs:
 
       - name: run pre-commit
         run: |
-          echo $CHANGED_FILES | xargs pre-commit run --show-diff-on-failure --verbose --files
+          echo ${{ steps.filter.outputs.changed_files }} | xargs pre-commit run --show-diff-on-failure --verbose --files
