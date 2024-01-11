@@ -25,11 +25,11 @@ jobs:
       - name: save changed files to env
         run: |
           echo “CHANGED_FILES=${{ steps.filter.outputs.changed_files }}” >> $GITHUB_ENV
-      
+
       - name: show changed files
         run: |
           echo "changed files: $CHANGE_FILES"
-          
+
       - name: install pre-commit
         run: |
           pip install pre-commit
