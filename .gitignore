@@ -1,7 +1,30 @@
-# Prerequisites
-*.d
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyc
 
-# Compiled Object files
+# C++
+build/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Compiled C++ Object files
 *.slo
 *.lo
 *.o
@@ -12,9 +35,9 @@
 *.pch
 
 # Compiled Dynamic libraries
+*.dll
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -27,6 +50,10 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
+
+# Ignored folders
+###################
+.idea/
+.vscode/
