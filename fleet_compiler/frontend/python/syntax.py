@@ -435,7 +435,10 @@ class AstDumper(AstVisitor):
         return f'Variable {node.name} {ref_str}'
 
     def visitImportStatement(self, node: ImportStatement):
-        return f"Import {node.package} as {node.alias}"
+        msg = f"Import {node.package}"
+        if node.alias:
+            msg += f" as {node.alias}"
+        return msg
     
     def visitBinary(self, node: Binary):
         return f"<Binary {node.op}: {self.visit(node.exp1)}, {self.visit(node.exp2)}>"

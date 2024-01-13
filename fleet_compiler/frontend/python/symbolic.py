@@ -20,6 +20,7 @@ from enum import Enum
 class SymbolKind(Enum):
     FunctionSymbol = 1
     VariableSymbol = 2
+    OperatorSymbol = 3
 
 
 class Symbol:
@@ -36,3 +37,9 @@ class FunctionSymbol(Symbol):
 class VariableSymbol(Symbol):
     def __init__(self, kind: SymbolKind, node) -> None:
         super().__init__(kind, node)
+
+
+class OperatorSymbol(Symbol):
+    def __init__(self, kind: SymbolKind, op_name: str, node) -> None:
+        super().__init__(kind, node)
+        self.op_name = op_name
