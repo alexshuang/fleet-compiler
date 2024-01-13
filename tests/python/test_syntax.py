@@ -28,7 +28,7 @@ class TestSyntax(unittest.TestCase):
 
     def testDecimal1(self):
         data = 'a = -3.7;b=-2\nassert(a == -3.7)\nassert(b == -2)'
-        run_test(data, get_basic_pipeline(), get_interpreter())
+        run_e2e_test(data)
 
     def testDecimal2(self):
         data = 'a = -3.7.2'

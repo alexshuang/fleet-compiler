@@ -17,6 +17,7 @@
 from .lexer import Op
 from .syntax import *
 from .ops import Operation
+from .symbolic import OperatorSymbol
 
 
 class RetVal:
@@ -64,49 +65,51 @@ class Interpreter(AstVisitor):
         return RetVal()
     
     def visitFunctionCall(self, node: FunctionCall):
-        if node.sym: # function decl
-            self.enter() # push
+        if node.sym:
+            if isinstance(node.sym, OperatorSymbol):
+                # third-party or built-in operators
+                arg_list = self.visitArgumentList(node.arg_list)
+                args, kwargs = [], {}
+                for o in arg_list:
+                    if isinstance(o, dict):
+                        kwargs.update(o)
+                    else:
+                        args.append(o)
+                op_name = node.sym.op_name
+                if self.ops.has(op_name):
+                    return self.ops.lookup(op_name)(args, kwargs)
+            else: # function define
+                self.enter() # push
 
-            # args
-            func = node.sym.node
-            params = func.signature.param_list.params
-            args = node.arg_list.args
-            num_args = len(args)
-            num_params = len(params)
-            if num_params < num_args:
-                raise TypeError(f"Interpreter: Expect {num_params} arguments but got {num_args}")
+                # args
+                func = node.sym.node
+                params = func.signature.param_list.params
+                args = node.arg_list.args
+                num_args = len(args)
+                num_params = len(params)
+                if num_params < num_args:
+                    raise TypeError(f"Interpreter: Expect {num_params} arguments but got {num_args}")
 
-            names, values = [], []
-            for i, arg in enumerate(args):
-                names.append(params[i].name if isinstance(arg, PositionalArgument) else arg.name)
-                values.append(self.visit(arg.value))
-            # args with default-value
-            for p in params[num_args:]:
-                names.append(p.name)
-                values.append(self.visit(p.init))
+                names, values = [], []
+                for i, arg in enumerate(args):
+                    names.append(params[i].name if isinstance(arg, PositionalArgument) else arg.name)
+                    values.append(self.visit(arg.value))
+                # args with default-value
+                for p in params[num_args:]:
+                    names.append(p.name)
+                    values.append(self.visit(p.init))
 
-            # set variable values
-            for k, v in zip(names, values):
-                self.update_variable_value(k, v)
+                # set variable values
+                for k, v in zip(names, values):
+                    self.update_variable_value(k, v)
 
-            # body
-            ret = self.visitBlock(func.block)
+                # body
+                ret = self.visitBlock(func.block)
 
-            self.exit() # pop
+                self.exit() # pop
+                return ret
         else:
-            # third-party or built-in operators
-            arg_list = self.visitArgumentList(node.arg_list)
-            args, kwargs = [], {}
-            for o in arg_list:
-                if isinstance(o, dict):
-                    kwargs.update(o)
-                else:
-                    args.append(o)
-            if self.ops.has(node.name):
-                ret = self.ops.lookup(node.name)(args, kwargs)
-            else:
-                raise TypeError(f"Interpreter: Unsupport operation {node.name}")
-        return ret
+            raise TypeError(f"Interpreter: Unsupport operation {node.name}")
     
     def visitArgumentList(self, node: ArgumentList):
         args = [self.visit(o) for o in node.args if o]

@@ -24,7 +24,7 @@ import numpy as np
 
 from fleet_compiler.frontend.python.lexer import Tokenizer, TokenKind
 from fleet_compiler.frontend.python.parsing import Parser, AstDumper
-from fleet_compiler.frontend.python.semantic import ReferenceResolvePass, ReplaceAliasOperationNamePass, BuiltinReferenceResolvePass
+from fleet_compiler.frontend.python.semantic import ReferenceResolvePass, OperatorReferenceResolvePass
 from fleet_compiler.frontend.python.pass_manager import Pipeline
 from fleet_compiler.frontend.python.syntax import AstModule, AstVisitor
 from fleet_compiler.frontend.python.runtime import Interpreter
@@ -123,8 +123,7 @@ def main():
 
     pipeline = Pipeline()
     pipeline.add(ReferenceResolvePass())
-    pipeline.add(ReplaceAliasOperationNamePass())
-    pipeline.add(BuiltinReferenceResolvePass())
+    pipeline.add(OperatorReferenceResolvePass())
     pipeline.run(module, True)
 
     if args.emitAST:
