@@ -18,6 +18,7 @@ import re
 import os
 
 import fleet_compiler.frontend.python.operators.python.ops
+import fleet_compiler.frontend.python.operators.python.time.ops
 import fleet_compiler.frontend.python.operators.numpy.ops
 import fleet_compiler.frontend.python.operators.numpy.random.ops
 
