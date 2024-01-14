@@ -16,6 +16,10 @@ class TestExpression(unittest.TestCase):
         data = 'a = 2 * 8**2;assert(a == 128)'
         run_e2e_test(data)
 
+    def testExpression3(self):
+        data = 'def foo(a):\n  return a ** 3\nassert(2 + 3 * foo(3) == 83)'
+        run_e2e_test(data)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

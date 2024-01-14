@@ -75,9 +75,11 @@ class OperatorReferenceResolvePass(Pass):
     def __init__(self) -> None:
         super().__init__()
         self.alias_tab = {}
-        self.builtins = ['print', 'assert']
+        self.imported = []
+        self.builtins = ['print', 'assert', 'time', 'sum']
 
     def visitImportStatement(self, node: ImportStatement):
+        self.imported.append(node.package)
         if node.alias != "":
             self.alias_tab[node.alias] = node.package
 
@@ -86,12 +88,16 @@ class OperatorReferenceResolvePass(Pass):
         if node.sym is None:
             parts = node.name.split('.')
             pkg_or_func = parts[0]
+            op_name = None
             if pkg_or_func in self.builtins: # print -> python._print
-                op_name = 'python.' + '.'.join(parts[:-1]) + "_" + parts[-1]
-            elif pkg_or_func in self.alias_tab: # np.xxx -> numpy.xxx
+                mid = '.' + '.'.join(parts[:-1]) + '.' if len(parts) > 1 else "."
+                op_name = 'python' + mid + "_" + parts[-1]
+            elif pkg_or_func in self.alias_tab: # import numpy as np; np.xxx -> numpy.xxx
                 op_name = '.'.join([self.alias_tab[pkg_or_func]] + \
                     node.name.split('.')[1:])
-            else:
+            elif pkg_or_func in self.imported: # e.g. import numpy; numpy.xxx
                 op_name = node.name
-            node.sym = OperatorSymbol(SymbolKind.OperatorSymbol, op_name, self)
+
+            if op_name is not None:
+                node.sym = OperatorSymbol(SymbolKind.OperatorSymbol, op_name, self)
         return super().visitFunctionCall(node)

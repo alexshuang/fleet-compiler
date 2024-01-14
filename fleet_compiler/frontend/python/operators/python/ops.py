@@ -19,3 +19,6 @@ def _print(args, kwargs):
 
 def _assert(args, kwargs):
     assert(args[0])
+
+def _sum(args, kwargs):
+    return sum(*args, **kwargs)

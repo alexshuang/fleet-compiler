@@ -14,28 +14,8 @@
 #
 # ===---------------------------------------------------------------------------
 
-import numpy as np
+import time
 
-def matmul(args, kwargs):
-    return np.matmul(*args, **kwargs)
+def _time(args, kwargs):
+    return time.time(*args, **kwargs)
 
-def sqrt(args, kwargs):
-    return np.sqrt(*args, **kwargs)
-
-def tanh(args, kwargs):
-    return np.tanh(*args, **kwargs)
-
-def shape(args, kwargs):
-    return np.shape(*args, **kwargs)
-
-def power(args, kwargs):
-    return np.power(*args, **kwargs)
-
-def ones(args, kwargs):
-    return np.ones(*args, **kwargs)
-
-def sum(args, kwargs):
-    return np.sum(*args, **kwargs)
-
-def allclose(args, kwargs):
-    return np.allclose(*args, **kwargs)
