@@ -50,6 +50,10 @@ class TestSyntax(unittest.TestCase):
         data = "''' hello comments '''"
         run_test(data)
 
+    def testReturnInSubBlock(self):
+        data = 'def foo():\n  def bar():\n    return 20\n  return bar()\nassert(foo() == 20)'
+        run_e2e_test(data)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
