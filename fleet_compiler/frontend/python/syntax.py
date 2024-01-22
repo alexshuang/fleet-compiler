@@ -102,6 +102,25 @@ class BlockEnd(Statement):
         return visitor.visitBlockEnd(self)
 
 
+class Branch(Statement):
+    def __init__(self, cond: Expression, block: Block):
+        self.is_else_branch = True if cond is None else False
+        self.cond = cond
+        self.block = block
+    
+    def accept(self, visitor):
+        return visitor.visitBranch(self)
+
+
+class IfStatement(Statement):
+    def __init__(self, branches: list) -> None:
+        super().__init__()
+        self.branches = branches
+    
+    def accept(self, visitor):
+        return visitor.visitIfStatement(self)
+
+
 class AstModule(AstNode):
     def __init__(self, block: Block) -> None:
         self.block = block
@@ -355,6 +374,15 @@ class AstVisitor:
     def visitBinary(self, node: Binary):
         return self.visit(node.exp1), self.visit(node.exp2)
 
+    def visitIfStatement(self, node: IfStatement):
+        for b in node.branches:
+            self.visitBranch(b)
+
+    def visitBranch(self, node: Branch):
+        if node.cond:
+            self.visit(node.cond)
+        self.visit(node.block)
+
 
 class AstDumper(AstVisitor):
     def __init__(self, prefix="") -> None:
@@ -445,6 +473,21 @@ class AstDumper(AstVisitor):
     
     def visitUnary(self, node: Unary):
         return self.visit(node.exp)
+
+    def visitIfStatement(self, node: IfStatement):
+        print(self.prefix + "If Statement")
+        self.inc_indent()
+        for b in node.branches:
+            self.visitBranch(b)
+        self.dec_indent()
+
+    def visitBranch(self, node: Branch):
+        print(self.prefix + ("Else Branch" if node.is_else_branch else "Then Branch"))
+        self.inc_indent()
+        if not node.is_else_branch:
+            print(self.prefix + f"Condition: {self.visit(node.cond)}")
+        self.visitBlock(node.block)
+        self.dec_indent()
 
     def inc_indent(self):
         self.prefix += "  "

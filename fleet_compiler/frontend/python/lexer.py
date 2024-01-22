@@ -22,13 +22,13 @@ def is_boolean(data):
     return data in ['True', 'False']
 
 def is_keyword(data):
-    return data in ['def']
+    return data in ['def', 'if', 'elif', 'else']
 
 def is_terminator(ch):
     return ch == '\n' or ch == ';'
 
 def is_operator(ch):
-    return ch in ['+', '-', '*', '/', '%', '^', '&', '=', '!', '@']
+    return ch in ['+', '-', '*', '/', '%', '^', '&', '=', '@', '!', '<', '>']
 
 def is_alpha(ch):
     return (ch >= 'a' and ch <= 'z') or (ch >= 'A' and ch <= 'Z')

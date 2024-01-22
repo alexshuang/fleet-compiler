@@ -54,6 +54,14 @@ class TestSyntax(unittest.TestCase):
         data = 'def foo():\n  def bar():\n    return 20\n  return bar()\nassert(foo() == 20)'
         run_e2e_test(data)
 
+    def testIf(self):
+        data = 'x = 1\nif x <= 1:\n  y = 10\nelse:\n  y = 20\nassert(y == 10)'
+        run_e2e_test(data)
+
+    def testIf2(self):
+        data = 'def fib(n):\n if n <= 1:\n  return n\n else:\n  return fib(n - 1) + fib(n - 2)\nassert(fib(6) == 8)'
+        run_e2e_test(data)
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

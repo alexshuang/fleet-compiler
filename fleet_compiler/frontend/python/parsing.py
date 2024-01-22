@@ -58,7 +58,8 @@ class Parser:
     block = statementList
     statementList = statement*
     statement = indentation (functionDef | functionCall | returnStatement | \
-        variableDef | expressionStatement | emptyStatement | importStatement)
+        variableDef | expressionStatement | emptyStatement | importStatement | \
+        ifStatement)
     indentation = ' '*
     funcitonDef = 'def' Identifier signature ':'
     functionCall = Identifier '(' args ')' terminator
@@ -72,6 +73,7 @@ class Parser:
     typeName = StringLiteral
     emptyStatement = terminator
     importStatement = 'import' package ('as' Identifier)? terminator
+    ifStatement = 'if' expression ':' '\n' block ('elif' expression ':' '\n' block)? ('else' ':' '\n' block)?
     package = Identifier ('.' Identifier)*
     expressionStatement = expression terminator
     expression = assignment
@@ -136,6 +138,8 @@ class Parser:
             ret = self.parse_return()
         elif t.data == "import":
             ret = self.parse_import()
+        elif t.data == "if":
+            ret = self.parse_if()
         elif t.kind == TokenKind.Identifier:
             ret = self.parse_identifier()
         elif t.kind == TokenKind.Terminator: # empty statement
@@ -417,6 +421,50 @@ class Parser:
         if t.kind == TokenKind.Terminator:
             self.tokenizer.next() # skip terminator
 
+    def parse_if(self):
+        '''
+        ifStatement = 'if' expression ':' '\n' block ('elif' expression ':' '\n' block)? ('else' ':' '\n' block)?
+        '''
+        def skip_colon_terminator():
+            t = self.tokenizer.peak()
+            if t.data != ':':
+                self.raise_if_error(f"Expect got ':' here, not {t.data}")
+            self.tokenizer.next() # skip :
+            t = self.tokenizer.peak()
+            if t.kind != TokenKind.Terminator:
+                self.raise_if_error(f"Expect got '\\n' here, not {t.data}")
+            self.tokenizer.next() # skip \n
+            
+        def parse_branch():
+            is_else_branch = self.tokenizer.peak().data == 'else'
+            self.tokenizer.next() # skip if, elif or else
+            cond = self.parse_expression() if not is_else_branch else None
+            skip_colon_terminator()
+            self.enter_indent()
+            block = self.parse_block()
+            return Branch(cond, block)
+
+        def is_valid(tok):
+            return tok.kind == TokenKind.Keyword and tok.data in ['if', 'elif', 'else']
+
+        branches = []
+        branches.append(parse_branch())
+        while True:
+            t = self.tokenizer.peak()
+            if t.kind == TokenKind.Indentation:
+                self.tokenizer.save_checkpoint()
+                self.tokenizer.next()
+                if is_valid(self.tokenizer.peak()):
+                    branches.append(parse_branch())
+                else:
+                    self.tokenizer.load_checkpoint()
+                    break
+            elif is_valid(t):
+                branches.append(parse_branch())
+            else:
+                break
+        return IfStatement(branches)
+ 
     def enter_indent(self):
         # enter new indent
         self.indentation = Indentation(self.indentation)
@@ -449,3 +497,6 @@ class Parser:
 
     def raise_arg_error(self, msg):
         raise self.raise_error(SyntaxErrorCode.Argument, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_if_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.If, f"{self.tokenizer.location_str} : {msg}")
