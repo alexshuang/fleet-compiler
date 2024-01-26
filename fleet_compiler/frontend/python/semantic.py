@@ -101,3 +101,15 @@ class OperatorReferenceResolvePass(Pass):
             if op_name is not None:
                 node.sym = OperatorSymbol(SymbolKind.OperatorSymbol, op_name, self)
         return super().visitFunctionCall(node)
+
+
+class HandleSliceOpPass(Pass):
+    '''
+    Create an OperatorSymbol for SliceStatement.
+    Todo: replace slice op to function call.
+    '''
+    def __init__(self) -> None:
+        super().__init__()
+
+    def visitSliceStatement(self, node: SliceStatement):
+        node.sym = OperatorSymbol(SymbolKind.OperatorSymbol, 'python._slice', self)

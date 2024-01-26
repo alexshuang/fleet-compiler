@@ -39,3 +39,6 @@ def sum(args, kwargs):
 
 def allclose(args, kwargs):
     return np.allclose(*args, **kwargs)
+
+def arange(args, kwargs):
+    return np.arange(*args, **kwargs)
