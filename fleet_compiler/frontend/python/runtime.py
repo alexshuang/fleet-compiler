@@ -174,6 +174,20 @@ class Interpreter(AstVisitor):
                 self.exit()
                 return ret
 
+    def visitSliceStatement(self, node: SliceStatement):
+        slice_str = self.visitSlice(node.slice)
+        op_name = node.sym.op_name
+        if self.ops.has(op_name):
+            return self.ops.lookup(op_name)([self.get_variable_value(node.name), slice_str], {})
+
+    def visitSlice(self, node: Slice):
+        slices = [str(self.visit(o)) for o in node.exps]
+        if node.omitted_first_dim:
+            slices = [''] + slices
+        if node.omitted_last_dim:
+            slices.append('')
+        return ':'.join(slices)
+
     def visitBranch(self, node: Branch):
         return super().visitBranch(node)
 

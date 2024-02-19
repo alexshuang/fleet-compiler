@@ -73,6 +73,8 @@ class Parser:
     typeName = StringLiteral
     emptyStatement = terminator
     importStatement = 'import' package ('as' Identifier)? terminator
+    listItems = Identifier '[' range ']'
+    range = expression (:? expression?)*
     ifStatement = 'if' expression ':' '\n' block ('elif' expression ':' '\n' block)? ('else' ':' '\n' block)?
     package = Identifier ('.' Identifier)*
     expressionStatement = expression terminator
@@ -243,6 +245,8 @@ class Parser:
         '''
         functionCall = Identifier '(' args ')' terminator
         variableDef = Identifier typeAnnotation? '=' expressionStatement terminator
+        listItems = Identifier '[' range ']'
+        range = expression (:? expression?)*
         '''
         name = self.tokenizer.next().data # skip identifier
         t = self.tokenizer.peak()
@@ -255,7 +259,15 @@ class Parser:
             else:
                 ret = Variable(name, type)
         elif t.data == "=":
-            init = self.parse_expression_statement()
+            self.tokenizer.save_checkpoint()
+            self.tokenizer.next()
+            t1 = self.tokenizer.next()
+            t2 = self.tokenizer.peak()
+            if t1.kind == TokenKind.Identifier and t2.data == '[':
+                init = SliceStatement(t1.data, self.parse_slice())
+            else:
+                self.tokenizer.load_checkpoint()
+                init = self.parse_expression_statement()
             ret = VariableDef(name, None, init)
         elif t.data == "(":
             ret = self.parse_function_call(name)
@@ -465,6 +477,20 @@ class Parser:
                 break
         return IfStatement(branches)
  
+    def parse_slice(self):
+        tokens = []
+        self.tokenizer.next() # skip [
+        while self.tokenizer.peak().data != ']':
+            if self.tokenizer.peak().data == ':':
+                tokens.append(self.tokenizer.next().data) # skip :
+            else:
+                tokens.append(self.parse_expression())
+        omitted_first_dim = True if tokens[0] == ':' else False
+        omitted_last_dim = True if tokens[-1] == ':' else False
+        self.tokenizer.next() # skip ]
+        exps = [o for o in tokens if o != ':']
+        return Slice(exps, omitted_first_dim, omitted_last_dim)
+
     def enter_indent(self):
         # enter new indent
         self.indentation = Indentation(self.indentation)

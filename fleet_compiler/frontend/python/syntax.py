@@ -186,7 +186,7 @@ class FunctionCall(Expression):
 
 
 class VariableDef(Statement):
-    def __init__(self, name: str, type, init: ExpressionStatement) -> None:
+    def __init__(self, name: str, type, init) -> None:
         super().__init__()
         self.name = name
         self.type = type
@@ -288,6 +288,28 @@ class EmptyStatement(Statement):
         return visitor.visitEmptyStatement(self)
 
 
+class Slice(Expression):
+    def __init__(self, exps: list, omitted_first_dim: bool = False, omitted_last_dim: bool = False) -> None:
+        super().__init__()
+        self.exps = exps
+        self.omitted_first_dim = omitted_first_dim
+        self.omitted_last_dim = omitted_last_dim
+    
+    def accept(self, visitor):
+        return visitor.visitSlice(self)
+    
+
+class SliceStatement(Statement):
+    def __init__(self, name, slice_obj: Slice) -> None:
+        super().__init__()
+        self.name = name
+        self.slice = slice_obj
+        self.sym = None
+    
+    def accept(self, visitor):
+        return visitor.visitSliceStatement(self)
+
+
 class AstVisitor:
     def visit(self, node: AstNode):
         return node.accept(self)
@@ -377,6 +399,13 @@ class AstVisitor:
     def visitIfStatement(self, node: IfStatement):
         for b in node.branches:
             self.visitBranch(b)
+    
+    def visitSliceStatement(self, node: SliceStatement):
+        self.visitSlice(node.slice)
+
+    def visitSlice(self, node: Slice):
+        for o in node.exps:
+            self.visit(o) 
 
     def visitBranch(self, node: Branch):
         if node.cond:
@@ -449,7 +478,7 @@ class AstDumper(AstVisitor):
         return f"Return {self.visit(node.ret) if node.ret else None}"
     
     def visitVariableDef(self, node: VariableDef):
-        init = self.visitExpressionStatement(node.init)
+        init = self.visit(node.init)
         return f"Variable define {node.name}, init: {init}"
 
     def visitBooleanLiteral(self, node: BooleanLiteral):
@@ -488,6 +517,17 @@ class AstDumper(AstVisitor):
             print(self.prefix + f"Condition: {self.visit(node.cond)}")
         self.visitBlock(node.block)
         self.dec_indent()
+    
+    def visitSliceStatement(self, node: SliceStatement):
+        return f"Slice {node.name} by {self.visitSlice(node.slice)}"
+
+    def visitSlice(self, node: Slice):
+        slices = [str(self.visit(o)) for o in node.exps]
+        if node.omitted_first_dim:
+            slices = [''] + slices
+        if node.omitted_last_dim:
+            slices.append('')
+        return ':'.join(slices)
 
     def inc_indent(self):
         self.prefix += "  "

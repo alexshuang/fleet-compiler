@@ -22,3 +22,11 @@ def _assert(args, kwargs):
 
 def _sum(args, kwargs):
     return sum(*args, **kwargs)
+
+def _slice(args, kwargs):
+    slice_str = args[1]
+    if ':' in slice_str:
+        parts = [int(o) if o else None for o in slice_str.split(':')]
+        return args[0][slice(*parts)]
+    else:
+        return args[0][int(slice_str)]
