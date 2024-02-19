@@ -57,10 +57,11 @@ class Interpreter(AstVisitor):
             if should_run(o):
                 ret = self.visit(o)
                 if isinstance(ret, RetVal):
+                    if ret.value is not None: # not return by BlockEnd
+                        self.set_return_value(ret.value)
                     return ret
     
     def visitBlockEnd(self, node: BlockEnd):
-        self.set_return_value(None)
         return RetVal()
     
     def visitFunctionCall(self, node: FunctionCall):
@@ -159,6 +160,23 @@ class Interpreter(AstVisitor):
         else:
             raise TypeError(f"Interpreter: Unsupport operator {node.op}")
     
+    def visitIfStatement(self, node: IfStatement):
+        for b in node.branches:
+            # else branch
+            if b.cond is None:
+                self.enter()
+                ret = self.visitBlock(b.block)
+                self.exit()
+                return ret
+            elif self.visit(b.cond): # then branch
+                self.enter()
+                ret = self.visitBlock(b.block)
+                self.exit()
+                return ret
+
+    def visitBranch(self, node: Branch):
+        return super().visitBranch(node)
+
     def enter(self):
         self.call_stack.append(StackFrame())
     
