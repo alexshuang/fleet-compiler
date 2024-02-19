@@ -89,6 +89,7 @@ class Parser:
         self.indentation = None
         self.pos_arg_idx = None
         self.not_allow_indent = True # not allow indent in main phase
+        self.prefetch_stmts = []
     
     def parse_module(self):
         return AstModule(self.parse_block())
@@ -97,6 +98,9 @@ class Parser:
         '''
         statement = newline | indentation (functionDef | functionCall | returnStatement | variableDef | expressionStatement | emptyStatement)
         '''
+        if len(self.prefetch_stmts) > 0:
+            return self.prefetch_stmts.pop(0)
+
         t = self.tokenizer.peak()
         if t.kind == TokenKind.Newline:
             self.tokenizer.next() # skip \n
@@ -106,10 +110,12 @@ class Parser:
         # which not_allow_indent = True. Otherwise, it will rollback indent and 
         # determine the boundary of the block
         if t.kind != TokenKind.Indentation:
-            self.indentation = None
+            while self.indentation:
+                self.exit_indent()
+                self.prefetch_stmts.append(BlockEnd())
             if not self.not_allow_indent:
                 self.not_allow_indent = True
-                return BlockEnd()
+                return self.prefetch_stmts.pop(0)
         else:
             if self.not_allow_indent:
                 self.raise_indent_error(f"Unexpected indentation")
@@ -117,8 +123,10 @@ class Parser:
                 self.tokenizer.next() # skip indent
                 t = self.tokenizer.peak()
             elif self.indentation.match_parents(t.data):
-                self.exit_indent()
-                return BlockEnd()
+                while not self.indentation.match(t.data):
+                    self.exit_indent()
+                    self.prefetch_stmts.append(BlockEnd())
+                return self.prefetch_stmts.pop(0)
             else:
                 self.raise_indent_error(f"Unexpected indentation")
         

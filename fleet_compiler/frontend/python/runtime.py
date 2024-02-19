@@ -28,7 +28,7 @@ class RetVal:
 class StackFrame:
     def __init__(self) -> None:
         self.variables = {} # local variables
-        self.ret: RetVal = None # return value
+        self.ret_val = None # return value
 
     def update(self, name: str, value):
         self.variables[name] = value
@@ -57,11 +57,10 @@ class Interpreter(AstVisitor):
             if should_run(o):
                 ret = self.visit(o)
                 if isinstance(ret, RetVal):
-                    break
-
-        return ret.value if ret else None
+                    return ret
     
     def visitBlockEnd(self, node: BlockEnd):
+        self.set_return_value(None)
         return RetVal()
     
     def visitFunctionCall(self, node: FunctionCall):
@@ -107,7 +106,7 @@ class Interpreter(AstVisitor):
                 ret = self.visitBlock(func.block)
 
                 self.exit() # pop
-                return ret
+                return self.call_stack[-1].ret_val
         else:
             raise TypeError(f"Interpreter: Unsupport operation {node.name}")
     
@@ -123,6 +122,7 @@ class Interpreter(AstVisitor):
 
     def visitReturnStatement(self, node: ReturnStatement):
         value = self.visit(node.ret) if node.ret else None
+        self.set_return_value(value)
         return RetVal(value)
 
     def visitParamentDef(self, node: ParamentDef):
@@ -179,3 +179,7 @@ class Interpreter(AstVisitor):
         frame = self.call_stack[-1]
         if frame:
             frame.update(name, value)
+
+    def set_return_value(self, value):
+        self.call_stack[-2].ret_val = value
+
