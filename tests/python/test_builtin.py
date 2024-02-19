@@ -28,6 +28,10 @@ class TestBuiltin(unittest.TestCase):
         data = 'import numpy as np\na = np.arange(10)\nb = a[4:6]\nb = b[1]\nassert(b == 5)'
         run_e2e_test(data)
 
+    def testSlice4(self):
+        data = 'import numpy as np\na = np.arange(10)\nb = a[4:6]\nassert(b[1] == 5)'
+        run_e2e_test(data)
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
