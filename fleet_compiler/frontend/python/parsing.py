@@ -271,6 +271,8 @@ class Parser:
             ret = VariableDef(name, None, init)
         elif t.data == "(":
             ret = self.parse_function_call(name)
+        elif t.data == "[":
+            ret = SliceStatement(name, self.parse_slice())
         else:
             self.raise_statement_error(f"Unsupport statement which start with {t.data}")
         self.skip_terminator()
@@ -370,6 +372,8 @@ class Parser:
             self.tokenizer.next()
             if self.tokenizer.peak().data == '(':
                 return self.parse_function_call(t.data)
+            elif self.tokenizer.peak().data == '[':
+                return SliceStatement(t.data, self.parse_slice())
             else:
                 return Variable(t.data)
         else:
