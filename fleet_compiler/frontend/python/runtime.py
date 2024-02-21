@@ -191,6 +191,12 @@ class Interpreter(AstVisitor):
     def visitBranch(self, node: Branch):
         return super().visitBranch(node)
 
+    def visitListStatement(self, node: ListStatement):
+        return self.visitListContent(node.content)
+
+    def visitListContent(self, node: ListContent):
+        return [self.visit(o) for o in node.exps]
+
     def enter(self):
         self.call_stack.append(StackFrame())
     

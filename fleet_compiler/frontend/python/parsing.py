@@ -260,14 +260,17 @@ class Parser:
                 ret = Variable(name, type)
         elif t.data == "=":
             self.tokenizer.save_checkpoint()
-            self.tokenizer.next()
-            t1 = self.tokenizer.next()
-            t2 = self.tokenizer.peak()
-            if t1.kind == TokenKind.Identifier and t2.data == '[':
-                init = SliceStatement(t1.data, self.parse_slice())
+            self.tokenizer.next() # skip =
+            if self.tokenizer.peak().data == '[':
+                init = ListStatement(self.parse_list())
             else:
-                self.tokenizer.load_checkpoint()
-                init = self.parse_expression_statement()
+                t1 = self.tokenizer.next()
+                t2 = self.tokenizer.peak()
+                if t1.kind == TokenKind.Identifier and t2.data == '[':
+                    init = SliceStatement(t1.data, self.parse_slice())
+                else:
+                    self.tokenizer.load_checkpoint()
+                    init = self.parse_expression_statement()
             ret = VariableDef(name, None, init)
         elif t.data == "(":
             ret = self.parse_function_call(name)
@@ -345,7 +348,7 @@ class Parser:
     def parse_primary(self):
         '''
         primary = StringLiteral | IntegerLiteral | DecimalLiteral | NoneLiteral |
-            BooleanLiteral | functionCall | '(' expression ')'
+            BooleanLiteral | functionCall | '(' expression ')' | '[' expression? (, expression)* ']'
         '''
         ret = None
         t = self.tokenizer.peak()
@@ -367,7 +370,9 @@ class Parser:
         if ret:
             self.tokenizer.next()
             return ret
-        
+        elif t.data == '[':
+            self.tokenizer.next() # skip '['
+            return ListStatement(self.parse_list())
         elif t.kind == TokenKind.Identifier:
             self.tokenizer.next()
             if self.tokenizer.peak().data == '(':
@@ -495,6 +500,25 @@ class Parser:
         exps = [o for o in tokens if o != ':']
         return Slice(exps, omitted_first_dim, omitted_last_dim)
 
+    def parse_list(self):
+        data = []
+        self.tokenizer.next() # skip [
+        t = self.tokenizer.peak()
+        while t.kind != TokenKind.EOF and t.data != ']':
+            data.append(self.parse_expression())
+            t = self.tokenizer.peak()
+            if t.data != ']':
+                if t.data == ',':
+                    t = self.tokenizer.next()
+                else:
+                    self.raise_list_error(f"Expect got ',' here, not {t.data}")
+        t = self.tokenizer.peak()
+        if t.data == ']':
+            self.tokenizer.next() # skip ]
+        else:
+            self.raise_list_error(f"Expect got ']' here, not {t.data}")
+        return ListContent(data)
+
     def enter_indent(self):
         # enter new indent
         self.indentation = Indentation(self.indentation)
@@ -530,3 +554,6 @@ class Parser:
 
     def raise_if_error(self, msg):
         raise self.raise_error(SyntaxErrorCode.If, f"{self.tokenizer.location_str} : {msg}")
+
+    def raise_list_error(self, msg):
+        raise self.raise_error(SyntaxErrorCode.List, f"{self.tokenizer.location_str} : {msg}")

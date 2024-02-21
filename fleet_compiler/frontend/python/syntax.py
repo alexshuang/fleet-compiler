@@ -305,9 +305,27 @@ class SliceStatement(Statement):
         self.name = name
         self.slice = slice_obj
         self.sym = None
-    
+
     def accept(self, visitor):
         return visitor.visitSliceStatement(self)
+
+
+class ListContent(Expression):
+    def __init__(self, exps: list) -> None:
+        super().__init__()
+        self.exps = exps
+    
+    def accept(self, visitor):
+        return visitor.visitListContent(self)
+
+
+class ListStatement(Statement):
+    def __init__(self, content: ListContent) -> None:
+        super().__init__()
+        self.content = content
+    
+    def accept(self, visitor):
+        return visitor.visitListStatement(self)
 
 
 class AstVisitor:
@@ -405,12 +423,19 @@ class AstVisitor:
 
     def visitSlice(self, node: Slice):
         for o in node.exps:
-            self.visit(o) 
+            self.visit(o)
 
     def visitBranch(self, node: Branch):
         if node.cond:
             self.visit(node.cond)
         self.visit(node.block)
+
+    def visitListStatement(self, node: ListStatement):
+        self.visitListContent(node.content)
+
+    def visitListContent(self, node: ListContent):
+        for o in node.exps:
+            self.visit(o) 
 
 
 class AstDumper(AstVisitor):
@@ -528,6 +553,12 @@ class AstDumper(AstVisitor):
         if node.omitted_last_dim:
             slices.append('')
         return ':'.join(slices)
+
+    def visitListStatement(self, node: ListStatement):
+        return f"{self.visitListContent(node.content)}"
+
+    def visitListContent(self, node: ListContent):
+        return [self.visit(o) for o in node.exps]
 
     def inc_indent(self):
         self.prefix += "  "
