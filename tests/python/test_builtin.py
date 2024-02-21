@@ -32,6 +32,15 @@ class TestBuiltin(unittest.TestCase):
         data = 'import numpy as np\na = np.arange(10)\nb = a[4:6]\nassert(b[1] == 5)'
         run_e2e_test(data)
 
+    def testList(self):
+        data = 'a = [1, 2, 3, 4]\nassert(a[1] == 2)\nassert(a[3] == 4)'
+        run_e2e_test(data)
+
+    def testList2(self):
+        data = 'a = [1, 2, 3, 4]\nb = []\nb = b + a\nassert(b[3] == 4)'
+        run_e2e_test(data)
+
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()

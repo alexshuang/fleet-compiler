@@ -35,6 +35,7 @@ class SyntaxErrorCode(Enum):
     Primary = auto()
     Operator = auto()
     If = auto()
+    List = auto()
     # OpenBracket = auto()            # [
     # CloseBracket = auto()           # ]
     # OpenParen = auto()              # (
