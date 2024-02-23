@@ -1,6 +1,8 @@
 # fleet-compiler
 
-An MLIR-based(coming soon) AI compiler designed for PyTorch(coming soon)/Python-like DSL (domain-specific languages) to CPU/RISC-V DSA (domain-specific architectures).
+An MLIR-based AI compiler designed for Python-like and PyTorch frontends to CPU/RISC-V DSA (domain-specific architectures).
+
+_Note: Python-like E2E will be supported in preference to PyTorch._
 
 ## Quick Start
 
@@ -10,9 +12,9 @@ pip install fleet-compiler
 # Or editable: pip install -e .
 ```
 
-2. Try one sample, run a "pythonic" example on CPU:
+2. Try inference a "Pythonic" gpt2 example:
 ```
-fleet_compiler_cli --input examples/ffn_example.py
+fleet_compiler_cli --input examples/gpt2.py
 ```
 
 ## Developers
