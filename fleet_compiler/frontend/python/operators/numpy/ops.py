@@ -42,3 +42,30 @@ def allclose(args, kwargs):
 
 def arange(args, kwargs):
     return np.arange(*args, **kwargs)
+
+def stack(args, kwargs):
+    return np.stack(*args, **kwargs)
+
+def mean(args, kwargs):
+    return np.mean(*args, **kwargs)
+
+def var(args, kwargs):
+    return np.var(*args, **kwargs)
+
+def split(args, kwargs):
+    return np.split(*args, **kwargs)
+
+def tri(args, kwargs):
+    return np.tri(*args, **kwargs)
+
+def transpose(args, kwargs):
+    return np.transpose(*args, **kwargs)
+
+def max(args, kwargs):
+    return np.max(*args, **kwargs)
+
+def exp(args, kwargs):
+    return np.exp(*args, **kwargs)
+
+def hstack(args, kwargs):
+    return np.hstack(*args, **kwargs)

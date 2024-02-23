@@ -78,6 +78,8 @@ class Interpreter(AstVisitor):
                 op_name = node.sym.op_name
                 if self.ops.has(op_name):
                     return self.ops.lookup(op_name)(args, kwargs)
+                else:
+                    raise TypeError(f"Interpreter: Unsupport operation {node.name}")
             else: # function define
                 self.enter() # push
 
