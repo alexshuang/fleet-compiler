@@ -29,4 +29,4 @@ def _slice(args, kwargs):
         parts = [int(o) if o else None for o in slice_str.split(':')]
         return args[0][slice(*parts)]
     else:
-        return args[0][int(slice_str)]
+        return args[0][eval(slice_str)]

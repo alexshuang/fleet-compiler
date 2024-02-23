@@ -76,7 +76,7 @@ class OperatorReferenceResolvePass(Pass):
         super().__init__()
         self.alias_tab = {}
         self.imported = []
-        self.builtins = ['print', 'assert', 'time', 'sum']
+        self.builtins = ['print', 'assert', 'time', 'sum', 'map', 'len', 'range', 'list']
 
     def visitImportStatement(self, node: ImportStatement):
         self.imported.append(node.package)
