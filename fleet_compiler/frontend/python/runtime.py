@@ -15,7 +15,7 @@
 # ===---------------------------------------------------------------------------
 
 from .lexer import Op
-from .syntax import *
+from .ast import *
 from .ops import Operation
 from .symbolic import OperatorSymbol
 

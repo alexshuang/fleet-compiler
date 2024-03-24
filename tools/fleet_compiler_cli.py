@@ -26,7 +26,7 @@ from fleet_compiler.frontend.python.lexer import Tokenizer, TokenKind
 from fleet_compiler.frontend.python.parsing import Parser, AstDumper
 from fleet_compiler.frontend.python.semantic import ReferenceResolvePass, OperatorReferenceResolvePass, HandleSliceOpPass
 from fleet_compiler.frontend.python.pass_manager import Pipeline
-from fleet_compiler.frontend.python.syntax import AstModule, AstVisitor
+from fleet_compiler.frontend.python.ast import AstModule, AstVisitor
 from fleet_compiler.frontend.python.runtime import Interpreter
 
 from fleet_compiler.mlir.importers.ast import ASTModuleImporter

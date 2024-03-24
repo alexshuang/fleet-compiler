@@ -19,7 +19,7 @@
 # 
 # ===---------------------------------------------------------------------------
 
-from .syntax import *
+from .ast import *
 from .scope import Scope
 from .symbolic import *
 from .pass_manager import *

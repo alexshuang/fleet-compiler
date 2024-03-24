@@ -1,4 +1,4 @@
-from fleet_compiler.frontend.python.syntax import AstModule, AstVisitor
+from fleet_compiler.frontend.python.ast import AstModule, AstVisitor
 
 import iree.compiler
 import iree.compiler._mlir_libs

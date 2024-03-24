@@ -14,7 +14,7 @@
 #
 # ===---------------------------------------------------------------------------
 
-from .syntax import *
+from .ast import *
 from .symbolic import *
 
 
