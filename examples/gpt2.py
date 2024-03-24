@@ -27,12 +27,13 @@ def attention(q, k, v, mask):
 
 def mha(x, n_head):
     x = linear(x, c_attn_w, c_attn_b)
+    # Not support for-loop, unroll it
+    # out_heads = [attention(q, k, v, casual_mask) for q, k, v in zip(*qkv_heads)]
     qkv = np.split(x, 3, axis=-1)
     q = np.split(qkv[0], n_head, axis=-1)
     k = np.split(qkv[1], n_head, axis=-1)
     v = np.split(qkv[2], n_head, axis=-1)
     casual_mask = (1 - np.tri(bs)) * -0.0000000001
-    # Not support for-loop, unroll it
     head0 = attention(q[0], k[0], v[0], casual_mask)
     head1 = attention(q[1], k[1], v[1], casual_mask)
     head2 = attention(q[2], k[2], v[2], casual_mask)
@@ -60,6 +61,8 @@ def gpt2(x):
     x = wte[inputs]
     x = x + wpe[pos_array]
     # Not support for-loop, unroll it
+    # for block in blocks:
+    #   x = transformer_block(x, **block, n_head=n_head)
     x = transformer_block(x)
     x = transformer_block(x)
     x = transformer_block(x)
@@ -92,7 +95,7 @@ np.random.seed(42)
 wte = np.random.randn(vocab_size, n_embed)
 wpe = np.random.randn(n_positions, n_embed)
 
-# layer 0
+# Shared with all layers
 c_fc_w = np.random.randn(n_embed, 4 * n_embed)
 c_fc_b = np.random.randn(4 * n_embed)
 c_proj_w = np.random.randn(4 * n_embed, n_embed)

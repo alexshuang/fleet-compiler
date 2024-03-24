@@ -29,6 +29,8 @@ from fleet_compiler.frontend.python.pass_manager import Pipeline
 from fleet_compiler.frontend.python.syntax import AstModule, AstVisitor
 from fleet_compiler.frontend.python.runtime import Interpreter
 
+from fleet_compiler.mlir.importers.ast import ASTModuleImporter
+
 
 def create_dir(path: str):
     if os.path.isfile(path):
@@ -83,8 +85,8 @@ def validate(src_path: str, m: AstModule, v: AstVisitor):
 def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
-    parser.add_argument('--input', type=str, required=True, help='Input file path')
-    parser.add_argument('--output-dir', type=str, help='Output file path')
+    parser.add_argument('input', type=str, help='Input file path of *.py')
+    parser.add_argument('--output-dir', '-o', type=str, help='Output dir path')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
@@ -111,24 +113,31 @@ def main():
                 fp.write(f"kind={tok.kind.name}, data={tok.data}\n")
 
     parser = Parser(data)
-    module = parser.parse_module()
+    ast_module = parser.parse_module()
 
     ast_dumper = AstDumper()
 
     print("raw AST:")
-    ast_dumper.visit(module)
+    ast_dumper.visit(ast_module)
 
     if args.emitAST:
-        save_output(output_file_stem + ".before.ast", module, ast_dumper)
+        save_output(output_file_stem + ".before.ast", ast_module, ast_dumper)
 
     pipeline = Pipeline()
     pipeline.add(ReferenceResolvePass())
     pipeline.add(OperatorReferenceResolvePass())
     pipeline.add(HandleSliceOpPass())
-    pipeline.run(module, True)
+    pipeline.run(ast_module, True)
 
     if args.emitAST:
-        save_output(output_file_stem + ".after.ast", module, ast_dumper)
+        save_output(output_file_stem + ".after.ast", ast_module, ast_dumper)
+
+    module = ASTModuleImporter(ast_module).import_graph()
+    module.dump()
+    return
+
+    if args.emitMLIR:
+        save_output(output_file_stem + ".mlir", module, ast_dumper)
 
     if args.only_compile:
         return
