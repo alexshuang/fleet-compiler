@@ -15,7 +15,7 @@
 # ===---------------------------------------------------------------------------
 
 from .lexer import *
-from .syntax import *
+from .ast import *
 from .dtype import *
 from .indentation import *
 from .error import SyntaxException, SyntaxErrorCode
