@@ -15,7 +15,7 @@
 # ===---------------------------------------------------------------------------
 
 import re
-from .syntax import *
+from .ast import *
 
 
 def camel_to_snake(name):
