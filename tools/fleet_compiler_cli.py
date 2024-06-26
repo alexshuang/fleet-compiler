@@ -29,6 +29,8 @@ from fleet_compiler.frontend.python.pass_manager import Pipeline
 from fleet_compiler.frontend.python.ast import AstModule, AstVisitor
 from fleet_compiler.frontend.python.runtime import Interpreter
 
+from fleet_compiler.ir.importer import ASTModuleImporter
+from fleet_compiler.ir.printer import Printer
 
 def create_dir(path: str):
     if os.path.isfile(path):
@@ -111,34 +113,38 @@ def main():
                 fp.write(f"kind={tok.kind.name}, data={tok.data}\n")
 
     parser = Parser(data)
-    module = parser.parse_module()
+    ast_module = parser.parse_module()
 
     ast_dumper = AstDumper()
 
     print("raw AST:")
-    ast_dumper.visit(module)
+    ast_dumper.visit(ast_module)
 
     if args.emitAST:
-        save_output(output_file_stem + ".before.ast", module, ast_dumper)
+        save_output(output_file_stem + ".before.ast", ast_module, ast_dumper)
 
     pipeline = Pipeline()
     pipeline.add(ReferenceResolvePass())
     pipeline.add(OperatorReferenceResolvePass())
     pipeline.add(HandleSliceOpPass())
-    pipeline.run(module, True)
+    pipeline.run(ast_module, True)
 
     if args.emitAST:
-        save_output(output_file_stem + ".after.ast", module, ast_dumper)
+        save_output(output_file_stem + ".after.ast", ast_module, ast_dumper)
 
     if args.only_compile:
         return
 
+    print("\nraw IR:")
+    module = ASTModuleImporter(ast_module).import_graph()
+    module.dump()
+
     print("\nrun:")
     interpreter = Interpreter()
-    interpreter.visit(module)
+    interpreter.visit(ast_module)
 
     if args.validation:
-        if validate(args.input, module, interpreter):
+        if validate(args.input, ast_module, interpreter):
             print("validation success!")
         else:
             print("validation failed!")
