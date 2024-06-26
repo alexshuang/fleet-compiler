@@ -85,7 +85,7 @@ def validate(src_path: str, m: AstModule, v: AstVisitor):
 def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
-    parser.add_argument('input', type=str, required=True, help='Input file path')
+    parser.add_argument('input', type=str, help='Input file path')
     parser.add_argument('--output-dir', type=str, help='Output file path')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
