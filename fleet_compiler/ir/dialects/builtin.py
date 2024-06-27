@@ -37,7 +37,7 @@ class UnrankedTensorType(IRType):
 @dataclass
 class StringAttr(Attribute):
     value: str
-    type: StringType = field(init=False, default=StringType())
+    type: StringType = field(init=False, default_factory=StringType)
 
 
 @dataclass
