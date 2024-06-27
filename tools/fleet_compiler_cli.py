@@ -22,12 +22,12 @@ import argparse
 from typing import Union
 import numpy as np
 
-from fleet_compiler.frontend.python.lexer import Tokenizer, TokenKind
-from fleet_compiler.frontend.python.parsing import Parser, AstDumper
-from fleet_compiler.frontend.python.semantic import ReferenceResolvePass, OperatorReferenceResolvePass, HandleSliceOpPass
-from fleet_compiler.frontend.python.pass_manager import Pipeline
-from fleet_compiler.frontend.python.ast import AstModule, AstVisitor
-from fleet_compiler.frontend.python.runtime import Interpreter
+from fleet_compiler.frontend.lexer import Tokenizer, TokenKind
+from fleet_compiler.frontend.parsing import Parser, AstDumper
+from fleet_compiler.frontend.semantic import ReferenceResolvePass, OperatorReferenceResolvePass, HandleSliceOpPass
+from fleet_compiler.frontend.pass_manager import Pipeline
+from fleet_compiler.frontend.ast import AstModule, AstVisitor
+from fleet_compiler.frontend.runtime import Interpreter
 
 from fleet_compiler.ir.importer import ASTModuleImporter
 from fleet_compiler.ir.printer import Printer

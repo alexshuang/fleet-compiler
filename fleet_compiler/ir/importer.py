@@ -20,7 +20,7 @@ from .builder import *
 from .dialects.builtin import *
 from .dialects import arith
 
-from fleet_compiler.frontend.python.ast import (
+from fleet_compiler.frontend.ast import (
     AstModule,
     AstVisitor,
     Block as ASTBlock,

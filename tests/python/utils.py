@@ -1,7 +1,7 @@
-from fleet_compiler.frontend.python.parsing import Parser
-from fleet_compiler.frontend.python.semantic import Pipeline, ReferenceResolvePass, OperatorReferenceResolvePass, HandleSliceOpPass
-from fleet_compiler.frontend.python.runtime import Interpreter
-from fleet_compiler.frontend.python.error import SyntaxException
+from fleet_compiler.frontend.parsing import Parser
+from fleet_compiler.frontend.semantic import Pipeline, ReferenceResolvePass, OperatorReferenceResolvePass, HandleSliceOpPass
+from fleet_compiler.frontend.runtime import Interpreter
+from fleet_compiler.frontend.error import SyntaxException
 
 
 def get_basic_pipeline():

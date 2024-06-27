@@ -17,10 +17,10 @@
 import re
 import os
 
-import fleet_compiler.frontend.python.operators.python.ops
-import fleet_compiler.frontend.python.operators.python.time.ops
-import fleet_compiler.frontend.python.operators.numpy.ops
-import fleet_compiler.frontend.python.operators.numpy.random.ops
+import fleet_compiler.frontend.operators.python.ops
+import fleet_compiler.frontend.operators.python.time.ops
+import fleet_compiler.frontend.operators.numpy.ops
+import fleet_compiler.frontend.operators.numpy.random.ops
 
 
 def get_function_names(file_path):
@@ -48,12 +48,13 @@ class Operation:
     def register_operators(self):
         current_directory = os.path.dirname(os.path.realpath(__file__))
         current_directory_parts = [o for o in current_directory.split('/') if o != '']
-        clip_len = len(current_directory_parts) - 3 # fleet_compiler/frontend/python/...
+        clip_len = len(current_directory_parts) - 2 # fleet_compiler/frontend/python/...
         for file_path in find_ops_paths():
             func_names = get_function_names(file_path)
             path_parts = [o for o in file_path.split('/') if o != '']
             path_parts[-1] = path_parts[-1][:-3] # cut .py from ops.py
             for op in func_names:
+                # import pdb; pdb.set_trace()
                 key = f"{'.'.join(path_parts[len(current_directory_parts)+1:-1])}.{op}"
                 impl = eval(f"{'.'.join(path_parts[clip_len:])}.{op}")
                 self.op_tab[key] = impl
