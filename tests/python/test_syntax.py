@@ -2,7 +2,7 @@ import logging
 import unittest
 
 from utils import *
-from fleet_compiler.frontend.python.error import SyntaxErrorCode as code
+from fleet_compiler.frontend.error import SyntaxErrorCode as code
 
 
 class TestSyntax(unittest.TestCase):
