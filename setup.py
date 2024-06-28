@@ -77,7 +77,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'fleet_compiler_cli = tools.fleet_compiler_cli:main'
+            'fleet_compiler_cli = fleet_compiler.tools.cli:main'
         ],
     },
     license='Apache License v2.0',
