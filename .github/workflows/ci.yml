@@ -23,7 +23,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install .
           pip install -r dev_requirements.txt
-          apt install -y llvm-15 mlir-tools-15
+          sudo apt update
+          sudo apt install -y llvm-15 mlir-tools-15
 
       - name: Run tests
         run: |
