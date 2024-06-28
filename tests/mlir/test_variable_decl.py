@@ -1,4 +1,4 @@
-# RUN: fleet_compiler_cli %s | %FileCheck %s
+# RUN: fleet-compiler-cli %s | %FileCheck %s
 
 a = 2
 

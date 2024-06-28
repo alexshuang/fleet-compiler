@@ -23,6 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install .
+          pip install fleet_compiler_cli
           pip install -r dev_requirements.txt
           sudo apt update
           sudo apt install -y llvm-15 mlir-15-tools
