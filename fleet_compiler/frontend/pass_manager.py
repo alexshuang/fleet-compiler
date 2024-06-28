@@ -49,6 +49,6 @@ class Pipeline:
         self.passes.append(new_pass)
     
     def run(self, node: AstModule, dump: bool = False):
-        print(f"\nRun {self.name}:")
+        # print(f"\nRun {self.name}:")
         for p in self.passes:
             p.run(node, dump)

@@ -443,6 +443,9 @@ class AstDumper(AstVisitor):
         super().__init__()
         self.prefix = prefix
     
+    def __call__(self, node: AstNode):
+        self.visit(node)
+
     def visitModule(self, node: AstModule):
         print(self.prefix + "Module:")
         self.inc_indent()
