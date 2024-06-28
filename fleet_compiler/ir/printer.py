@@ -90,9 +90,10 @@ class Printer:
         self._print_string(operand.name)
 
     def _print_regions(self, op: Operation):
-        self._print_string(" (")
-        self.print_list(op.regions, self._print_region)
-        self._print_string(")")
+        if len(op.regions) > 0 and len(op.regions[0].blocks):
+            self._print_string(" (")
+            self.print_list(op.regions, self._print_region)
+            self._print_string(")")
 
     def _print_region(self, region: Region):
         self._print_string("{\n")

@@ -39,11 +39,11 @@ def create_dir(path: str):
         os.makedirs(path)
 
 
-def save_output(output_path: str, m: AstModule, v: AstVisitor):
+def save_output(output_path: str, fn: callable):
     old_stdout = sys.stdout
     with open(output_path, 'w') as fp:
         sys.stdout = fp
-        v.visit(m)
+        fn()
     sys.stdout = old_stdout
 
 
@@ -86,60 +86,69 @@ def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
     parser.add_argument('input', type=str, help='Input file path')
-    parser.add_argument('--output-dir', type=str, help='Output file path')
+    # parser.add_argument('--dump-intermediates-to', type=str,
+    #                     help='path to write translated executable intermediates (*.token,.ast,.ir etc) into')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
     parser.add_argument('--emitByteCode', action='store_true', help='emit *.bc')
+    parser.add_argument('--output', '-o', type=str, help='Output file path for emit')
     parser.add_argument('--only-compile', action='store_true', help='not run')
     parser.add_argument('--validation', action='store_true', help='validate the results')
 
     args = parser.parse_args()
 
-    if args.output_dir:
-        create_dir(args.output_dir)
-    else:
-        args.output_dir = "."
+    # has_intermediates_dir = False
+    # if args.dump_intermediates_to:
+    #     create_dir(args.dump_intermediates_to)
+    #     has_intermediates_dir = True
 
-    output_file_stem = os.path.join(args.output_dir, os.path.splitext(args.input)[0])
+    # output_file_stem = os.path.join(args.output_dir, os.path.splitext(args.input)[0])
     data = open(args.input, "r").read()
 
     if args.emitToken:
         tokenizer = Tokenizer(data)
-        output_file = output_file_stem + ".token"
-        with open(output_file, "w") as fp:
-            while tokenizer.peak().kind != TokenKind.EOF:
-                tok = tokenizer.next()
-                fp.write(f"kind={tok.kind.name}, data={tok.data}\n")
+        token_list = ""
+        while tokenizer.peak().kind != TokenKind.EOF:
+            tok = tokenizer.next()
+            token_list += f"kind={tok.kind.name}, data='{tok.data}'\n"
+        if args.output:
+            with open(args.output, "w") as fp:
+                fp.write(token_list)
+        else:
+            print(token_list)
 
     parser = Parser(data)
     ast_module = parser.parse_module()
 
-    ast_dumper = AstDumper()
-
-    print("raw AST:")
-    ast_dumper.visit(ast_module)
-
-    if args.emitAST:
-        save_output(output_file_stem + ".before.ast", ast_module, ast_dumper)
+    # if args.emitAST:
+    #     ast_dumper = AstDumper()
+    #     ast_dumper.visit(ast_module)
+    #     # save_output(output_file_stem + ".before.ast", ast_module, ast_dumper)
 
     pipeline = Pipeline()
     pipeline.add(ReferenceResolvePass())
     pipeline.add(OperatorReferenceResolvePass())
     pipeline.add(HandleSliceOpPass())
-    pipeline.run(ast_module, True)
+    pipeline.run(ast_module, False)
 
     if args.emitAST:
-        save_output(output_file_stem + ".after.ast", ast_module, ast_dumper)
+        ast_dumper = AstDumper()
+        if args.output:
+            save_output(args.output, lambda: ast_dumper(ast_module))
+        else:
+            ast_dumper(ast_module)
+
+    module = ASTModuleImporter(ast_module).import_graph()
+    if args.emitMLIR:
+        if args.output:
+            save_output(args.output, lambda: module.dump())
+        else:
+            module.dump()
 
     if args.only_compile:
         return
 
-    print("\nraw IR:")
-    module = ASTModuleImporter(ast_module).import_graph()
-    module.dump()
-
-    print("\nrun:")
     interpreter = Interpreter()
     interpreter.visit(ast_module)
 
