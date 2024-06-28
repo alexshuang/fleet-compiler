@@ -36,7 +36,7 @@ PACKAGE_VERSION = version_info.get("package-version") or "0.1dev1"
 
 setup(
     name=f"fleet-compiler-cli{PACKAGE_SUFFIX}",
-    version=f"{PACKAGE_VERSION}",
+    version="0.1",
     description="Fleet Compiler CLI",
     license='Apache License v2.0',
     author='Shuang Huang',
