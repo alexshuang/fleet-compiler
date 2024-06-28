@@ -26,6 +26,9 @@ from fleet_compiler.frontend.ast import (
     Block as ASTBlock,
     VariableDef,
     IntegerLiteral,
+    DecimalLiteral,
+    BooleanLiteral,
+    NoneLiteral
 )
 
 class ConvertASTtoMLIR(AstVisitor):
@@ -57,7 +60,24 @@ class ConvertASTtoMLIR(AstVisitor):
     def visitIntegerLiteral(self, node: IntegerLiteral):
         type = IntegerType(32, True)
         attr = IntegerAttr(node.value, type)
-        op = arith.Constant(attr, type)
+        self.create(arith.Constant(attr, type))
+
+    def visitDecimalLiteral(self, node: DecimalLiteral):
+        type = FloatType(32)
+        attr = FloatAttr(node.value, type)
+        self.create(arith.Constant(attr, type))
+
+    def visitBooleanLiteral(self, node: BooleanLiteral):
+        type = BoolType()
+        attr = BoolAttr(node.value)
+        self.create(arith.Constant(attr, type))
+
+    def visitNoneLiteral(self, node: NoneLiteral):
+        type = NoneType()
+        attr = NoneAttr()
+        self.create(arith.Constant(attr, type))
+
+    def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
 

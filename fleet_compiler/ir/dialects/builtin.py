@@ -22,6 +22,16 @@ class FloatType(IRType):
 
 
 @dataclass
+class BoolType(IRType):
+    pass
+
+
+@dataclass
+class NoneType(IRType):
+    pass
+
+
+@dataclass
 class RankedTensorType(IRType):
     dims: list
     element_type: IntegerType | FloatType
@@ -50,6 +60,16 @@ class IntegerAttr(Attribute):
 class FloatAttr(Attribute):
     value: float
     type: FloatType
+
+
+@dataclass
+class BoolAttr(Attribute):
+    value: bool
+
+
+@dataclass
+class NoneAttr(Attribute):
+    pass
 
 
 @dataclass
