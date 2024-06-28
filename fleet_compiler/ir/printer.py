@@ -109,7 +109,7 @@ class Printer:
                 self._print_string(")")
             self._print_string(":\n")
         self._indent += 1
-        self.print_list(block.operations, self.print)
+        self.print_list(block.operations, self.print, sep='')
         self._indent -= 1
 
     def _print_attributes(self, op: Operation):
@@ -140,16 +140,26 @@ class Printer:
             elif isinstance(t, FloatType):
                 return f"f{t.bitwidth}"
             else:
-                return "Unkown"
+                return ""
             
         self._print_string(f"{name} = ")
         if isinstance(attr, IntegerAttr):
             self._print_string(f"{attr.value}: {_get_type(attr.type)}")
         elif isinstance(attr, FloatAttr):
             self._print_string(f"{attr.value}: {_get_type(attr.type)}")
+        elif isinstance(attr, BoolAttr):
+            self._print_string("true" if attr.value else "false")
+        elif isinstance(attr, NoneAttr):
+            self._print_string("none")
 
     def _print_type(self, t: IRType):
         if isinstance(t, IntegerType):
             self._print_string(f"{'u' if not t.signedness else ''}i{t.bitwidth}")
         elif isinstance(t, FloatType):
             self._print_string(f"f{t.bitwidth}")
+        elif isinstance(t, BoolType):
+            self._print_string(f"i1")
+        elif isinstance(t, NoneType):
+            self._print_string(f"()")
+        else:
+            self._print_string(f"unkown")
