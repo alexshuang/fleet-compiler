@@ -1,5 +1,4 @@
 -e .
 pytest
 pre-commit
-llvm-15
-mlir-tools-15
+lit
