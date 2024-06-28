@@ -21,11 +21,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
           pip install -r dev_requirements.txt
           sudo apt update
           sudo apt install -y llvm-15 mlir-15-tools
 
       - name: Run tests
         run: |
+          pip install .
           pytest tests
