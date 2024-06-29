@@ -135,32 +135,35 @@ class Printer:
             self._print_string(")")
 
     def _print_attribute(self, name: str, attr: Attribute):
-        def _get_type(t: IRType):
-            if isinstance(t, IntegerType):
-                return f"{'u' if not t.signedness else ''}i{t.bitwidth}"
-            elif isinstance(t, FloatType):
-                return f"f{t.bitwidth}"
-            else:
-                return ""
-            
         self._print_string(f"{name} = ")
-        if isinstance(attr, IntegerAttr):
-            self._print_string(f"{attr.value}: {_get_type(attr.type)}")
-        elif isinstance(attr, FloatAttr):
-            self._print_string(f"{attr.value}: {_get_type(attr.type)}")
+        if isinstance(attr, IntegerAttr | FloatAttr):
+            self._print_string(f"{attr.value}: {self._get_type_str(attr.type)}")
         elif isinstance(attr, BoolAttr):
             self._print_string("true" if attr.value else "false")
         elif isinstance(attr, NoneAttr):
             self._print_string("none")
+        elif isinstance(attr, DenseIntOrFPElementsAttr):
+            self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
 
     def _print_type(self, t: IRType):
-        if isinstance(t, IntegerType):
-            self._print_string(f"{'u' if not t.signedness else ''}i{t.bitwidth}")
-        elif isinstance(t, FloatType):
-            self._print_string(f"f{t.bitwidth}")
-        elif isinstance(t, BoolType):
-            self._print_string(f"i1")
-        elif isinstance(t, NoneType):
-            self._print_string(f"()")
+        supported_type = [IntegerType, FloatType, BoolType, NoneType, RankedTensorType]
+        if type(t) in supported_type:
+            self._print_string(self._get_type_str(t))
         else:
             self._print_string(f"unkown")
+    
+    def _get_type_str(self, t: IRType):
+        if isinstance(t, IntegerType):
+            return f"{'u' if not t.signedness else ''}i{t.bitwidth}"
+        elif isinstance(t, FloatType):
+            return f"f{t.bitwidth}"
+        elif isinstance(t, BoolType):
+            return f"i1"
+        elif isinstance(t, NoneType):
+            return "()"
+        elif isinstance(t, RankedTensorType):
+            shape_str = [str(o) for o in t.dims]
+            elem_type_str = [self._get_type_str(t.element_type)]
+            return f"tensor<{'x'.join(shape_str + elem_type_str)}>"
+        else:
+            return "undefined"
