@@ -21,6 +21,7 @@ from .dialects.builtin import *
 from .dialects import arith
 
 from fleet_compiler.frontend.ast import (
+    AstNode,
     AstModule,
     AstVisitor,
     Block as ASTBlock,
@@ -28,8 +29,10 @@ from fleet_compiler.frontend.ast import (
     IntegerLiteral,
     DecimalLiteral,
     BooleanLiteral,
-    NoneLiteral
+    NoneLiteral,
+    ListContent
 )
+
 
 class ConvertASTtoMLIR(AstVisitor):
     ast: AstModule
@@ -76,10 +79,54 @@ class ConvertASTtoMLIR(AstVisitor):
         type = NoneType()
         attr = NoneAttr()
         self.create(arith.Constant(attr, type))
+    
+    def visitListContent(self, node: ListContent):
+        support_elem_types = [BooleanLiteral, IntegerLiteral, DecimalLiteral]
+        elem_type_priority = {o:i for i, o in enumerate(support_elem_types)}
+        dtype_funcs = [bool, int, float]
+
+        def is_tensor_or_vector(node: ListContent):
+            if not node.exps or len(node.exps) == 0:
+                return False
+            for o in node.exps:
+                if type(o.exp) not in support_elem_types:
+                    return False
+            return True
+
+        def get_dense_attr(node: ListContent):
+            priority = -1
+            data = []
+            for o in node.exps:
+                elem = o.exp
+                data.append(elem.value)
+                priority = max(elem_type_priority[type(elem)], priority)
+            dtype_fn = dtype_funcs[priority]
+            # 1-D array support now
+            data = list(map(dtype_fn, data))
+            elem_type = ConvertASTtoMLIR.create_ir_type_from_literal(support_elem_types[priority])
+            tensor_type = RankedTensorType([len(data)], elem_type)
+            return DenseIntOrFPElementsAttr(data, tensor_type)
+
+        if is_tensor_or_vector(node):
+            dense_attr = get_dense_attr(node)
+            self.create(arith.Constant(dense_attr, dense_attr.type))
+        else:
+            for o in node.exps:
+                self.visit(o)
 
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
+    
+    @staticmethod
+    def create_ir_type_from_literal(literal: AstNode):
+        ir_type_factory = {
+            IntegerLiteral: IntegerType(32, True),
+            DecimalLiteral: FloatType(32),
+            BooleanLiteral: BoolType(),
+            NoneLiteral: NoneType(),
+        }
+        return ir_type_factory[literal]
 
 
 class ASTModuleImporter():
