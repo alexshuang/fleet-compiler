@@ -53,6 +53,40 @@ class BuilderStack:
     
     def get(self):
         return self.stack[-1]
+    
+    def walk(self):
+        return self.stack[::-1]
+
+
+@dataclass
+class SymbolTable:
+    "A mapping from variable names to Values, append-only"
+    table: dict[str, Value] = field(default_factory=dict)
+
+    def __contains__(self, __o: object) -> bool:
+        return __o in self.table
+
+    def __getitem__(self, __key: str) -> Value:
+        return self.table[__key]
+
+    def __setitem__(self, __key: str, __value: Value) -> None:
+        if __key in self:
+            raise AssertionError(f"Cannot add value for key {__key} in scope {self}")
+        self.table[__key] = __value
+
+
+# @dataclass
+# class SymbolTableStack:
+#     stack: Sequence[SymbolTable] = field(default_factory=list)
+
+#     def push(self, t: SymbolTable):
+#         self.stack.append(t)
+    
+#     def pop(self):
+#         return self.stack.pop()
+    
+#     def get(self):
+#         return self.stack[-1]
 
 
 class SingletonMeta(type):
@@ -75,12 +109,33 @@ class ImplicitBuilder(metaclass=SingletonMeta):
     
     def get(self):
         return self._stack.get()
+    
+    def lookup_symbol(self, sym_name: str):
+        for i, b in enumerate(self._stack.walk()):
+            if sym_name in b.symbol_table:
+                return (b.symbol_table[sym_name], i)
+        raise ValueError(f"unkown symbol {sym_name} in symbol table stack")
+
+
+# class ImplicitSymbolTable(metaclass=SingletonMeta):
+#     def __init__(self) -> None:
+#         self._stack = SymbolTableStack()
+
+#     def push(self, table: SymbolTable):
+#         self._stack.push(table)
+        
+#     def pop(self):
+#         return self._stack.pop()
+    
+#     def get(self):
+#         return self._stack.get()
 
 
 class Builder(contextlib.AbstractContextManager):
     def __init__(self, insertion_point: InsertionPoint) -> None:
         super().__init__()
         self.insertion_point = insertion_point
+        self.symbol_table = SymbolTable()
 
     @staticmethod
     def before(op: Operation):

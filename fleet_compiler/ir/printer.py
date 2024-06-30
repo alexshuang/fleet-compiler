@@ -114,9 +114,10 @@ class Printer:
         self._indent -= 1
 
     def _print_attributes(self, op: Operation):
-        self._print_string(" {")
-        self.print_dict(op.attributes, self._print_attribute)
-        self._print_string("}")
+        if len(op.attributes) > 0:
+            self._print_string(" {")
+            self.print_dict(op.attributes, self._print_attribute)
+            self._print_string("}")
 
     def _print_op_type(self, op: Operation):
         input_types = [o.type for o in op.operands]

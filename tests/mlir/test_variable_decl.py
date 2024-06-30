@@ -5,6 +5,7 @@ b = 3.0
 c = True
 d = [1, 2, 3, 4]
 e = [5, 6.0, True, False]
+f = a
 
 # CHECK: module {
 # CHECK-NEXT:   %c2_i32 = arith.constant 2 : i32

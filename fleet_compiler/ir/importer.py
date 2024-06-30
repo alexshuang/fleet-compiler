@@ -18,19 +18,27 @@
 from .core import *
 from .builder import *
 from .dialects.builtin import *
-from .dialects import arith
+from .dialects import arith, tosa
+
+from fleet_compiler.frontend.lexer import (
+    Op as opcode
+)
 
 from fleet_compiler.frontend.ast import (
     AstNode,
     AstModule,
     AstVisitor,
     Block as ASTBlock,
+    ExpressionStatement,
+    Variable,
     VariableDef,
     IntegerLiteral,
     DecimalLiteral,
     BooleanLiteral,
     NoneLiteral,
-    ListContent
+    ListContent,
+    Binary,
+    Unary
 )
 
 
@@ -56,29 +64,29 @@ class ConvertASTtoMLIR(AstVisitor):
                 self.visit(o)
 
     def visitVariableDef(self, node: VariableDef):
-        # init_op = self.visit(node.init)
-        # self.sym_table[node.name] = init_op
-        self.visit(node.init)
+        init = self.visit(node.init)
+        builder = ImplicitBuilder().get()
+        builder.symbol_table[node.name] = init
 
     def visitIntegerLiteral(self, node: IntegerLiteral):
         type = IntegerType(32, True)
         attr = IntegerAttr(node.value, type)
-        self.create(arith.Constant(attr, type))
+        return self.create(arith.ConstantOp(attr, type))
 
     def visitDecimalLiteral(self, node: DecimalLiteral):
         type = FloatType(32)
         attr = FloatAttr(node.value, type)
-        self.create(arith.Constant(attr, type))
+        return self.create(arith.ConstantOp(attr, type))
 
     def visitBooleanLiteral(self, node: BooleanLiteral):
         type = BoolType()
         attr = BoolAttr(node.value)
-        self.create(arith.Constant(attr, type))
+        return self.create(arith.ConstantOp(attr, type))
 
     def visitNoneLiteral(self, node: NoneLiteral):
         type = NoneType()
         attr = NoneAttr()
-        self.create(arith.Constant(attr, type))
+        return self.create(arith.ConstantOp(attr, type))
     
     def visitListContent(self, node: ListContent):
         support_elem_types = [BooleanLiteral, IntegerLiteral, DecimalLiteral]
@@ -109,14 +117,36 @@ class ConvertASTtoMLIR(AstVisitor):
 
         if is_tensor_or_vector(node):
             dense_attr = get_dense_attr(node)
-            self.create(arith.Constant(dense_attr, dense_attr.type))
+            return self.create(arith.ConstantOp(dense_attr, dense_attr.type))
         else:
-            for o in node.exps:
-                self.visit(o)
+            return [self.visit(o) for o in node.exps]
+    
+    def visitVariable(self, node: Variable):
+        value, _ = ImplicitBuilder().lookup_symbol(node.name)
+        return value
+    
+    def visitBinary(self, node: Binary):
+        if node.op == opcode.Assign:
+            return self.visit(node.exp2)
+        elif node.op == opcode.Plus:
+            return self.make_add_op(node.exp1, node.exp2)
 
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
+        return op.results[0]
+    
+    def make_add_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+        if lhs.type != rhs.type:
+            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
+        if isinstance(lhs.type, IntegerType | BoolType):
+            return self.create(arith.AddIOp(lhs, rhs))
+        elif isinstance(lhs.type, FloatType):
+            return self.create(arith.AddFOp(lhs, rhs))
+        else:
+            return self.create(tosa.AddOp(lhs, rhs))
     
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
