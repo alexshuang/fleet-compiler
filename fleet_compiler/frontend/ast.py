@@ -431,7 +431,7 @@ class AstVisitor:
         self.visit(node.block)
 
     def visitListStatement(self, node: ListStatement):
-        self.visitListContent(node.content)
+        return self.visitListContent(node.content)
 
     def visitListContent(self, node: ListContent):
         for o in node.exps:
