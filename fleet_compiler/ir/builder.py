@@ -75,20 +75,6 @@ class SymbolTable:
         self.table[__key] = __value
 
 
-# @dataclass
-# class SymbolTableStack:
-#     stack: Sequence[SymbolTable] = field(default_factory=list)
-
-#     def push(self, t: SymbolTable):
-#         self.stack.append(t)
-    
-#     def pop(self):
-#         return self.stack.pop()
-    
-#     def get(self):
-#         return self.stack[-1]
-
-
 class SingletonMeta(type):
     _instances = {}
     def __call__(cls, *args, **kwargs):
@@ -115,20 +101,6 @@ class ImplicitBuilder(metaclass=SingletonMeta):
             if sym_name in b.symbol_table:
                 return (b.symbol_table[sym_name], i)
         raise ValueError(f"unkown symbol {sym_name} in symbol table stack")
-
-
-# class ImplicitSymbolTable(metaclass=SingletonMeta):
-#     def __init__(self) -> None:
-#         self._stack = SymbolTableStack()
-
-#     def push(self, table: SymbolTable):
-#         self._stack.push(table)
-        
-#     def pop(self):
-#         return self._stack.pop()
-    
-#     def get(self):
-#         return self._stack.get()
 
 
 class Builder(contextlib.AbstractContextManager):
