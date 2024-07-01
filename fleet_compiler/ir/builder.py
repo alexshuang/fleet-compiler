@@ -70,8 +70,6 @@ class SymbolTable:
         return self.table[__key]
 
     def __setitem__(self, __key: str, __value: Value) -> None:
-        if __key in self:
-            raise AssertionError(f"Cannot add value for key {__key} in scope {self}")
         self.table[__key] = __value
 
 
