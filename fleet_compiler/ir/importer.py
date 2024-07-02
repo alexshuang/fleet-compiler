@@ -120,7 +120,7 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(arith.ConstantOp(dense_attr, dense_attr.type))
         else:
             return [self.visit(o) for o in node.exps]
-    
+
     def visitVariable(self, node: Variable):
         value, _ = ImplicitBuilder().lookup_symbol(node.name)
         return value
