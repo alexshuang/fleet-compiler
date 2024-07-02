@@ -3,18 +3,30 @@
 a = 2
 b = 3
 c = a + b
+c = a - b
+c = a * b
+c = a / b
 
 a = 1.0
 b = 3.0
 c = a + b
+c = a - b
+c = a * b
+c = a / b
 
 a = True
 b = True
 c = a + b
+c = a - b
+c = a * b
+c = a / b
 
 a = [1, 2, 3, 4]
 b = [5, 6, 7, 8]
 c = a + b
+c = a - b
+c = a * b
+c = a / b
 
 # CHECK: module {
 # CHECK-NEXT:   %c2_i32 = arith.constant 2 : i32

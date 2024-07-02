@@ -124,18 +124,24 @@ class ConvertASTtoMLIR(AstVisitor):
     def visitVariable(self, node: Variable):
         value, _ = ImplicitBuilder().lookup_symbol(node.name)
         return value
-    
+
     def visitBinary(self, node: Binary):
         if node.op == opcode.Assign:
             return self.visit(node.exp2)
         elif node.op == opcode.Plus:
             return self.make_add_op(node.exp1, node.exp2)
+        elif node.op == opcode.Minus:
+            return self.make_sub_op(node.exp1, node.exp2)
+        elif node.op == opcode.Multiply:
+            return self.make_mul_op(node.exp1, node.exp2)
+        elif node.op == opcode.Divide:
+            return self.make_div_op(node.exp1, node.exp2)
 
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
         return op.results[0]
-    
+
     def make_add_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
         rhs = self.visit(node2)
@@ -147,7 +153,44 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(arith.AddFOp(lhs, rhs))
         else:
             return self.create(tosa.AddOp(lhs, rhs))
-    
+
+    def make_sub_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+        if lhs.type != rhs.type:
+            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
+        if isinstance(lhs.type, IntegerType | BoolType):
+            return self.create(arith.SubIOp(lhs, rhs))
+        elif isinstance(lhs.type, FloatType):
+            return self.create(arith.SubFOp(lhs, rhs))
+        else:
+            return self.create(tosa.SubOp(lhs, rhs))
+
+    def make_mul_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+        if lhs.type != rhs.type:
+            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
+        if isinstance(lhs.type, IntegerType | BoolType):
+            return self.create(arith.MulIOp(lhs, rhs))
+        elif isinstance(lhs.type, FloatType):
+            return self.create(arith.MulFOp(lhs, rhs))
+        else:
+            return self.create(tosa.MulOp(lhs, rhs))
+
+    def make_div_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+        if lhs.type != rhs.type:
+            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
+        if isinstance(lhs.type, IntegerType | BoolType):
+            return self.create(arith.DivSIOp(lhs, rhs))
+        elif isinstance(lhs.type, FloatType):
+            return self.create(arith.DivFOp(lhs, rhs))
+        else:
+            _rhs = self.create(tosa.ReciprocalOp(rhs))
+            return self.create(tosa.MulOp(lhs, _rhs))
+
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
         ir_type_factory = {
