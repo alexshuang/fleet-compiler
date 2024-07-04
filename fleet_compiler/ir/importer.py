@@ -15,13 +15,19 @@
 #
 # ===---------------------------------------------------------------------------
 
+import numpy as np
+
 from .core import *
 from .builder import *
 from .dialects.builtin import *
-from .dialects import arith, tosa
+from .dialects import arith, tosa, numpy as numpy_dialect
 
 from fleet_compiler.frontend.lexer import (
     Op as opcode
+)
+
+from fleet_compiler.frontend.symbolic import (
+    OperatorSymbol
 )
 
 from fleet_compiler.frontend.ast import (
@@ -29,7 +35,6 @@ from fleet_compiler.frontend.ast import (
     AstModule,
     AstVisitor,
     Block as ASTBlock,
-    ExpressionStatement,
     Variable,
     VariableDef,
     IntegerLiteral,
@@ -38,8 +43,21 @@ from fleet_compiler.frontend.ast import (
     NoneLiteral,
     ListContent,
     Binary,
-    Unary
+    Unary,
+    FunctionCall,
+    ArgumentList
 )
+
+
+def dtype_to_irtype(dtype):
+    if dtype == np.int:
+        return IntegerType
+    elif dtype == np.float:
+        return FloatType
+    elif dtype == np.bool:
+        return BoolType
+    else:
+        raise ValueError(f"unsupported dtype: {dtype}")
 
 
 class ConvertASTtoMLIR(AstVisitor):
@@ -137,6 +155,23 @@ class ConvertASTtoMLIR(AstVisitor):
         elif node.op == opcode.Divide:
             return self.make_div_op(node.exp1, node.exp2)
 
+    def visitArgumentList(self, node: ArgumentList):
+        args = [self.visit(o) for o in node.args if o]
+        return args if len(args) > 0 else ""
+
+    def visitFunctionCall(self, node: FunctionCall):
+        arg_list = self.visitArgumentList(node.arg_list)
+        args, kwargs = [], {}
+        for o in arg_list:
+            if isinstance(o, dict):
+                kwargs.update(o)
+            else:
+                args.append(o)
+        sym = node.sym
+        if isinstance(sym, OperatorSymbol):
+            if sym.op_name.startswith('numpy.'):
+                return self.make_numpy_op(sym.op_name, *args, **kwargs)
+
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
@@ -190,6 +225,12 @@ class ConvertASTtoMLIR(AstVisitor):
         else:
             _rhs = self.create(tosa.ReciprocalOp(rhs))
             return self.create(tosa.MulOp(lhs, _rhs))
+
+    def make_numpy_op(self, op_name, *args, **kwargs):
+        if op_name == 'numpy.random.randn':
+            return self.create(numpy_dialect.RandomRandnOp(args))
+        else:
+            raise ValueError(f"unsupported op: {op_name}")
 
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
