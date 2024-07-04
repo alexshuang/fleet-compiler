@@ -34,5 +34,6 @@ apt install llvm-15 mlir-tools-15
 
 Run tests:
 ```
-pytest tests
+pytest tests/python
+lit tests/mlir
 ```
