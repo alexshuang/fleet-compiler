@@ -1,12 +1,10 @@
 # fleet-compiler
 
-An MLIR-based AI compiler designed for Python frontend to Host/RISC-V DSA (domain-specific architectures).
+Fleet compiler is based on MLIR and aims to compile Python frontend code to Host/RISC-V domain-specific architectures (DSA).
 
-The Fleet compiler parses neural networks written in Python and Numpy into an Abstract Syntax Tree (AST), then translates them into Intermediate Representation (IR).
-Optimizations from Tensor to LLVM IR are provided prior to generate RISC-V ISA.
+The compiler parses neural networks written in Python and Numpy into Abstract Syntax Tree (AST), translates into Intermediate Representation (IR) for graph optimiaztion.
 
-The IR is inspired by the design of MLIR. Its dialects and operations correspond to those in MLIR, with similar syntax and semantics.
-It's ensures that any dialect/op can be easily converted into real MLIR, allowing for optimization and code generation by MLIR/LLVM at any compilation stage.
+The IR is inspired by MLIR, with its dialects and operations having similar syntax and semantics to those in MLIR. This ensures that any dialect and operation can be easily converted into MLIR, allowing for optimization and code generation by MLIR/LLVM.
 
 ## Quick Start
 
