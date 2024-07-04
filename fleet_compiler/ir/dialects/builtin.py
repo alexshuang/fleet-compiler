@@ -78,6 +78,12 @@ class DenseIntOrFPElementsAttr(Attribute):
     type: RankedTensorType | UnrankedTensorType
 
 
+@dataclass
+class DenseIntElementsAttr(Attribute):
+    value: list[int]
+    type: RankedTensorType | UnrankedTensorType
+
+
 class ModuleOp(Operation):
     name = 'builtin.module'
     sym_name = StringAttr("main")

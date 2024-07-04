@@ -26,11 +26,9 @@ c = a / b
 a = [1, 2, 3, 4]
 b = [5, 6, 7, 8]
 c = a + b
-
-# not support by pytest, test in np.array case later
-# c = a - b
-# c = a * b
-# c = a / b
+c = a - b
+c = a * b
+c = a / b
 
 # CHECK: module {
 # CHECK-NEXT:   %c2_i32 = arith.constant 2 : i32
@@ -54,4 +52,8 @@ c = a + b
 # CHECK-NEXT:   %cst_2 = arith.constant dense<[1, 2, 3, 4]> : tensor<4xi32>
 # CHECK-NEXT:   %cst_3 = arith.constant dense<[5, 6, 7, 8]> : tensor<4xi32>
 # CHECK-NEXT:   %12 = "tosa.add"(%cst_2, %cst_3) : (tensor<4xi32>, tensor<4xi32>) -> tensor<4xi32>
+# CHECK-NEXT:   %13 = "tosa.sub"(%cst_2, %cst_3) : (tensor<4xi32>, tensor<4xi32>) -> tensor<4xi32>
+# CHECK-NEXT:   %14 = "tosa.mul"(%cst_2, %cst_3) {shift = 0 : i32} : (tensor<4xi32>, tensor<4xi32>) -> tensor<4xi32>
+# CHECK-NEXT:   %15 = "tosa.reciprocal"(%cst_3) : (tensor<4xi32>) -> tensor<4xi32>
+# CHECK-NEXT:   %16 = "tosa.mul"(%cst_2, %15) {shift = 0 : i32} : (tensor<4xi32>, tensor<4xi32>) -> tensor<4xi32>
 # CHECK-NEXT: }
