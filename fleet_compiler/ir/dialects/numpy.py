@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from ..core import *
 from .builtin import *
-from .shape import *
 
 
 class RandomRandnOp(Operation):
