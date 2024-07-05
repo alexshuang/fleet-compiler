@@ -20,7 +20,8 @@ import numpy as np
 from .core import *
 from .builder import *
 from .dialects.builtin import *
-from .dialects import arith, tosa, numpy as numpy_dialect
+from .dialects.func import *
+from .dialects import arith, tosa, numpy as numpy_dialect, func
 
 from fleet_compiler.frontend.lexer import (
     Op as opcode
@@ -45,7 +46,11 @@ from fleet_compiler.frontend.ast import (
     Binary,
     Unary,
     FunctionCall,
-    ArgumentList
+    ArgumentList,
+    FunctionDef,
+    Signature,
+    ParameterList,
+    ParamentDef
 )
 
 
@@ -172,10 +177,29 @@ class ConvertASTtoMLIR(AstVisitor):
             if sym.op_name.startswith('numpy.'):
                 return self.make_numpy_op(sym.op_name, *args, **kwargs)
 
+    def visitFunctionDef(self, node: FunctionDef):
+        # self.visitSignature(node.signature)
+        func_type = FunctionType([], [])
+        self.create(func.FuncOp(node.name, func_type, []))
+        pass
+        # self.visitSignature(node.signature)
+        # self.visitBlock(node.block)
+
+    # def visitSignature(self, node: Signature):
+    #     params = self.visitParameterList(node.param_list)
+
+    # def visitParameterList(self, node: ParameterList):
+    #     return [self.visitParamentDef(p) for p in node.params]
+
+    # def visitParamentDef(self, node: ParamentDef):
+    #     import pdb; pdb.set_trace()
+    #     value, _ = ImplicitBuilder().lookup_symbol(node.name)
+    #     return value
+
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
-        return op.results[0]
+        return op.results[0] if op.results else None
 
     def make_add_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
