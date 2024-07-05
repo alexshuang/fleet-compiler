@@ -19,6 +19,7 @@ from __future__ import annotations
 from .core import *
 from .builder import *
 from .dialects.builtin import *
+from .dialects.func import *
 
 from dataclasses import dataclass, field
 
@@ -35,10 +36,13 @@ class Printer:
     def print(self, op: Operation):
         if isinstance(op, Operation):
             if has_custom_print(op):
-                op.parent(op)
+                op.print(self._get_indent())
             else:
-                self._print_results(op)
-                self._print_op_with_default_format(op)
+                if isinstance(op, FuncOp):
+                    self._print_func(op)
+                else:
+                    self._print_results(op)
+                    self._print_op_with_default_format(op)
         elif isinstance(op, Region):
             self._print_region(op)
         elif isinstance(op, Block):
@@ -46,8 +50,11 @@ class Printer:
         elif isinstance(op, Value):
             self._print_string(op.name)
 
+    def _get_indent(self):
+        return " " * self._indent_space_sizes * self._indent
+
     def _print_results(self, op: Operation):
-        self._print_string("  " * self._indent)
+        self._print_string(self._get_indent())
         res = op.results
         if len(res) == 0:
             return
@@ -93,13 +100,19 @@ class Printer:
         if len(op.regions) > 0 and len(op.regions[0].blocks):
             self._print_string(" (")
             self.print_list(op.regions, self._print_region)
-            self._print_string(")")
+            if self._indent > 0:
+                self._print_string(f"{self._get_indent()}" + ")")
+            else:
+                self._print_string(")")
 
     def _print_region(self, region: Region):
         self._print_string("{\n")
         self._print_block(region.blocks[0], False)
         self.print_list(region.blocks[1:], self._print_block)
-        self._print_string("}")
+        if self._indent > 0:
+            self._print_string(f"{self._get_indent()}" + "}\n")
+        else:
+            self._print_string("}")
 
     def _print_block(self, block: Block, print_args=True):
         if print_args:
@@ -143,6 +156,8 @@ class Printer:
             self._print_string("true" if attr.value else "false")
         elif isinstance(attr, NoneAttr):
             self._print_string("none")
+        elif isinstance(attr, StringAttr):
+            self._print_string(attr.value)
         elif isinstance(attr, DenseIntOrFPElementsAttr):
             self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
 
@@ -168,3 +183,15 @@ class Printer:
             return f"tensor<{'x'.join(shape_str + elem_type_str)}>"
         else:
             return "undefined"
+
+    def _print_func(self, op: FuncOp):
+        sym_name = op.attributes['sym_name'].value
+        prefix = self._get_indent()
+        func_type = op.attributes['function_type']
+        input_types = [self._get_type_str(o) for o in func_type.input_types]
+        output_types = [self._get_type_str(o) for o in func_type.output_types]
+        arg_str = ', '.join([f'%arg{i}: {o}' for i, o in enumerate(input_types)])
+        output_type_str = ', '.join(output_types)
+
+        self._print_string(f"{prefix}{op.name} @{sym_name}({arg_str}) -> ({output_type_str}) ")
+        self._print_region(op.regions[0])
