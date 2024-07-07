@@ -207,8 +207,10 @@ class ConvertASTtoMLIR(AstVisitor):
         ret_val = self.visit(node.ret)
         if not isinstance(ret_val, list):
             ret_val = [ret_val]
-        self.create(ReturnOp(ret_val))
+        ret_op = self.create(ReturnOp(ret_val))
         self.has_explicit_ret = True
+        func_op = ret_op.parent.parent.parent
+        func_op.function_type.output_types = [o.type for o in ret_val]
 
     def visitBlockEnd(self, node: BlockEnd):
         if not self.has_explicit_ret:

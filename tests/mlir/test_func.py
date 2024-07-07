@@ -3,7 +3,7 @@
 def bar():
     a = 10
     b = 11
-    c = a + b
+    return a + b
 
 bar()
 
