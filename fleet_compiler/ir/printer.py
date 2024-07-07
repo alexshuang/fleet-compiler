@@ -40,6 +40,10 @@ class Printer:
             else:
                 if isinstance(op, FuncOp):
                     self._print_func(op)
+                elif isinstance(op, ReturnOp):
+                    self._print_ret(op)
+                elif isinstance(op, CallOp):
+                    self._print_call(op)
                 else:
                     self._print_results(op)
                     self._print_op_with_default_format(op)
@@ -195,3 +199,24 @@ class Printer:
 
         self._print_string(f"{prefix}{op.name} @{sym_name}({arg_str}) -> ({output_type_str}) ")
         self._print_region(op.regions[0])
+
+    def _print_ret(self, op: ReturnOp):
+        prefix = self._get_indent()
+        if len(op.operands) > 0:
+            rets = ','.join([o.name for o in op.operands])
+            ret_types = ','.join([self._get_type_str(o.type) for o in op.operands])
+            ret = f' {rets}: {ret_types}'
+        else:
+            ret = ''
+        self._print_string(f"{prefix}return{ret}\n")
+
+    def _print_call(self, op: CallOp):
+        prefix = self._get_indent()
+        results = ','.join([o.name for o in op.results])
+        if results != '':
+            results += ' = '
+        sym_name = op.attributes['callee'].sym_name.value
+        operands = ','.join([o.name for o in op.operands])
+        operand_types = ','.join([self._get_type_str(o.type) for o in op.operands])
+        output_types = ','.join([self._get_type_str(o.type) for o in op.results])
+        self._print_string(f"{prefix}{results}func.call @{sym_name}({operands}) : ({operand_types}) -> ({output_types})\n")

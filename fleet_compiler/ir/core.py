@@ -101,9 +101,12 @@ class Block(IRNode):
             
     def add_op(self, op: Operation):
         self.operations.append(op)
+        self._attach_op(op)
 
     def add_ops(self, ops: list[Operation]):
         self.operations.extend(ops)
+        for o in ops:
+            self._attach_op(o)
     
     def insert_before(self, new_op: Operation, existing_op: Operation):
         assert existing_op.parent is self, "The \'existing op\' is not in current block"
