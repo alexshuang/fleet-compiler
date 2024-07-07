@@ -28,7 +28,8 @@ from fleet_compiler.frontend.lexer import (
 )
 
 from fleet_compiler.frontend.symbolic import (
-    OperatorSymbol
+    OperatorSymbol,
+    FunctionSymbol
 )
 
 from fleet_compiler.frontend.ast import (
@@ -48,6 +49,8 @@ from fleet_compiler.frontend.ast import (
     FunctionCall,
     ArgumentList,
     FunctionDef,
+    ReturnStatement,
+    BlockEnd,
     Signature,
     ParameterList,
     ParamentDef
@@ -72,6 +75,7 @@ class ConvertASTtoMLIR(AstVisitor):
     def __init__(self, ast: AstModule) -> None:
         super().__init__()
         self.ast = ast
+        self.has_explicit_ret = False
 
     def convert(self):
         return self.visitModule(self.ast)
@@ -94,22 +98,22 @@ class ConvertASTtoMLIR(AstVisitor):
     def visitIntegerLiteral(self, node: IntegerLiteral):
         type = IntegerType(32, True)
         attr = IntegerAttr(node.value, type)
-        return self.create(arith.ConstantOp(attr, type))
+        return self.create(arith.ConstantOp(attr, type)).results[0]
 
     def visitDecimalLiteral(self, node: DecimalLiteral):
         type = FloatType(32)
         attr = FloatAttr(node.value, type)
-        return self.create(arith.ConstantOp(attr, type))
+        return self.create(arith.ConstantOp(attr, type)).results[0]
 
     def visitBooleanLiteral(self, node: BooleanLiteral):
         type = BoolType()
         attr = BoolAttr(node.value)
-        return self.create(arith.ConstantOp(attr, type))
+        return self.create(arith.ConstantOp(attr, type)).results[0]
 
     def visitNoneLiteral(self, node: NoneLiteral):
         type = NoneType()
         attr = NoneAttr()
-        return self.create(arith.ConstantOp(attr, type))
+        return self.create(arith.ConstantOp(attr, type)).results[0]
     
     def visitListContent(self, node: ListContent):
         support_elem_types = [BooleanLiteral, IntegerLiteral, DecimalLiteral]
@@ -140,7 +144,7 @@ class ConvertASTtoMLIR(AstVisitor):
 
         if is_tensor_or_vector(node):
             dense_attr = get_dense_attr(node)
-            return self.create(arith.ConstantOp(dense_attr, dense_attr.type))
+            return self.create(arith.ConstantOp(dense_attr, dense_attr.type)).results[0]
         else:
             return [self.visit(o) for o in node.exps]
 
@@ -176,14 +180,17 @@ class ConvertASTtoMLIR(AstVisitor):
         if isinstance(sym, OperatorSymbol):
             if sym.op_name.startswith('numpy.'):
                 return self.make_numpy_op(sym.op_name, *args, **kwargs)
+        elif isinstance(sym, FunctionSymbol):
+            func_op, _ = ImplicitBuilder().lookup_symbol(sym.node.name)
+            return self.make_call_op(func_op, *args, **kwargs)
 
     def visitFunctionDef(self, node: FunctionDef):
         # self.visitSignature(node.signature)
         func_type = FunctionType([], [])
-        self.create(func.FuncOp(node.name, func_type, []))
-        pass
-        # self.visitSignature(node.signature)
-        # self.visitBlock(node.block)
+        func_op = self.create(func.FuncOp(node.name, func_type, []))
+        self.visitBlock(node.block, func_op.regions[0].blocks[0])
+        builder = ImplicitBuilder().get()
+        builder.symbol_table[node.name] = func_op
 
     # def visitSignature(self, node: Signature):
     #     params = self.visitParameterList(node.param_list)
@@ -196,10 +203,22 @@ class ConvertASTtoMLIR(AstVisitor):
     #     value, _ = ImplicitBuilder().lookup_symbol(node.name)
     #     return value
 
+    def visitReturnStatement(self, node: ReturnStatement):
+        ret_val = self.visit(node.ret)
+        if not isinstance(ret_val, list):
+            ret_val = [ret_val]
+        self.create(ReturnOp(ret_val))
+        self.has_explicit_ret = True
+
+    def visitBlockEnd(self, node: BlockEnd):
+        if not self.has_explicit_ret:
+            self.create(ReturnOp([]))
+            self.has_explicit_ret = False
+
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
-        return op.results[0] if op.results else None
+        return op
 
     def make_add_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
@@ -207,11 +226,11 @@ class ConvertASTtoMLIR(AstVisitor):
         if lhs.type != rhs.type:
             raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
         if isinstance(lhs.type, IntegerType | BoolType):
-            return self.create(arith.AddIOp(lhs, rhs))
+            return self.create(arith.AddIOp(lhs, rhs)).results[0]
         elif isinstance(lhs.type, FloatType):
-            return self.create(arith.AddFOp(lhs, rhs))
+            return self.create(arith.AddFOp(lhs, rhs)).results[0]
         else:
-            return self.create(tosa.AddOp(lhs, rhs))
+            return self.create(tosa.AddOp(lhs, rhs)).results[0]
 
     def make_sub_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
@@ -219,11 +238,11 @@ class ConvertASTtoMLIR(AstVisitor):
         if lhs.type != rhs.type:
             raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
         if isinstance(lhs.type, IntegerType | BoolType):
-            return self.create(arith.SubIOp(lhs, rhs))
+            return self.create(arith.SubIOp(lhs, rhs)).results[0]
         elif isinstance(lhs.type, FloatType):
-            return self.create(arith.SubFOp(lhs, rhs))
+            return self.create(arith.SubFOp(lhs, rhs)).results[0]
         else:
-            return self.create(tosa.SubOp(lhs, rhs))
+            return self.create(tosa.SubOp(lhs, rhs)).results[0]
 
     def make_mul_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
@@ -231,11 +250,11 @@ class ConvertASTtoMLIR(AstVisitor):
         if lhs.type != rhs.type:
             raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
         if isinstance(lhs.type, IntegerType | BoolType):
-            return self.create(arith.MulIOp(lhs, rhs))
+            return self.create(arith.MulIOp(lhs, rhs)).results[0]
         elif isinstance(lhs.type, FloatType):
-            return self.create(arith.MulFOp(lhs, rhs))
+            return self.create(arith.MulFOp(lhs, rhs)).results[0]
         else:
-            return self.create(tosa.MulOp(lhs, rhs))
+            return self.create(tosa.MulOp(lhs, rhs)).results[0]
 
     def make_div_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
@@ -243,18 +262,25 @@ class ConvertASTtoMLIR(AstVisitor):
         if lhs.type != rhs.type:
             raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
         if isinstance(lhs.type, IntegerType | BoolType):
-            return self.create(arith.DivSIOp(lhs, rhs))
+            return self.create(arith.DivSIOp(lhs, rhs)).results[0]
         elif isinstance(lhs.type, FloatType):
-            return self.create(arith.DivFOp(lhs, rhs))
+            return self.create(arith.DivFOp(lhs, rhs)).results[0]
         else:
-            _rhs = self.create(tosa.ReciprocalOp(rhs))
-            return self.create(tosa.MulOp(lhs, _rhs))
+            _rhs = self.create(tosa.ReciprocalOp(rhs)).results[0]
+            return self.create(tosa.MulOp(lhs, _rhs)).results[0]
 
     def make_numpy_op(self, op_name, *args, **kwargs):
         if op_name == 'numpy.random.randn':
-            return self.create(numpy_dialect.RandomRandnOp(args))
+            return self.create(numpy_dialect.RandomRandnOp(args)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
+
+    def make_call_op(self, func_op: FuncOp, *args, **kwargs):
+        attr = {
+            'callee': FlatSymbolRefAttr(StringAttr(func_op.attributes['sym_name'].value))
+        }
+        return self.create(func.CallOp(args, func_op.function_type.output_types,
+                                       attr))
 
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
