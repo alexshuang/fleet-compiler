@@ -8,11 +8,11 @@ def bar():
 bar()
 
 # CHECK: module {
-# CHECK-NEXT:   func.func @bar() {
+# CHECK-NEXT:   func.func @bar() -> i32 {
 # CHECK-NEXT:     %c10_i32 = arith.constant 10 : i32
 # CHECK-NEXT:     %c11_i32 = arith.constant 11 : i32
-# CHECK-NEXT:     %0 = arith.addi %c10_i32, %c11_i32 : i32
-# CHECK-NEXT:     return
+# CHECK-NEXT:     %1 = arith.addi %c10_i32, %c11_i32 : i32
+# CHECK-NEXT:     return %1 : i32
 # CHECK-NEXT:   }
-# CHECK-NEXT:   func.call @bar() : () -> ()
+# CHECK-NEXT:   %0 = func.call @bar() : () -> i32
 # CHECK-NEXT: }
