@@ -1,4 +1,4 @@
-# RUN: fleet_compiler_cli %s --emitMLIR --only-compile | %mlir-opt | %FileCheck %s
+# RUN: fleet_compiler_cli %s --emitMLIR --only-compile | %FileCheck %s
 
 import numpy as np
 
@@ -12,19 +12,25 @@ def bar():
 
 bar()
 
-a = np.random.randn(2, 3)
-b = np.random.randn(2, 3)
+a = np.random.randn(4)
+b = np.random.randn(4)
 foo(a, b)
 
-# CHECK: module {
-# CHECK-NEXT:   func.func @foo(%arg0: tensor<*xf32>, %arg1: tensor<*xf32>) -> tensor<*xf32> {
-# CHECK-NEXT:     %0 = "tosa.sub"(%arg0, %arg1) : (tensor<*xf32>, tensor<*xf32>) -> tensor<*xf32>
-# CHECK-NEXT:     return %0 : tensor<*xf32>
+# CHECK: "builtin.module" () ({
+# CHECK-NEXT:   func.func @foo(%arg0: tensor<*xf32>, %arg1: tensor<*xf32>) -> (tensor<*xf32>) {
+# CHECK-NEXT:     %0 = "tosa.sub" (%arg0,%arg1) : (tensor<*xf32>,tensor<*xf32>) -> tensor<*xf32>
+# CHECK-NEXT:     return %0: tensor<*xf32>
 # CHECK-NEXT:   }
-# CHECK-NEXT:   func.func @bar() -> i32 {
-# CHECK-NEXT:     %c10_i32 = arith.constant 10 : i32
-# CHECK-NEXT:     %c11_i32 = arith.constant 11 : i32
-# CHECK-NEXT:     %0 = arith.addi %c10_i32, %c11_i32 : i32
-# CHECK-NEXT:     return %0 : i32
+# CHECK-NEXT:   func.func @bar() -> (i32) {
+# CHECK-NEXT:     %2 = "arith.constant" () {value = 10: i32} : () -> i32
+# CHECK-NEXT:     %3 = "arith.constant" () {value = 11: i32} : () -> i32
+# CHECK-NEXT:     %4 = "arith.addi" (%2,%3) : (i32,i32) -> i32
+# CHECK-NEXT:     return %4: i32
 # CHECK-NEXT:   }
-# CHECK-NEXT: }
+# CHECK-NEXT:   %6 = func.call @bar() : () -> (i32)
+# CHECK-NEXT:   %7 = "arith.constant" () {value = 4: i32} : () -> i32
+# CHECK-NEXT:   %8 = "numpy.random.randn" (%7) : (i32) -> tensor<4xf32>
+# CHECK-NEXT:   %9 = "arith.constant" () {value = 4: i32} : () -> i32
+# CHECK-NEXT:   %10 = "numpy.random.randn" (%9) : (i32) -> tensor<4xf32>
+# CHECK-NEXT:   %11 = func.call @foo(%8,%10) : (tensor<4xf32>,tensor<4xf32>) -> (tensor<*xf32>)
+# CHECK-NEXT: }) : () -> ()
