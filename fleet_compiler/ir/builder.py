@@ -61,7 +61,7 @@ class BuilderStack:
 @dataclass
 class SymbolTable:
     "A mapping from variable names to Values, append-only"
-    table: dict[str, Value] = field(default_factory=dict)
+    table: dict[str, Value | str] = field(default_factory=dict)
 
     def __contains__(self, __o: object) -> bool:
         return __o in self.table
@@ -95,9 +95,16 @@ class ImplicitBuilder(metaclass=SingletonMeta):
         return self._stack.get()
     
     def lookup_symbol(self, sym_name: str):
+        def get_value_by_symbol(builder: Builder, sym_name: str):
+            val = sym_name
+            # support str mapping to str, like {'a': 'arg0', 'arg0': Value}
+            while isinstance(val, str) and val in builder.symbol_table:
+                val = builder.symbol_table[val]
+            return val if isinstance(val, Value) else None
+
         for i, b in enumerate(self._stack.walk()):
-            if sym_name in b.symbol_table:
-                return (b.symbol_table[sym_name], i)
+            if val := get_value_by_symbol(b, sym_name):
+                return (val, i)
         raise ValueError(f"unkown symbol {sym_name} in symbol table stack")
 
 

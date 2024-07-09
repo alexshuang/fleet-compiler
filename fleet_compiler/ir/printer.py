@@ -166,7 +166,8 @@ class Printer:
             self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
 
     def _print_type(self, t: IRType):
-        supported_type = [IntegerType, FloatType, BoolType, NoneType, RankedTensorType]
+        supported_type = [IntegerType, FloatType, BoolType, NoneType,
+                          RankedTensorType, UnrankedTensorType]
         if type(t) in supported_type:
             self._print_string(self._get_type_str(t))
         else:
@@ -183,6 +184,10 @@ class Printer:
             return "()"
         elif isinstance(t, RankedTensorType):
             shape_str = [str(o) for o in t.dims]
+            elem_type_str = [self._get_type_str(t.element_type)]
+            return f"tensor<{'x'.join(shape_str + elem_type_str)}>"
+        elif isinstance(t, UnrankedTensorType):
+            shape_str = ['*']
             elem_type_str = [self._get_type_str(t.element_type)]
             return f"tensor<{'x'.join(shape_str + elem_type_str)}>"
         else:
