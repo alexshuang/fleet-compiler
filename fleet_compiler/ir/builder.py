@@ -100,7 +100,7 @@ class ImplicitBuilder(metaclass=SingletonMeta):
             # support str mapping to str, like {'a': 'arg0', 'arg0': Value}
             while isinstance(val, str) and val in builder.symbol_table:
                 val = builder.symbol_table[val]
-            return val if isinstance(val, Value) else None
+            return val if val is not sym_name else None
 
         for i, b in enumerate(self._stack.walk()):
             if val := get_value_by_symbol(b, sym_name):
