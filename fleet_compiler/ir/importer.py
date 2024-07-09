@@ -86,7 +86,13 @@ class ConvertASTtoMLIR(AstVisitor):
         return self.module
 
     def visitBlock(self, ast_block: ASTBlock, block: Block):
-        with Builder.at_end(block):
+        with Builder.at_end(block) as builder:
+            for o in block.arguments:
+                # ast name mapping to ir name
+                builder.symbol_table[o.ast_name] = o.name
+                # ir name mapping to Value
+                builder.symbol_table[o.name] = o
+
             for o in ast_block.stmts:
                 self.visit(o)
 
@@ -185,32 +191,46 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.make_call_op(func_op, *args, **kwargs)
 
     def visitFunctionDef(self, node: FunctionDef):
-        # self.visitSignature(node.signature)
-        func_type = FunctionType([], [])
-        func_op = self.create(func.FuncOp(node.name, func_type, []))
-        self.visitBlock(node.block, func_op.regions[0].blocks[0])
+        arg_attrs = self.visitSignature(node.signature)
+        ast_arg_names, input_types = [], []
+        for o in arg_attrs:
+            type = FloatType(32) if isinstance(o[1], NoneAttr) else o.type
+            input_types.append(UnrankedTensorType(type))
+            ast_arg_names.append(o[0])
+
+        entry_block = Block()
+        args = [BlockArgument(f'%arg{i}', type, [], entry_block, i, ast_name)
+                for i, (type, ast_name) in enumerate(zip(input_types, ast_arg_names))]
+        entry_block.arguments = args
+
+        self.visitBlock(node.block, entry_block)
+
+        ret = entry_block.operations[-1]
+        assert isinstance(ret, ReturnOp)
+        output_types = [o.type for o in ret.operands]
+
+        func_type = FunctionType(input_types, output_types)
+        func_op = self.create(func.FuncOp(node.name, func_type, Region([entry_block]),
+                                          arg_attrs))
         builder = ImplicitBuilder().get()
         builder.symbol_table[node.name] = func_op
 
-    # def visitSignature(self, node: Signature):
-    #     params = self.visitParameterList(node.param_list)
+    def visitSignature(self, node: Signature):
+        return self.visitParameterList(node.param_list)
 
-    # def visitParameterList(self, node: ParameterList):
-    #     return [self.visitParamentDef(p) for p in node.params]
+    def visitParameterList(self, node: ParameterList):
+        return [tuple(self.visitParamentDef(p)) for p in node.params]
 
-    # def visitParamentDef(self, node: ParamentDef):
-    #     import pdb; pdb.set_trace()
-    #     value, _ = ImplicitBuilder().lookup_symbol(node.name)
-    #     return value
+    def visitParamentDef(self, node: ParamentDef):
+        attr = self.visit(node.init) if node.init else NoneAttr()
+        return [node.name, attr]
 
     def visitReturnStatement(self, node: ReturnStatement):
         ret_val = self.visit(node.ret)
         if not isinstance(ret_val, list):
             ret_val = [ret_val]
-        ret_op = self.create(ReturnOp(ret_val))
+        self.create(ReturnOp(ret_val))
         self.has_explicit_ret = True
-        func_op = ret_op.parent.parent.parent
-        func_op.function_type.output_types = [o.type for o in ret_val]
 
     def visitBlockEnd(self, node: BlockEnd):
         if not self.has_explicit_ret:

@@ -39,7 +39,6 @@ class RankedTensorType(IRType):
 
 @dataclass
 class UnrankedTensorType(IRType):
-    dims: list
     element_type: IntegerType | FloatType
 
 

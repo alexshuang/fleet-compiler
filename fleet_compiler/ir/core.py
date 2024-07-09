@@ -124,6 +124,8 @@ class BlockArgument(Value):
     block: Block
     # index of the arguments
     index: int
+    # AST arg name
+    ast_name: str
 
     def owner(self) -> Block:
         return self.block
