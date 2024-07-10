@@ -39,6 +39,12 @@ class UnrankedTensorType(IRType):
     element_type: IntegerType | FloatType
 
 
+@dataclass
+class ArrayType(IRType):
+    dims: list
+    element_type: IntegerType | FloatType
+
+
 ## Attributes
 @dataclass
 class StringAttr(Attribute):
@@ -71,6 +77,12 @@ class NoneAttr(Attribute): ...
 class DenseIntOrFPElementsAttr(Attribute):
     value: list[int | float]
     type: RankedTensorType | UnrankedTensorType
+
+
+@dataclass
+class ArrayAttr(Attribute):
+    value: list
+    type: ArrayType
 
 
 class ModuleOp(Operation):

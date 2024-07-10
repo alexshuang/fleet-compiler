@@ -16,12 +16,15 @@
 # ===---------------------------------------------------------------------------
 
 import numpy as np
+from functools import reduce
+import operator
 
 from .core import *
 from .builder import *
 from .dialects.builtin import *
 from .dialects.func import *
-from .dialects import arith, tosa, numpy as numpy_dialect, func
+from .dialects import arith, tosa, numpy as numpy_dialect, func, math
+
 
 from fleet_compiler.frontend.lexer import (
     Op as opcode
@@ -169,6 +172,15 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.make_mul_op(node.exp1, node.exp2)
         elif node.op == opcode.Divide:
             return self.make_div_op(node.exp1, node.exp2)
+        elif node.op == opcode.AT:
+            return self.make_matmul_op(node.exp1, node.exp2)
+        elif node.op == opcode.Power:
+            return self.make_pow_op(node.exp1, node.exp2)
+        # elif node.op in [opcode.EQ, opcode.NE, opcode.GT,
+        #             opcode.GE, opcode.LT, opcode.LE]:
+        #     return self.make_cmp_op(node.exp1, node.exp2)
+        else:
+            raise TypeError(f"Interpreter: Unsupport operator {node.op}")
 
     def visitArgumentList(self, node: ArgumentList):
         args = [self.visit(o) for o in node.args if o]
@@ -304,6 +316,53 @@ class ConvertASTtoMLIR(AstVisitor):
         return self.create(func.CallOp(args, func_op.function_type.output_types,
                                        attr))
 
+    def make_matmul_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+        lhs_type = lhs.type
+        rhs_type = rhs.type
+
+        reshape_lhs = False
+
+        if isinstance(lhs_type, RankedTensorType):
+            lhs_dims, rhs_dims = lhs_type.dims, rhs_type.dims
+            if len(lhs_dims) > len(rhs_dims):
+                reshape_lhs = True
+                old_outer_dims = lhs_dims[:-1]
+                dim0 = reduce(operator.mul, old_outer_dims, 1)
+                lhs_dims = [dim0, lhs_dims[-1]]
+                new_shape = ArrayAttr(lhs_dims, ArrayType([2], IntegerType(32, True)))
+                lhs = self.create(tosa.ReshapeOp(lhs, attrs={'new_shape': new_shape})).results[0]
+
+        out = self.create(tosa.MatmulOp(lhs, rhs)).results[0]
+
+        if reshape_lhs:
+            new_out_dims = old_outer_dims + [out.type.dims[-1]]
+            new_out_shape = ArrayAttr(new_out_dims, ArrayType([len(old_outer_dims) + 1], IntegerType(32, True)))
+            out = self.create(tosa.ReshapeOp(out, attrs={'new_shape': new_out_shape})).results[0]
+
+        return out
+
+    def make_pow_op(self, node1: Unary, node2: Unary):
+        lhs = self.visit(node1)
+        rhs = self.visit(node2)
+
+        lhs_type, rhs_type = lhs.type, rhs.type
+        if isinstance(lhs_type, RankedTensorType):
+            if not isinstance(rhs_type, RankedTensorType):
+                raise ValueError(f"Invalid lhs/rhs to make power op! {lhs.type} vs. {rhs.type}")
+            lhs_type, rhs_type = lhs_type.element_type, rhs_type.element_type
+
+        if isinstance(lhs_type, FloatType):
+            if isinstance(rhs_type, IntegerType):
+                return self.create(math.FPowIOp(lhs, rhs)).results[0]
+            elif isinstance(rhs_type, FloatType):
+                return self.create(math.PowFOp(lhs, rhs)).results[0]
+        elif isinstance(lhs_type, IntegerType) and isinstance(rhs_type, IntegerType):
+            return self.create(math.IPowIOp(lhs, rhs)).results[0]
+        else:
+            raise ValueError("Invalid lhs/rhs to make power op!")
+
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
         ir_type_factory = {
@@ -320,6 +379,4 @@ class ASTModuleImporter():
         self.module = module
     
     def import_graph(self):
-        m = ConvertASTtoMLIR(self.module).convert()
-        return m
-    
+        return ConvertASTtoMLIR(self.module).convert()
