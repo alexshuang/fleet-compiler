@@ -23,7 +23,7 @@ from .core import *
 from .builder import *
 from .dialects.builtin import *
 from .dialects.func import *
-from .dialects import arith, tosa, numpy as numpy_dialect, func, linalg, math
+from .dialects import arith, tosa, numpy as numpy_dialect, func, math
 
 
 from fleet_compiler.frontend.lexer import (
