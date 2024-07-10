@@ -230,6 +230,10 @@ class Operation(IRNode):
             res.append(OpResult(f'%{self.op_result_id}', t, uses=[], op=self, index=i))
             Operation.op_result_id += 1
         
+        if self.name == "":
+            if match := re.match(r'(.+)Op$', self.__class__.__name__):
+                op_name = match.group(1).lower().replace('_', '.')
+                self.name = f'{self.__class__.__module__.split('.')[-1]}.{op_name}'
         self.results = res
         self.operands = operands
         self.successors = successors

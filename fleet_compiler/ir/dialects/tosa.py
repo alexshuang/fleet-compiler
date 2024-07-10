@@ -16,22 +16,17 @@ class _UnaryOp(Operation):
         super().__init__(operands=[input], result_types=[input.type])
 
 
-class AddOp(_BinaryOp):
-    name = 'tosa.add'
+class AddOp(_BinaryOp): ...
 
 
-class SubOp(_BinaryOp):
-    name = 'tosa.sub'
+class SubOp(_BinaryOp): ...
 
 
 class MulOp(_BinaryOp):
-    name = 'tosa.mul'
-
     def __init__(self, lhs: Value, rhs: Value):
         # not support quantlization
         attrs = {'shift': IntegerAttr(0, IntegerType(32, True))}
         super().__init__(lhs, rhs, attrs)
 
 
-class ReciprocalOp(_UnaryOp):
-    name = 'tosa.reciprocal'
+class ReciprocalOp(_UnaryOp): ...

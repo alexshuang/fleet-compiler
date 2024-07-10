@@ -293,7 +293,7 @@ class ConvertASTtoMLIR(AstVisitor):
 
     def make_numpy_op(self, op_name, *args, **kwargs):
         if op_name == 'numpy.random.randn':
-            return self.create(numpy_dialect.RandomRandnOp(args)).results[0]
+            return self.create(numpy_dialect.Random_RandnOp(args)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
 

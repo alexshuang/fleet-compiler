@@ -16,33 +16,25 @@ class _BinaryOp(Operation):
         super().__init__(operands=[lhs, rhs], result_types=[lhs.type])
 
 
-class AddIOp(_BinaryOp):
-    name = 'arith.addi'
+class AddIOp(_BinaryOp): ...
 
 
-class AddFOp(_BinaryOp):
-    name = 'arith.addf'
+class AddFOp(_BinaryOp): ...
 
 
-class SubIOp(_BinaryOp):
-    name = 'arith.subi'
+class SubIOp(_BinaryOp): ...
 
 
-class SubFOp(_BinaryOp):
-    name = 'arith.subf'
+class SubFOp(_BinaryOp): ...
 
 
-class MulIOp(_BinaryOp):
-    name = 'arith.muli'
+class MulIOp(_BinaryOp): ...
 
 
-class MulFOp(_BinaryOp):
-    name = 'arith.mulf'
+class MulFOp(_BinaryOp): ...
 
 
-class DivSIOp(_BinaryOp):
-    name = 'arith.divsi'
+class DivSIOp(_BinaryOp): ...
 
 
-class DivFOp(_BinaryOp):
-    name = 'arith.divf'
+class DivFOp(_BinaryOp): ...
