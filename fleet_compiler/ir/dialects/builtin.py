@@ -6,8 +6,7 @@ from ..core import *
 
 ## Types
 @dataclass
-class StringType(IRType):
-    pass
+class StringType(IRType): ...
 
 
 @dataclass
@@ -22,13 +21,11 @@ class FloatType(IRType):
 
 
 @dataclass
-class BoolType(IRType):
-    pass
+class BoolType(IRType): ...
 
 
 @dataclass
-class NoneType(IRType):
-    pass
+class NoneType(IRType): ...
 
 
 @dataclass
@@ -67,8 +64,7 @@ class BoolAttr(Attribute):
 
 
 @dataclass
-class NoneAttr(Attribute):
-    pass
+class NoneAttr(Attribute): ...
 
 
 @dataclass
@@ -78,7 +74,6 @@ class DenseIntOrFPElementsAttr(Attribute):
 
 
 class ModuleOp(Operation):
-    name = 'builtin.module'
     sym_name = StringAttr("main")
     body: Region
 

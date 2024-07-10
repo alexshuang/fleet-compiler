@@ -20,8 +20,6 @@ class FlatSymbolRefAttr(Attribute):
 
 
 class FuncOp(Operation):
-    name = 'func.func'
-
     def __init__(self, sym_name: str, function_type: FunctionType, body: Region,
                  arg_attrs: list[tuple] = [], visibility: str = 'public'):
         self.function_type = function_type
@@ -36,15 +34,11 @@ class FuncOp(Operation):
 
 
 class ReturnOp(Operation):
-    name = 'func.return'
-
     def __init__(self, operands: list[Value]):
         super().__init__(operands=operands)
 
 
 class CallOp(Operation):
-    name = 'func.call'
-
     def __init__(self, operands: list[Value], result_types: list[IRType],
                  attributes: dict[str, Attribute]):
         super().__init__(operands=operands, result_types=result_types,

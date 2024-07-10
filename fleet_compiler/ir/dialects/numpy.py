@@ -4,9 +4,7 @@ from ..core import *
 from .builtin import *
 
 
-class RandomRandnOp(Operation):
-    name = 'numpy.random.randn'
-
+class Random_RandnOp(Operation):
     def __init__(self, operands: list[Value]):
         try:
             output_shape = [o.owner().attributes['value'].value for o in operands]
