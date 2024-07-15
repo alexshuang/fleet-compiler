@@ -57,7 +57,9 @@ from fleet_compiler.frontend.ast import (
     BlockEnd,
     Signature,
     ParameterList,
-    ParamentDef
+    ParamentDef,
+    SliceStatement,
+    Slice
 )
 
 
@@ -245,6 +247,15 @@ class ConvertASTtoMLIR(AstVisitor):
             self.create(ReturnOp([]))
             self.has_explicit_ret = False
 
+    def visitSliceStatement(self, node: SliceStatement):
+        indices = self.visitSlice(node.slice)
+        values, _ = ImplicitBuilder().lookup_symbol(node.name)
+        return self.create(tosa.GatherOp(values, indices)).results[0]
+
+    def visitSlice(self, node: Slice):
+        assert len(node.exps) == 1, "Not support multi indices"
+        return self.visit(node.exps[0])
+
     def create(self, op: Operation):
         builder = ImplicitBuilder().get()
         builder.insert(op)
@@ -303,6 +314,8 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(numpy_dialect.VarOp(args, kwargs)).results[0]
         if op_name == 'numpy.sqrt':
             return self.create(numpy_dialect.SqrtOp(args, kwargs)).results[0]
+        if op_name == 'numpy.random.seed':
+            return self.create(numpy_dialect.Random_SeedOp(args, kwargs)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
 
@@ -311,7 +324,7 @@ class ConvertASTtoMLIR(AstVisitor):
             'callee': FlatSymbolRefAttr(StringAttr(func_op.attributes['sym_name'].value))
         }
         return self.create(func.CallOp(args, func_op.function_type.output_types,
-                                       attr))
+                                       attr)).results[0]
 
     def make_matmul_op(self, node1: Unary, node2: Unary):
         lhs = self.visit(node1)
