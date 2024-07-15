@@ -85,6 +85,19 @@ class ArrayAttr(Attribute):
     type: ArrayType
 
 
+def get_preference_by_type_cls(type: IRType):
+    if isinstance(type, IntegerType):
+        return 1
+    elif isinstance(type, FloatType):
+        return 2
+    elif isinstance(type, RankedTensorType):
+        return 3
+    elif isinstance(type, UnrankedTensorType):
+        return 4
+    else:
+        raise ValueError(f"unsupported type: {type}")
+
+
 class ModuleOp(Operation):
     sym_name = StringAttr("main")
     body: Region

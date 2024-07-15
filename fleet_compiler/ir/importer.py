@@ -328,6 +328,12 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(numpy_dialect.SumOp(args, kwargs)).results[0]
         elif op_name == 'numpy.exp':
             return self.create(numpy_dialect.ExpOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.split':
+            return self.create(numpy_dialect.SplitOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.tri':
+            return self.create(numpy_dialect.TriOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.hstack':
+            return self.create(numpy_dialect.HstackOp(args, kwargs)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
 

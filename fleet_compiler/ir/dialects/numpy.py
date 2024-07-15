@@ -212,3 +212,45 @@ class SumOp(Operation):
 class ExpOp(Operation):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+
+
+class SplitOp(Operation):
+    def __init__(self, args: list[Value], kwargs: dict[str, Value]):
+        attrs = {}
+        assert len(args) >= 2, "Invalid arguments"
+        operands = [args[0], args[1]]
+        input_type = args[0].type
+        input_dims = input_type.dims if isinstance(input_type, RankedTensorType) else None
+
+        axis = None
+        if len(args) >= 3:
+            axis = args[2]
+        elif len(kwargs) > 0:
+            axis = kwargs['axis']
+
+        if axis:
+            operands.append(axis)
+            axis_value = axis.owner().attributes['value'].value
+            if not isinstance(axis_value, list):
+                axis_value = [axis_value]
+            attrs['axis'] = ArrayAttr(axis_value,
+                                      ArrayType(len(axis_value), IntegerType(32, True)))
+
+        if input_dims:
+            output_dims = input_dims[axis_value]
+            output_type = RankedTensorType(output_dims, input_type.element_type)
+        else:
+            output_type = UnrankedTensorType(input_type.element_type)
+        super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
+
+
+class TriOp(Operation):
+    def __init__(self, args: list[Value], kwargs: dict[str, Value]):
+        super().__init__(operands=args, result_types=[args[0].type])
+
+
+class HstackOp(Operation):
+    def __init__(self, args: list[Value], kwargs: dict[str, Value]):
+        assert len(args) == 1 and len(args[0]) >= 2
+        args = args[0]
+        super().__init__(operands=args, result_types=[args[0].type])

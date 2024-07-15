@@ -6,9 +6,12 @@ from .builtin import *
 
 class _BinaryOp(Operation):
     def __init__(self, lhs: Value, rhs: Value, attrs: dict[str, Attribute] = {}):
+        output_type = lhs.type
         if lhs.type != rhs.type:
-            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
-        super().__init__(operands=[lhs, rhs], result_types=[lhs.type], attributes=attrs)
+            lhs_perf = get_preference_by_type_cls(lhs.type)
+            rhs_perf = get_preference_by_type_cls(rhs.type)
+            output_type = lhs.type if lhs_perf > rhs_perf else rhs.type
+        super().__init__(operands=[lhs, rhs], result_types=[output_type], attributes=attrs)
 
 
 class _UnaryOp(Operation):
