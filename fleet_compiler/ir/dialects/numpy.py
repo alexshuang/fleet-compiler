@@ -22,6 +22,7 @@ class TransposeOp(Operation):
         input_dims = input_type.dims
         assert len(input_dims) > 1, f"invalid transpose input: {input_dims}"
 
+        axes = None
         if len(args) > 1:
             axes = args[1]
         elif len(kwargs) > 0:
@@ -31,11 +32,11 @@ class TransposeOp(Operation):
             operands.append(axes)
             axes_value = axes.owner().attributes['value'].value
         else:
-            axes_value = list(range(len(input_dims), -1, -1))
+            axes_value = list(range(len(input_dims) - 1, -1, -1))
 
         attrs['axes'] = ArrayAttr(axes_value,
                                   ArrayType(len(axes_value), IntegerType(32, True)))
-        output_dims = input_dims[axes_value]
+        output_dims = [input_dims[i] for i in axes_value]
         output_type = RankedTensorType(output_dims, input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type])
 
@@ -119,3 +120,9 @@ class VarOp(Operation):
 class SqrtOp(Operation):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+
+
+class Random_SeedOp(Operation):
+    def __init__(self, args: list[Value], kwargs: dict[str, Value]):
+        output_type = NoneType()
+        super().__init__(operands=args, result_types=[output_type])
