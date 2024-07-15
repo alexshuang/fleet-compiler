@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ..core import *
+from .builtin import *
 
 
 class ConstantOp(Operation):
@@ -11,9 +12,12 @@ class ConstantOp(Operation):
 
 class _BinaryOp(Operation):
     def __init__(self, lhs: Value, rhs: Value):
+        output_type = lhs.type
         if lhs.type != rhs.type:
-            raise ValueError(f"lhs.type != rhs.type: {lhs.type} vs. {rhs.type}")
-        super().__init__(operands=[lhs, rhs], result_types=[lhs.type])
+            lhs_perf = get_preference_by_type_cls(lhs.type)
+            rhs_perf = get_preference_by_type_cls(rhs.type)
+            output_type = lhs.type if lhs_perf > rhs_perf else rhs.type
+        super().__init__(operands=[lhs, rhs], result_types=[output_type])
 
 
 class AddIOp(_BinaryOp): ...
