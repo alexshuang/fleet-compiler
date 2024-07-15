@@ -63,3 +63,12 @@ class GatherOp(Operation):
         else:
             output_type = UnrankedTensorType(values.type.element_type)
         super().__init__(operands=[values, indices], result_types=[output_type], attributes=attrs)
+
+
+class PowOp(Operation):
+    def __init__(self, input1: Value, input2: Value, attrs: dict[str, Attribute] = {}):
+        if isinstance(input1.type, RankedTensorType):
+            output_type = input1.type
+        else:
+            output_type = UnrankedTensorType(input1.type.element_type)
+        super().__init__(operands=[input1, input2], result_types=[output_type], attributes=attrs)

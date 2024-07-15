@@ -254,3 +254,8 @@ class HstackOp(Operation):
         assert len(args) == 1 and len(args[0]) >= 2
         args = args[0]
         super().__init__(operands=args, result_types=[args[0].type])
+
+
+class TanhOp(Operation):
+    def __init__(self, args: list[Value], kwargs: dict[str, Value]):
+        super().__init__(operands=args, result_types=[args[0].type])

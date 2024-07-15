@@ -97,9 +97,9 @@ class ConvertASTtoMLIR(AstVisitor):
         with Builder.at_end(block) as builder:
             for o in block.arguments:
                 # ast name mapping to ir name
-                builder.symbol_table[o.ast_name] = o.name
+                self.declare(o.ast_name, o.name)
                 # ir name mapping to Value
-                builder.symbol_table[o.name] = o
+                self.declare(o.name, o)
 
             for o in ast_block.stmts:
                 try:
@@ -110,8 +110,7 @@ class ConvertASTtoMLIR(AstVisitor):
 
     def visitVariableDef(self, node: VariableDef):
         init = self.visit(node.init)
-        builder = ImplicitBuilder().get()
-        builder.symbol_table[node.name] = init
+        self.declare(node.name, init)
 
     def visitIntegerLiteral(self, node: IntegerLiteral):
         type = IntegerType(32, True)
@@ -167,7 +166,7 @@ class ConvertASTtoMLIR(AstVisitor):
             return [self.visit(o) for o in node.exps]
 
     def visitVariable(self, node: Variable):
-        value, _ = ImplicitBuilder().lookup_symbol(node.name)
+        value = self.get(node.name)
         return value
 
     def visitBinary(self, node: Binary):
@@ -203,7 +202,7 @@ class ConvertASTtoMLIR(AstVisitor):
             if sym.op_name.startswith('numpy.'):
                 return self.make_numpy_op(sym.op_name, *args, **kwargs)
         elif isinstance(sym, FunctionSymbol):
-            func_op, _ = ImplicitBuilder().lookup_symbol(sym.node.name)
+            func_op = self.get(sym.node.name)
             return self.make_call_op(func_op, *args, **kwargs)
 
     def visitFunctionDef(self, node: FunctionDef):
@@ -228,8 +227,7 @@ class ConvertASTtoMLIR(AstVisitor):
         func_type = FunctionType(input_types, output_types)
         func_op = self.create(func.FuncOp(node.name, func_type, Region([entry_block]),
                                           arg_attrs))
-        builder = ImplicitBuilder().get()
-        builder.symbol_table[node.name] = func_op
+        self.declare(node.name, func_op)
 
     def visitSignature(self, node: Signature):
         return self.visitParameterList(node.param_list)
@@ -255,7 +253,7 @@ class ConvertASTtoMLIR(AstVisitor):
 
     def visitSliceStatement(self, node: SliceStatement):
         indices = self.visitSlice(node.slice)
-        values, _ = ImplicitBuilder().lookup_symbol(node.name)
+        values = self.get(node.name)
         return self.create(tosa.GatherOp(values, indices)).results[0]
 
     def visitSlice(self, node: Slice):
@@ -334,6 +332,8 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(numpy_dialect.TriOp(args, kwargs)).results[0]
         elif op_name == 'numpy.hstack':
             return self.create(numpy_dialect.HstackOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.tanh':
+            return self.create(numpy_dialect.TanhOp(args, kwargs)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
 
@@ -375,21 +375,47 @@ class ConvertASTtoMLIR(AstVisitor):
         lhs = self.visit(node1)
         rhs = self.visit(node2)
 
-        lhs_type, rhs_type = lhs.type, rhs.type
-        if isinstance(lhs_type, RankedTensorType):
-            if not isinstance(rhs_type, RankedTensorType):
-                raise ValueError(f"Invalid lhs/rhs to make power op! {lhs.type} vs. {rhs.type}")
-            lhs_type, rhs_type = lhs_type.element_type, rhs_type.element_type
+        tenosr_pow = False
+        # boardcast scalar to tensor
+        if isinstance(lhs.type, Union[RankedTensorType | UnrankedTensorType]):
+            if not isinstance(rhs.type, Union[RankedTensorType | UnrankedTensorType]):
+                rhs = self.create(tensor.SplatOp(rhs, lhs.type)).results[0]
+                tenosr_pow = True
+        elif isinstance(rhs.type, RankedTensorType | UnrankedTensorType):
+            if not isinstance(lhs.type, Union[RankedTensorType | UnrankedTensorType]):
+                lhs = self.create(tensor.SplatOp(lhs, rhs.type)).results[0]
+                tenosr_pow = True
 
-        if isinstance(lhs_type, FloatType):
-            if isinstance(rhs_type, IntegerType):
-                return self.create(math.FPowIOp(lhs, rhs)).results[0]
-            elif isinstance(rhs_type, FloatType):
-                return self.create(math.PowFOp(lhs, rhs)).results[0]
-        elif isinstance(lhs_type, IntegerType) and isinstance(rhs_type, IntegerType):
-            return self.create(math.IPowIOp(lhs, rhs)).results[0]
+        if tenosr_pow:
+            return self.create(tosa.PowOp(lhs, rhs)).results[0]
         else:
-            raise ValueError("Invalid lhs/rhs to make power op!")
+            lhs_type, rhs_type = lhs.type, rhs.type
+            if isinstance(lhs_type, RankedTensorType):
+                if not isinstance(rhs_type, RankedTensorType):
+                    raise ValueError(f"Invalid lhs/rhs to make power op! {lhs.type} vs. {rhs.type}")
+                lhs_type, rhs_type = lhs_type.element_type, rhs_type.element_type
+
+            if isinstance(lhs_type, FloatType):
+                if isinstance(rhs_type, IntegerType):
+                    return self.create(math.FPowIOp(lhs, rhs)).results[0]
+                elif isinstance(rhs_type, FloatType):
+                    return self.create(math.PowFOp(lhs, rhs)).results[0]
+            elif isinstance(lhs_type, IntegerType) and isinstance(rhs_type, IntegerType):
+                return self.create(math.IPowIOp(lhs, rhs)).results[0]
+            else:
+                raise ValueError("Invalid lhs/rhs to make power op!")
+
+    def declare(self, name: str, value: Value):
+        builder = ImplicitBuilder().get()
+        builder.symbol_table[name] = value
+
+    def get(self, name: str):
+        try:
+            value, _ = ImplicitBuilder().lookup_symbol(name)
+        except Exception as e:
+            traceback.print_exc()
+            sys.exit(-1)
+        return value
 
     @staticmethod
     def create_ir_type_from_literal(literal: AstNode):
