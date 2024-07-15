@@ -15,6 +15,8 @@
 #
 # ===---------------------------------------------------------------------------
 
+import sys
+import traceback
 import numpy as np
 from functools import reduce
 import operator
@@ -100,7 +102,11 @@ class ConvertASTtoMLIR(AstVisitor):
                 builder.symbol_table[o.name] = o
 
             for o in ast_block.stmts:
-                self.visit(o)
+                try:
+                    self.visit(o)
+                except Exception as e:
+                    traceback.print_exc()
+                    sys.exit(-1)
 
     def visitVariableDef(self, node: VariableDef):
         init = self.visit(node.init)
@@ -306,16 +312,22 @@ class ConvertASTtoMLIR(AstVisitor):
     def make_numpy_op(self, op_name, *args, **kwargs):
         if op_name == 'numpy.random.randn':
             return self.create(numpy_dialect.Random_RandnOp(args, kwargs)).results[0]
-        if op_name == 'numpy.transpose':
+        elif op_name == 'numpy.transpose':
             return self.create(numpy_dialect.TransposeOp(args, kwargs)).results[0]
-        if op_name == 'numpy.mean':
+        elif op_name == 'numpy.mean':
             return self.create(numpy_dialect.MeanOp(args, kwargs)).results[0]
-        if op_name == 'numpy.var':
+        elif op_name == 'numpy.var':
             return self.create(numpy_dialect.VarOp(args, kwargs)).results[0]
-        if op_name == 'numpy.sqrt':
+        elif op_name == 'numpy.sqrt':
             return self.create(numpy_dialect.SqrtOp(args, kwargs)).results[0]
-        if op_name == 'numpy.random.seed':
+        elif op_name == 'numpy.random.seed':
             return self.create(numpy_dialect.Random_SeedOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.max':
+            return self.create(numpy_dialect.MaxOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.sum':
+            return self.create(numpy_dialect.SumOp(args, kwargs)).results[0]
+        elif op_name == 'numpy.exp':
+            return self.create(numpy_dialect.ExpOp(args, kwargs)).results[0]
         else:
             raise ValueError(f"unsupported op: {op_name}")
 
@@ -389,4 +401,9 @@ class ASTModuleImporter():
         self.module = module
     
     def import_graph(self):
-        return ConvertASTtoMLIR(self.module).convert()
+        try:
+            m = ConvertASTtoMLIR(self.module).convert()
+        except Exception as e:
+            traceback.print_exc()
+            sys.exit(-1)
+        return m
