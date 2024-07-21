@@ -26,7 +26,7 @@ from .core import *
 from .builder import *
 from .dialects.builtin import *
 from .dialects.func import *
-from .dialects import arith, tosa, numpy as numpy_dialect, func, math, tensor
+from .dialects import arith, tosa, numpy as numpy_dialect, func, math, tensor, python as python_dialect
 
 
 from fleet_compiler.frontend.lexer import (
@@ -201,6 +201,8 @@ class ConvertASTtoMLIR(AstVisitor):
         if isinstance(sym, OperatorSymbol):
             if sym.op_name.startswith('numpy.'):
                 return self.make_numpy_op(sym.op_name, *args, **kwargs)
+            elif sym.op_name.startswith('python.'):
+                return self.make_python_op(sym.op_name, *args, **kwargs)
         elif isinstance(sym, FunctionSymbol):
             func_op = self.get(sym.node.name)
             return self.make_call_op(func_op, *args, **kwargs)
@@ -334,6 +336,12 @@ class ConvertASTtoMLIR(AstVisitor):
             return self.create(numpy_dialect.HstackOp(args, kwargs)).results[0]
         elif op_name == 'numpy.tanh':
             return self.create(numpy_dialect.TanhOp(args, kwargs)).results[0]
+        else:
+            raise ValueError(f"unsupported op: {op_name}")
+
+    def make_python_op(self, op_name, *args, **kwargs):
+        if op_name == 'python._print':
+            return self.create(python_dialect.PrintOp(args, kwargs))
         else:
             raise ValueError(f"unsupported op: {op_name}")
 
