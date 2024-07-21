@@ -111,6 +111,7 @@ np.random.seed(42)
 inputs = [8897, 33125, 34028, 11310, 46496, 8936, 13422, 12673, 12521, 4655, 27264, 42624, 48419, 27095, 24398, 15221]
 pos_array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 y = gpt2(inputs, pos_array)
+print(y)
 
 # CHECK: "builtin.module" () ({
 # CHECK-NEXT:   func.func @gelu(%arg0: tensor<*xf32>) -> (tensor<*xf32>) {
@@ -362,4 +363,5 @@ y = gpt2(inputs, pos_array)
 # CHECK-NEXT:   %228 = "arith.constant" () {value = dense<[8897, 33125, 34028, 11310, 46496, 8936, 13422, 12673, 12521, 4655, 27264, 42624, 48419, 27095, 24398, 15221]>: tensor<16xi32>} : () -> tensor<16xi32>
 # CHECK-NEXT:   %229 = "arith.constant" () {value = dense<[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]>: tensor<16xi32>} : () -> tensor<16xi32>
 # CHECK-NEXT:   %230 = func.call @gpt2(%228,%229) : (tensor<16xi32>,tensor<16xi32>) -> (tensor<*xf32>)
+# CHECK-NEXT:   "python.print" (%230) : (tensor<*xf32>) -> ()
 # CHECK-NEXT: }) : () -> ()
