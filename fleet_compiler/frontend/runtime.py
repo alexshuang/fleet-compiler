@@ -14,10 +14,14 @@
 #
 # ===---------------------------------------------------------------------------
 
+from __future__ import annotations
+
 from .lexer import Op
 from .ast import *
 from .ops import Operation
 from .symbolic import OperatorSymbol
+import contextlib
+from typing import Any
 
 
 class RetVal:
@@ -25,7 +29,32 @@ class RetVal:
         self.value = value
 
 
-class StackFrame:
+class SingletonMeta(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(SingletonMeta, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class CallStack(metaclass=SingletonMeta):
+    def __init__(self) -> None:
+        self._stack = []
+
+    def push(self, frame: StackFrame):
+        self._stack.append(frame)
+
+    def pop(self):
+        return self._stack.pop()
+
+    def get(self, index: int = None):
+        return self._stack[index] if index else self._stack[-1]
+
+    def size(self):
+        return len(self._stack)
+
+
+class StackFrame(contextlib.AbstractContextManager):
     def __init__(self) -> None:
         self.variables = {} # local variables
         self.ret_val = None # return value
@@ -36,16 +65,25 @@ class StackFrame:
     def get(self, name: str):
         return self.variables[name] if name in self.variables else None
 
+    def __enter__(self) -> Any:
+        CallStack().push(self)
+        return CallStack().get()
+
+    def __exit__(self, __exc_type: type[BaseException] | None,
+                 __exc_value: BaseException | None,
+                 __traceback: contextlib.TracebackType | None) -> bool | None:
+        return CallStack().pop()
+
 
 class Interpreter(AstVisitor):
     def __init__(self) -> None:
         super().__init__()
-        self.call_stack = []
+        self.call_stack = CallStack()
         self.ops = Operation()
     
     def visitModule(self, node: AstModule):
-        self.enter()
-        return super().visitModule(node)
+        with StackFrame():
+            return super().visitModule(node)
 
     def visitBlock(self, node: Block):
         def should_run(node):
@@ -81,35 +119,32 @@ class Interpreter(AstVisitor):
                 else:
                     raise TypeError(f"Interpreter: Unsupport operation {node.name}")
             else: # function define
-                self.enter() # push
+                with StackFrame():
+                    # args
+                    func = node.sym.node
+                    params = func.signature.param_list.params
+                    args = node.arg_list.args
+                    num_args = len(args)
+                    num_params = len(params)
+                    if num_params < num_args:
+                        raise TypeError(f"Interpreter: Expect {num_params} arguments but got {num_args}")
 
-                # args
-                func = node.sym.node
-                params = func.signature.param_list.params
-                args = node.arg_list.args
-                num_args = len(args)
-                num_params = len(params)
-                if num_params < num_args:
-                    raise TypeError(f"Interpreter: Expect {num_params} arguments but got {num_args}")
+                    names, values = [], []
+                    for i, arg in enumerate(args):
+                        names.append(params[i].name if isinstance(arg, PositionalArgument) else arg.name)
+                        values.append(self.visit(arg.value))
+                    # args with default-value
+                    for p in params[num_args:]:
+                        names.append(p.name)
+                        values.append(self.visit(p.init))
 
-                names, values = [], []
-                for i, arg in enumerate(args):
-                    names.append(params[i].name if isinstance(arg, PositionalArgument) else arg.name)
-                    values.append(self.visit(arg.value))
-                # args with default-value
-                for p in params[num_args:]:
-                    names.append(p.name)
-                    values.append(self.visit(p.init))
+                    # set variable values
+                    for k, v in zip(names, values):
+                        self.update_variable_value(k, v)
 
-                # set variable values
-                for k, v in zip(names, values):
-                    self.update_variable_value(k, v)
-
-                # body
-                ret = self.visitBlock(func.block)
-
-                self.exit() # pop
-                return self.call_stack[-1].ret_val
+                    # body
+                    ret = self.visitBlock(func.block)
+                return self.call_stack.get().ret_val
         else:
             raise TypeError(f"Interpreter: Unsupport operation {node.name}")
     
@@ -166,14 +201,12 @@ class Interpreter(AstVisitor):
         for b in node.branches:
             # else branch
             if b.cond is None:
-                self.enter()
-                ret = self.visitBlock(b.block)
-                self.exit()
+                with StackFrame():
+                    ret = self.visitBlock(b.block)
                 return ret
             elif self.visit(b.cond): # then branch
-                self.enter()
-                ret = self.visitBlock(b.block)
-                self.exit()
+                with StackFrame():
+                    ret = self.visitBlock(b.block)
                 return ret
 
     def visitSliceStatement(self, node: SliceStatement):
@@ -199,16 +232,10 @@ class Interpreter(AstVisitor):
     def visitListContent(self, node: ListContent):
         return [self.visit(o) for o in node.exps]
 
-    def enter(self):
-        self.call_stack.append(StackFrame())
-    
-    def exit(self):
-        self.call_stack.pop()
-
     def get_variable_value(self, name: str):
         value = None
-        for i in range(len(self.call_stack) - 1, -1, -1):
-            value = self.call_stack[i].get(name)
+        for i in range(self.call_stack.size() - 1, -1, -1):
+            value = self.call_stack.get(i).get(name)
             if value is not None:
                 break
         if value is None:
@@ -216,10 +243,9 @@ class Interpreter(AstVisitor):
         return value
 
     def update_variable_value(self, name: str, value):
-        frame = self.call_stack[-1]
-        if frame:
+        if frame := self.call_stack.get():
             frame.update(name, value)
 
     def set_return_value(self, value):
-        self.call_stack[-2].ret_val = value
+        self.call_stack.get(-2).ret_val = value
 
