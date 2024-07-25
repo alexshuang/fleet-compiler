@@ -209,6 +209,7 @@ class Operation(IRNode):
     properties: dict[str, Attribute] = field(default_factory=dict)
     regions: Sequence[Region] = field(default_factory=list)
     traits: Sequence[OpTrait] = field(default_factory=list)
+    hasCustomAssemblyFormat: bool = field(default=False)
     
     op_result_id: ClassVar[int] = 0
     

@@ -24,10 +24,6 @@ from .dialects.func import *
 from dataclasses import dataclass, field
 
 
-def has_custom_print(op: Operation):
-    return hasattr(op, 'print') and callable(getattr(op, 'print'))
-
-
 @dataclass
 class Printer:
     _indent: int = field(default=0)
@@ -35,18 +31,11 @@ class Printer:
 
     def print(self, op: Operation):
         if isinstance(op, Operation):
-            if has_custom_print(op):
-                op.print(self._get_indent())
+            if op.hasCustomAssemblyFormat:
+                op.print(self)
             else:
-                if isinstance(op, FuncOp):
-                    self._print_func(op)
-                elif isinstance(op, ReturnOp):
-                    self._print_ret(op)
-                elif isinstance(op, CallOp):
-                    self._print_call(op)
-                else:
-                    self._print_results(op)
-                    self._print_op_with_default_format(op)
+                self._print_results(op)
+                self._print_op_with_default_format(op)
         elif isinstance(op, Region):
             self._print_region(op)
         elif isinstance(op, Block):
@@ -194,36 +183,3 @@ class Printer:
             return f"tensor<{'x'.join(shape_str + elem_type_str)}>"
         else:
             return "undefined"
-
-    def _print_func(self, op: FuncOp):
-        sym_name = op.attributes['sym_name'].value
-        prefix = self._get_indent()
-        func_type = op.attributes['function_type']
-        input_types = [self._get_type_str(o) for o in func_type.input_types]
-        output_types = [self._get_type_str(o) for o in func_type.output_types]
-        arg_str = ', '.join([f'%arg{i}: {o}' for i, o in enumerate(input_types)])
-        output_type_str = ', '.join(output_types)
-
-        self._print_string(f"{prefix}{op.name} @{sym_name}({arg_str}) -> ({output_type_str}) ")
-        self._print_region(op.regions[0])
-
-    def _print_ret(self, op: ReturnOp):
-        prefix = self._get_indent()
-        if len(op.operands) > 0:
-            rets = ','.join([o.name for o in op.operands])
-            ret_types = ','.join([self._get_type_str(o.type) for o in op.operands])
-            ret = f' {rets}: {ret_types}'
-        else:
-            ret = ''
-        self._print_string(f"{prefix}return{ret}\n")
-
-    def _print_call(self, op: CallOp):
-        prefix = self._get_indent()
-        results = ','.join([o.name for o in op.results])
-        if results != '':
-            results += ' = '
-        sym_name = op.attributes['callee'].sym_name.value
-        operands = ','.join([o.name for o in op.operands])
-        operand_types = ','.join([self._get_type_str(o.type) for o in op.operands])
-        output_types = ','.join([self._get_type_str(o.type) for o in op.results])
-        self._print_string(f"{prefix}{results}func.call @{sym_name}({operands}) : ({operand_types}) -> ({output_types})\n")
