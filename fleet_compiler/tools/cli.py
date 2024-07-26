@@ -30,7 +30,9 @@ from fleet_compiler.frontend.ast import AstModule, AstVisitor
 from fleet_compiler.frontend.runtime import Interpreter
 
 from fleet_compiler.ir.importer import ASTModuleImporter
-from fleet_compiler.ir.printer import Printer
+from fleet_compiler.ir.pass_manager import PassManager
+from fleet_compiler.ir.transforms.lower_numpy import LowerNumpyPass
+
 
 def create_dir(path: str):
     if os.path.isfile(path):
@@ -95,6 +97,7 @@ def main():
     parser.add_argument('--output', '-o', type=str, help='Output file path for emit')
     parser.add_argument('--only-compile', action='store_true', help='not run')
     parser.add_argument('--validation', action='store_true', help='validate the results')
+    parser.add_argument('--opt', action='store_true', help='apply transforms')
 
     args = parser.parse_args()
 
@@ -140,6 +143,12 @@ def main():
             ast_dumper(ast_module)
 
     module = ASTModuleImporter(ast_module).import_graph()
+
+    if args.opt:
+        pm = PassManager()
+        pm.add(LowerNumpyPass())
+        pm.run(module)
+
     if args.emitMLIR:
         if args.output:
             save_output(args.output, lambda: module.dump())

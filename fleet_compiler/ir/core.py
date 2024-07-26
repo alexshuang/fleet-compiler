@@ -79,6 +79,10 @@ class Value(ABC):
     @classmethod
     def is_valid_name(self, name: str | None):
         return True if name is None or re.fullmatch(self._name_regex) else False
+    
+    def replace_by(self, new_value: Value):
+        for use in self.uses:
+            use.operation.operands[use.index] = new_value
 
 
 @dataclass
@@ -117,6 +121,13 @@ class Block(IRNode):
     def get_op_index(self, op: Operation):
         assert op.parent is self, "The \'existing op\' is not in current block"
         return self.operations.index(op)
+
+    def walk(self):
+        for o in self.operations:
+            yield from o.walk()
+    
+    def erase_op(self, op: Operation):
+        self.operations.pop(self.get_op_index(op))
 
 
 @dataclass
@@ -165,6 +176,10 @@ class Region(IRNode):
         self._attach_block(block)
         block.name = f"^bb{len(self.blocks)}"
         self.blocks.append(block)
+
+    def walk(self):
+        for o in self.blocks:
+            yield from o.walk()
 
 
 @dataclass
@@ -219,13 +234,13 @@ class Operation(IRNode):
     
     def __init__(self,
                  *,
-                 operands: Sequence[OpResult | BlockArgument] = (),
-                 result_types: Sequence[IRType] = (),
-                 successors: Sequence[Block] = (),
+                 operands: Sequence[OpResult | BlockArgument] = [],
+                 result_types: Sequence[IRType] = [],
+                 successors: Sequence[Block] = [],
                  attributes: dict[str, Attribute] = {},
                  properties: dict[str, Attribute] = {},
-                 regions: Sequence[Region] = (),
-                 traits: Sequence[OpTrait] = ()):
+                 regions: Sequence[Region] = [],
+                 traits: Sequence[OpTrait] = []):
         res = []
         for i, t in enumerate(result_types):
             res.append(OpResult(f'%{self.op_result_id}', t, uses=[], op=self, index=i))
@@ -236,7 +251,9 @@ class Operation(IRNode):
                 op_name = match.group(1).lower().replace('_', '.')
                 self.name = f'{self.__class__.__module__.split(".")[-1]}.{op_name}'
         self.results = res
-        self.operands = operands
+        self.operands = [o for o in operands]
+        for i, o in enumerate(self.operands):
+            o.uses.append(Use(self, i))
         self.successors = successors
         self.properties = properties
         self.attributes = attributes
@@ -247,12 +264,12 @@ class Operation(IRNode):
     
     @classmethod
     def create(cls,
-            operands: Sequence[OpResult | BlockArgument] = (),
-            result_types: Sequence[IRType] = (),
-            successors: Sequence[Block] = (),
+            operands: Sequence[OpResult | BlockArgument] = [],
+            result_types: Sequence[IRType] = [],
+            successors: Sequence[Block] = [],
             attributes: dict[str, Attribute] = {},
             properties: dict[str, Attribute] = {},
-            regions: Sequence[Region] = ()):
+            regions: Sequence[Region] = []):
         op = cls.__new__(cls)
         Operation.__init__(op,
                            operands=operands,
@@ -268,3 +285,8 @@ class Operation(IRNode):
             raise ValueError("Can't attach a attached region")
         region.parent = self
         self.regions.append(region)
+
+    def walk(self):
+        yield self
+        for o in self.regions:
+            yield from o.walk()

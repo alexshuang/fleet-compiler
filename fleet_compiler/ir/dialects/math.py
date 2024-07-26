@@ -1,4 +1,7 @@
 from __future__ import annotations
+from collections.abc import Sequence
+
+from fleet_compiler.ir.core import Attribute, Block, BlockArgument, IRType, OpResult, OpTrait, Region
 
 from ..core import *
 from .builtin import *
@@ -41,3 +44,8 @@ class PowFOp(Operation):
         if lhs_type != rhs_type or not isinstance(lhs_type, FloatType):
             raise ValueError(f"invalid lhs/rhs: {lhs_type}, {rhs_type} for math.powf")
         super().__init__(operands=[lhs, rhs], result_types=[lhs.type], attributes=attrs)
+
+
+class SqrtOp(Operation):
+    def __init__(self, operand: Value):
+        super().__init__(operands=[operand], result_types=[operand.type])
