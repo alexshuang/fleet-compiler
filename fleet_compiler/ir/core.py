@@ -121,13 +121,17 @@ class Block(IRNode):
     def get_op_index(self, op: Operation):
         assert op.parent is self, "The \'existing op\' is not in current block"
         return self.operations.index(op)
-
+    
     def walk(self):
         for o in self.operations:
             yield from o.walk()
     
     def erase_op(self, op: Operation):
-        self.operations.pop(self.get_op_index(op))
+        old = self.operations.pop(self.get_op_index(op))
+        old.parent = None
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
 @dataclass
@@ -140,6 +144,9 @@ class BlockArgument(Value):
 
     def owner(self) -> Block:
         return self.block
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
 @dataclass
@@ -181,6 +188,26 @@ class Region(IRNode):
         for o in self.blocks:
             yield from o.walk()
 
+    def clone(self, src_region: Region, block_mapper: dict[Block, Block] = {},
+              value_mapper: dict[Value, Value] = {}):
+        new_blocks = []
+        for block in src_region.blocks:
+            new_block = Block()
+            block_mapper[block] = new_block
+            new_blocks.append(new_block)
+
+        for block, new_block in zip(src_region.blocks, new_blocks):
+            for arg in block.arguments:
+                new_arg = BlockArgument(arg.name, arg.type, [], new_block,
+                                        arg.index, arg.ast_name)
+                value_mapper[arg] = new_arg
+                new_block.arguments.append(new_arg)
+            for o in block.operations:
+                new_block.add_op(o.clone())
+
+        for o in new_blocks:
+            self.add_block(o)
+
 
 @dataclass
 class OpResult(Value):
@@ -191,6 +218,9 @@ class OpResult(Value):
 
     def owner(self) -> Operation:
         return self.op
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
 @dataclass
@@ -279,7 +309,7 @@ class Operation(IRNode):
                            properties=properties,
                            regions=regions)
         return op
-        
+
     def add_region(self, region: Region):
         if region.parent:
             raise ValueError("Can't attach a attached region")
@@ -290,3 +320,29 @@ class Operation(IRNode):
         yield self
         for o in self.regions:
             yield from o.walk()
+
+    def clone(self, block_mapper: dict[Block, Block] = {},
+              value_mapper: dict[Value, Value] = {}):
+        # import pdb; pdb.set_trace()
+        # non-region
+        operands = [value_mapper[operand] if operand in value_mapper else operand
+                    for operand in self.operands]
+        result_types = [o.type for o in self.results]
+        successors = [block_mapper[successor] if successor in block_mapper else successor
+                    for successor in self.successors]
+        attributes = self.attributes.copy()
+        properties = self.properties.copy()
+        regions = [Region() for _ in range(len(self.regions))]
+        # new_op = Operation.create(operands, result_types, successors,
+        #                           attributes, properties, regions)
+        new_op = self.create(operands, result_types, successors,
+                             attributes, properties, regions)
+
+        for i, res in enumerate(new_op.results):
+            value_mapper[self.results[i]] = res
+
+        # regions
+        for i, region in enumerate(new_op.regions):
+            region.clone(self.regions[i], block_mapper, value_mapper)
+
+        return new_op
