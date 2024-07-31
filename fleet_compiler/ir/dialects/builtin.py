@@ -109,6 +109,10 @@ class ModuleOp(Operation):
         super().__init__(regions=[self.body],
                          attributes=self.attributes)
 
+    @property
+    def operations(self):
+        return self.body.blocks[0].operations
+
     def dump(self):
         from ..printer import Printer
         Printer().print(self)
