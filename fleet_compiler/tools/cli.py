@@ -32,6 +32,7 @@ from fleet_compiler.frontend.runtime import Interpreter
 from fleet_compiler.ir.importer import ASTModuleImporter
 from fleet_compiler.ir.pass_manager import PassManager
 from fleet_compiler.ir.transforms.lower_numpy import LowerNumpyPass
+from fleet_compiler.ir.transforms.inline import InlineFunctionPass
 
 
 def create_dir(path: str):
@@ -146,6 +147,7 @@ def main():
 
     if args.opt:
         pm = PassManager()
+        pm.add(InlineFunctionPass())
         pm.add(LowerNumpyPass())
         pm.run(module)
 
