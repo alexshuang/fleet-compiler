@@ -133,6 +133,13 @@ class Block(IRNode):
     def __hash__(self) -> int:
         return id(self)
 
+    def walk(self):
+        for o in self.operations:
+            yield from o.walk()
+    
+    def erase_op(self, op: Operation):
+        self.operations.pop(self.get_op_index(op))
+
 
 @dataclass
 class BlockArgument(Value):
