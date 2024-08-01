@@ -33,6 +33,7 @@ from fleet_compiler.ir.importer import ASTModuleImporter
 from fleet_compiler.ir.pass_manager import PassManager
 from fleet_compiler.ir.transforms.lower_numpy import LowerNumpyPass
 from fleet_compiler.ir.transforms.inline import InlineFunctionPass
+from fleet_compiler.ir.transforms.shape_inference import ShapeInferencePass
 
 
 def create_dir(path: str):
@@ -149,6 +150,7 @@ def main():
         pm = PassManager()
         pm.add(InlineFunctionPass())
         pm.add(LowerNumpyPass())
+        pm.add(ShapeInferencePass())
         pm.run(module)
 
     if args.emitMLIR:

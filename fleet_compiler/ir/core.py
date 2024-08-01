@@ -244,6 +244,11 @@ class OpTrait(ABC):
 
 
 @dataclass
+class OpInterface(ABC):
+    pass
+
+
+@dataclass
 class Operation(IRNode):
     name = ""
     parent: Block | None = None
