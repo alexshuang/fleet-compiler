@@ -74,7 +74,7 @@ class RewritePatternApplier:
 
         while worklist:
             modified = False
-            _op = worklist.pop()
+            _op = worklist.pop(0)
 
             for p in self.pattern_set:
                 if modified := p.match_and_rewrite(_op, self.rewriter):
@@ -95,5 +95,5 @@ def op_rewrite_pattern(func: callable[RewritePattern, Operation, PatternRewriter
         if isinstance(op, expected_type):
             return func(self, op, rewriter)
         return False
-    
+
     return impl

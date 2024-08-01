@@ -5,6 +5,7 @@ from fleet_compiler.ir.core import Attribute, Block, BlockArgument, IRType, OpRe
 
 from ..core import *
 from .builtin import *
+from ..interfaces import ShapeInferenceOpInterface
 
 
 class FPowIOp(Operation):
@@ -46,6 +47,11 @@ class PowFOp(Operation):
         super().__init__(operands=[lhs, rhs], result_types=[lhs.type], attributes=attrs)
 
 
-class SqrtOp(Operation):
+class SqrtOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, operand: Value):
         super().__init__(operands=[operand], result_types=[operand.type])
+
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"Invalid operand type: {in_type}")
+        op.results[0].type = in_type
