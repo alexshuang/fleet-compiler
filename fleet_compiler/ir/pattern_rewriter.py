@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Iterable
 
 from fleet_compiler.ir.builder import InsertionPoint
 from .core import *
@@ -55,9 +56,11 @@ class PatternRewriter:
         assert isinstance(block := op.parent_node, Block)
         block.erase_op(op)
 
-    def insert_op_before(self, op: Operation, new_ops: Sequence[Operation]):
+    def insert_op_before(self, op: Operation, new_ops: Sequence[Operation] | Operation):
         assert isinstance(block := op.parent_node, Block)
+        new_ops = [new_ops] if not isinstance(new_ops, Iterable) else new_ops
         for o in new_ops:
+            o.parent = None
             block.insert_before(o, op)
 
     def replace_all_uses_with(self, old: Value, new: Value):

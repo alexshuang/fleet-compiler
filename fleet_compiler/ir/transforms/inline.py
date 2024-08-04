@@ -28,29 +28,27 @@ class InlineFunction(RewritePattern):
         cast_ops = [tensor.CastOp(operand, type)
                     for operand, type in zip(op.operands,
                                              new_func_op.attributes['function_type'].input_types)]
-        for o in cast_ops:
-            block.insert_before(o, op)
-        
+        rewriter.insert_op_before(op, cast_ops)
+        op.operands = [o.results[0] for o in cast_ops]
+
         # replace operands
         args = inlined_block.arguments
-        new_operands = [o.results[0] for o in cast_ops]
-        for old, new in zip(args, new_operands):
+        for old, new in zip(args, op.operands):
             rewriter.replace_all_uses_with(old, new)
         
         # inline block before call op
-        new_ops = [o for o in inlined_block.operations if not isinstance(o, func.ReturnOp)]
-        for o in new_ops:
-            o.parent = None
-            block.insert_before(o, op)
+        ret_values = []
+        for o in inlined_block.operations:
+            if not isinstance(o, func.ReturnOp):
+                rewriter.insert_op_before(op, [o])
+            else:
+                ret_values = o.operands
 
-        last_op = new_ops[-1]
+        assert len(ret_values) > 0
 
         # replace results
-        # MUST: return value are the previous output
-        for old, new in zip(op.results, last_op.results):
+        for old, new in zip(op.results, ret_values):
             rewriter.replace_all_uses_with(old, new)
-            for use in old.uses:
-                new.uses.append(Use(use.operation, use.index))
 
         # erase call op & func decl op
         rewriter.erase_op(op)
