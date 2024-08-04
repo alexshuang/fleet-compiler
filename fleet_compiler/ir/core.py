@@ -43,6 +43,9 @@ class IRNode(ABC):
 class Use:
     operation: Operation
     index: int
+
+    def __hash__(self) -> int:
+        return id(self.operation) + id(self.index)
     
 
 @dataclass
@@ -54,11 +57,11 @@ class IRType(ABC):
 class Value(ABC):
     _name: str
     type: IRType
-    uses: Sequence[Use]
+    uses: set[Use]
     _name_regex = re.compile(r"(%[A-Za-z_0-9]*)")
 
     def __post_init__(self):
-        self.uses = []
+        self.uses = set()
 
     @property
     def name(self) -> str:
@@ -83,6 +86,14 @@ class Value(ABC):
     def replace_by(self, new_value: Value):
         for use in self.uses:
             use.operation.operands[use.index] = new_value
+            new_value.add_use(Use(use.operation, use.index))
+
+    def add_use(self, use: Use):
+        self.uses.add(use)
+
+    def remove_use(self, use: Use):
+        assert use in self.uses, "remove invalid use"
+        self.uses.remove(use)
 
 
 @dataclass
@@ -129,6 +140,8 @@ class Block(IRNode):
     def erase_op(self, op: Operation):
         old = self.operations.pop(self.get_op_index(op))
         old.parent = None
+        for i, o in enumerate(old.operands):
+            o.remove_use(Use(old, i))
 
     def __hash__(self) -> int:
         return id(self)
@@ -252,7 +265,7 @@ class OpInterface(ABC):
 class Operation(IRNode):
     name = ""
     parent: Block | None = None
-    operands: Sequence[OpResult | BlockArgument] = field(default_factory=list)
+    _operands: Sequence[OpResult | BlockArgument] = field(default_factory=list)
     results: Sequence[OpResult] = field(default_factory=list)
     successors: Sequence[Block] = field(default_factory=list)
     attributes: dict[str, Attribute] = field(default_factory=dict)
@@ -278,7 +291,7 @@ class Operation(IRNode):
                  traits: Sequence[OpTrait] = []):
         res = []
         for i, t in enumerate(result_types):
-            res.append(OpResult(f'%{self.op_result_id}', t, uses=[], op=self, index=i))
+            res.append(OpResult(f'%{self.op_result_id}', t, uses=set(), op=self, index=i))
             Operation.op_result_id += 1
         
         if self.name == "":
@@ -286,9 +299,9 @@ class Operation(IRNode):
                 op_name = match.group(1).lower().replace('_', '.')
                 self.name = f'{self.__class__.__module__.split(".")[-1]}.{op_name}'
         self.results = res
-        self.operands = [o for o in operands]
-        for i, o in enumerate(self.operands):
-            o.uses.append(Use(self, i))
+        self._operands = [o for o in operands]
+        for i, o in enumerate(self._operands):
+            o.add_use(Use(self, i))
         self.successors = successors
         self.properties = properties
         self.attributes = attributes
@@ -297,6 +310,18 @@ class Operation(IRNode):
             self.add_region(o)
         self.traits = traits
     
+    @property
+    def operands(self):
+        return self._operands
+
+    @operands.setter
+    def operands(self, new: Sequence[OpResult | BlockArgument]):
+        for i, operand in enumerate(self._operands):
+            operand.remove_use(Use(self, i))
+        for i, operand in enumerate(new):
+            operand.add_use(Use(self, i))
+        self._operands = new
+
     @classmethod
     def create(cls,
             operands: Sequence[OpResult | BlockArgument] = [],
