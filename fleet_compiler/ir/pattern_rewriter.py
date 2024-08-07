@@ -53,11 +53,11 @@ class PatternRewriter:
             self.replace_all_uses_with(old_res, new_res)
 
     def erase_op(self, op: Operation):
-        assert isinstance(block := op.parent_node, Block)
+        assert isinstance(block := op.parent, Block)
         block.erase_op(op)
 
     def insert_op_before(self, op: Operation, new_ops: Sequence[Operation] | Operation):
-        assert isinstance(block := op.parent_node, Block)
+        assert isinstance(block := op.parent, Block)
         new_ops = [new_ops] if not isinstance(new_ops, Iterable) else new_ops
         for o in new_ops:
             o.parent = None
@@ -68,26 +68,21 @@ class PatternRewriter:
 
 
 class RewritePatternApplier:
-    def __init__(self, pattern_set: list[RewritePattern]):
+    def __init__(self, pattern_set: list[RewritePattern], reverse_ops=False):
         self.rewriter = PatternRewriter()
         self.pattern_set = pattern_set
+        self.reverse_ops = reverse_ops
 
     def apply(self, op: Operation):
-        worklist = self._populate_worklist(op)
-
-        while worklist:
-            modified = False
-            _op = worklist.pop(0)
-
-            for p in self.pattern_set:
-                if modified := p.match_and_rewrite(_op, self.rewriter):
-                    break
-
-            if modified:
-                worklist = self._populate_worklist(op)
+        for p in self.pattern_set:
+            worklist = self._populate_worklist(op)
+            while worklist:
+                _op = worklist.pop(0)
+                if p.match_and_rewrite(_op, self.rewriter):
+                    worklist = self._populate_worklist(op)
 
     def _populate_worklist(self, op: Operation):
-        return [o for o in op.walk()]
+        return [o for o in op.walk(self.reverse_ops)]
 
 
 def op_rewrite_pattern(func: callable[RewritePattern, Operation, PatternRewriter]):

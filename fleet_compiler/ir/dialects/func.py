@@ -46,6 +46,10 @@ class FuncOp(Operation):
         p._print_string(f"{prefix}{self.name} @{sym_name}({arg_str}) -> ({output_type_str}) ")
         p._print_region(self.regions[0])
 
+    @property
+    def operations(self):
+        return self.regions[0].blocks[0].operations
+
 
 class ReturnOp(Operation):
     hasCustomAssemblyFormat = True

@@ -21,13 +21,14 @@ from .builder import *
 from .dialects.builtin import *
 from .dialects.func import *
 
-from dataclasses import dataclass, field
+# from dataclasses import dataclass, field
 
 
-@dataclass
 class Printer:
-    _indent: int = field(default=0)
-    _indent_space_sizes: int = field(default=2)
+    def __init__(self, fp, indent: int = 0, indent_space_sizes: int = 2):
+        self._fp = fp
+        self._indent = indent
+        self._indent_space_sizes = indent_space_sizes
 
     def print(self, op: Operation):
         if isinstance(op, Operation):
@@ -67,10 +68,10 @@ class Printer:
             func(k, v)
 
     def _print_string(self, text: str):
-        print(text, end="")
+        print(text, end="", file=self._fp)
     
     def _print_new_line(self):
-        print('')
+        print('', file=self._fp)
 
     def _print_op_with_default_format(self, op: Operation):
         self._print_string(f"\"{op.name}\"")
@@ -145,6 +146,8 @@ class Printer:
         self._print_string(f"{name} = ")
         if isinstance(attr, IntegerAttr | FloatAttr):
             self._print_string(f"{attr.value}: {self._get_type_str(attr.type)}")
+        # elif isinstance(attr, FloatAttr):
+        #     self._print_string(f"{attr.value:.8f}: {self._get_type_str(attr.type)}")
         elif isinstance(attr, BoolAttr):
             self._print_string("true" if attr.value else "false")
         elif isinstance(attr, NoneAttr):
@@ -154,7 +157,8 @@ class Printer:
         elif isinstance(attr, DenseIntOrFPElementsAttr):
             self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
         elif isinstance(attr, ArrayAttr):
-            self._print_string(f"array<{self._get_type_str(attr.type.element_type)}: {', '.join([str(o) for o in attr.value])}>")
+            # self._print_string(f"array<{self._get_type_str(attr.type.element_type)}: {', '.join([str(o) for o in attr.value])}>")
+            self._print_string(attr.value)
 
     def _print_type(self, t: IRType):
         supported_type = [IntegerType, FloatType, BoolType, NoneType,

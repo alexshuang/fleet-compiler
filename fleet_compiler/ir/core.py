@@ -133,8 +133,8 @@ class Block(IRNode):
         assert op.parent is self, "The \'existing op\' is not in current block"
         return self.operations.index(op)
     
-    def walk(self):
-        for o in self.operations:
+    def walk(self, reverse_ops: bool = False):
+        for o in self.operations[::-1] if reverse_ops else self.operations:
             yield from o.walk()
     
     def erase_op(self, op: Operation):
@@ -197,9 +197,9 @@ class Region(IRNode):
         block.name = f"^bb{len(self.blocks)}"
         self.blocks.append(block)
 
-    def walk(self):
+    def walk(self, reverse_ops: bool = False):
         for o in self.blocks:
-            yield from o.walk()
+            yield from o.walk(reverse_ops)
 
     def clone(self, src_region: Region, block_mapper: dict[Block, Block] = {},
               value_mapper: dict[Value, Value] = {}):
@@ -253,7 +253,8 @@ class Data(Attribute):
 
 @dataclass
 class OpTrait(ABC):
-    pass
+    def verify(self):
+        pass
 
 
 @dataclass
@@ -273,12 +274,16 @@ class Operation(IRNode):
     regions: Sequence[Region] = field(default_factory=list)
     traits: Sequence[OpTrait] = field(default_factory=list)
     hasCustomAssemblyFormat: bool = field(default=False)
-    
+    hasCanonicalizer: bool = field(default=False)
+
     op_result_id: ClassVar[int] = 0
     
     @property
     def parent_node(self) -> IRNode:
-        return self.parent
+        op = self.parent
+        while isinstance(op, Block | Region):
+            op = op.parent
+        return op
     
     def __init__(self,
                  *,
@@ -297,7 +302,9 @@ class Operation(IRNode):
         if self.name == "":
             if match := re.match(r'(.+)Op$', self.__class__.__name__):
                 op_name = match.group(1).lower().replace('_', '.')
-                self.name = f'{self.__class__.__module__.split(".")[-1]}.{op_name}'
+        else:
+            op_name = self.name
+        self.name = f'{self.__class__.__module__.split(".")[-1]}.{op_name}'
         self.results = res
         self._operands = [o for o in operands]
         for i, o in enumerate(self._operands):
@@ -346,10 +353,10 @@ class Operation(IRNode):
         region.parent = self
         self.regions.append(region)
 
-    def walk(self):
+    def walk(self, reverse_ops: bool = False):
         yield self
         for o in self.regions:
-            yield from o.walk()
+            yield from o.walk(reverse_ops)
 
     def clone(self, block_mapper: dict[Block, Block] = {},
               value_mapper: dict[Value, Value] = {}):
