@@ -75,7 +75,7 @@ class NoneAttr(Attribute): ...
 
 @dataclass
 class DenseIntOrFPElementsAttr(Attribute):
-    value: list[int | float]
+    value: list[int | float] | int | float
     type: RankedTensorType | UnrankedTensorType
 
 

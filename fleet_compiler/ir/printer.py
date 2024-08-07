@@ -143,8 +143,10 @@ class Printer:
 
     def _print_attribute(self, name: str, attr: Attribute):
         self._print_string(f"{name} = ")
-        if isinstance(attr, IntegerAttr | FloatAttr):
+        if isinstance(attr, IntegerAttr):
             self._print_string(f"{attr.value}: {self._get_type_str(attr.type)}")
+        elif isinstance(attr, FloatAttr):
+            self._print_string(f"{attr.value:.8f}: {self._get_type_str(attr.type)}")
         elif isinstance(attr, BoolAttr):
             self._print_string("true" if attr.value else "false")
         elif isinstance(attr, NoneAttr):
@@ -154,7 +156,8 @@ class Printer:
         elif isinstance(attr, DenseIntOrFPElementsAttr):
             self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
         elif isinstance(attr, ArrayAttr):
-            self._print_string(f"array<{self._get_type_str(attr.type.element_type)}: {', '.join([str(o) for o in attr.value])}>")
+            # self._print_string(f"array<{self._get_type_str(attr.type.element_type)}: {', '.join([str(o) for o in attr.value])}>")
+            self._print_string(attr.value)
 
     def _print_type(self, t: IRType):
         supported_type = [IntegerType, FloatType, BoolType, NoneType,

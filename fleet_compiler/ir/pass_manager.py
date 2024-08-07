@@ -38,8 +38,9 @@ class Pass(ABC):
 
 
 class PassManager:
-    def __init__(self):
+    def __init__(self, dump_intermediates_to: str = None):
         self.passes = []
+        self.dump_intermediates_to = dump_intermediates_to
     
     def add(self, p: Pass):
         if p not in self.passes:
@@ -47,4 +48,10 @@ class PassManager:
 
     def run(self, op: ModuleOp):
         for p in self.passes:
+            # print(f"## Before {p.name}:")
+            # op.dump()
+            # print("\n")
             p(op)
+            # print(f"## After {p.name}:")
+            # op.dump()
+            # print("\n")

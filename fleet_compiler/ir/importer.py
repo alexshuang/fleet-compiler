@@ -256,7 +256,12 @@ class ConvertASTtoMLIR(AstVisitor):
     def visitSliceStatement(self, node: SliceStatement):
         indices = self.visitSlice(node.slice)
         values = self.get(node.name)
-        return self.create(tosa.GatherOp(values, indices)).results[0]
+        if isinstance(id_type := indices.type, RankedTensorType):
+            new_type = RankedTensorType(id_type.dims, IntegerType(32, True))
+        else:
+            new_type = UnrankedTensorType(IntegerType(32, True))
+        casted_indices = self.create(tosa.CastOp(indices, new_type)).results[0]
+        return self.create(tosa.GatherOp(values, casted_indices)).results[0]
 
     def visitSlice(self, node: Slice):
         assert len(node.exps) == 1, "Not support multi indices"
