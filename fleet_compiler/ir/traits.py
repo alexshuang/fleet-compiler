@@ -1,4 +1,4 @@
-# ===- core.py -------------------------------------------------------------
+# ===- traits.py -------------------------------------------------------------
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 from __future__ import annotations
 
 from .core import *
-from .dialects.builtin import RankedTensorType
 
 
-class ShapeInferenceOpInterface(OpInterface):
-    def infer_shapes(self, op: Operation):
-        raise NotImplementedError
+@dataclass
+class Pure(OpTrait):
+    """ No side effect for an operation """
+

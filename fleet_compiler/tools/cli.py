@@ -34,6 +34,8 @@ from fleet_compiler.ir.pass_manager import PassManager
 from fleet_compiler.ir.transforms.lower_numpy import LowerNumpyPass
 from fleet_compiler.ir.transforms.inline import InlineFunctionPass
 from fleet_compiler.ir.transforms.shape_inference import ShapeInferencePass
+from fleet_compiler.ir.transforms.canonicalize import CanonicalizePass
+from fleet_compiler.ir.transforms.dce import DeadCodeEliminationPass
 
 
 def create_dir(path: str):
@@ -148,9 +150,17 @@ def main():
 
     if args.opt:
         pm = PassManager()
+
         pm.add(InlineFunctionPass())
-        pm.add(LowerNumpyPass())
+        pm.add(CanonicalizePass())
+        pm.add(DeadCodeEliminationPass())
+
         pm.add(ShapeInferencePass())
+        pm.add(CanonicalizePass())
+        pm.add(DeadCodeEliminationPass())
+
+        pm.add(LowerNumpyPass())
+
         pm.run(module)
 
     if args.emitMLIR:
