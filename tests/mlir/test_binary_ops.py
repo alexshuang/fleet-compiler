@@ -83,9 +83,9 @@ c = a @ b
 # CHECK-NEXT:   %35 = "arith.constant" () {value = 3: i32} : () -> i32
 # CHECK-NEXT:   %36 = "arith.constant" () {value = 4: i32} : () -> i32
 # CHECK-NEXT:   %37 = "numpy.random.randn" (%35,%36) : (i32,i32) -> tensor<3x4xf32>
-# CHECK-NEXT:   %38 = "tosa.reshape" (%34) {new_shape = array<i32: 4, 3>} : (tensor<2x2x3xf32>) -> tensor<4x3xf32>
+# CHECK-NEXT:   %38 = "tosa.reshape" (%34) {new_shape = [4, 3]} : (tensor<2x2x3xf32>) -> tensor<4x3xf32>
 # CHECK-NEXT:   %39 = "tosa.matmul" (%38,%37) : (tensor<4x3xf32>,tensor<3x4xf32>) -> tensor<4x4xf32>
-# CHECK-NEXT:   %40 = "tosa.reshape" (%39) {new_shape = array<i32: 2, 2, 4>} : (tensor<4x4xf32>) -> tensor<2x2x4xf32>
+# CHECK-NEXT:   %40 = "tosa.reshape" (%39) {new_shape = [2, 2, 4]} : (tensor<4x4xf32>) -> tensor<2x2x4xf32>
 # CHECK-NEXT:   %41 = "arith.constant" () {value = 2: i32} : () -> i32
 # CHECK-NEXT:   %42 = "arith.constant" () {value = 3: i32} : () -> i32
 # CHECK-NEXT:   %43 = "numpy.random.randn" (%41,%42) : (i32,i32) -> tensor<2x3xf32>

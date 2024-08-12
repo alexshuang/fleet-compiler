@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from fleet_compiler.ir.core import Operation
+
 from ..core import *
 from .builtin import *
+from ..interfaces import ShapeInferenceOpInterface
+from ..traits import *
 
 
 class Random_RandnOp(Operation):
@@ -11,7 +15,7 @@ class Random_RandnOp(Operation):
         super().__init__(operands=args, result_types=[output_type])
 
 
-class TransposeOp(Operation):
+class TransposeOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         operands = [args[0]]
@@ -43,10 +47,21 @@ class TransposeOp(Operation):
             output_type = RankedTensorType(output_dims, input_type.element_type)
         else:
             output_type = UnrankedTensorType(input_type.element_type)
-        super().__init__(operands=operands, result_types=[output_type])
+        super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
+    
+    def infer_shapes(self, op: Operation):
+        t = op.operands[0].type
+        dims = t.dims
+        axes_val = None if isinstance(axes := op.attributes['axes'], NoneAttr) else axes.value
+        if axes_val:
+            assert len(axes_val) == len(dims)
+            new_dims = [dims[i] for i in axes_val]
+        else:
+            new_dims = dims[::-1]
+        op.results[0].type = RankedTensorType(new_dims, t.element_type)
 
 
-class MeanOp(Operation):
+class MeanOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         operands = [args[0]]
@@ -83,8 +98,13 @@ class MeanOp(Operation):
             output_type = UnrankedTensorType(input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
+    def infer_shapes(self, op: Operation):
+        axis = op.attributes['axis'].value[0]
+        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
-class VarOp(Operation):
+
+class VarOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         operands = [args[0]]
@@ -121,19 +141,29 @@ class VarOp(Operation):
             output_type = UnrankedTensorType(input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
+    def infer_shapes(self, op: Operation):
+        axis = op.attributes['axis'].value
+        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
-class SqrtOp(Operation):
+
+class SqrtOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type
 
 
 class Random_SeedOp(Operation):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         output_type = NoneType()
-        super().__init__(operands=args, result_types=[output_type])
+        super().__init__(operands=args, result_types=[output_type], traits=[Pure()])
 
 
-class MaxOp(Operation):
+class MaxOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         operands = [args[0]]
@@ -170,8 +200,13 @@ class MaxOp(Operation):
             output_type = UnrankedTensorType(input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
+    def infer_shapes(self, op: Operation):
+        axis = op.attributes['axis'].value[0]
+        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
-class SumOp(Operation):
+
+class SumOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         operands = [args[0]]
@@ -208,13 +243,23 @@ class SumOp(Operation):
             output_type = UnrankedTensorType(input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
+    def infer_shapes(self, op: Operation):
+        axis = op.attributes['axis'].value[0]
+        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
-class ExpOp(Operation):
+
+class ExpOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+    
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type
 
 
-class SplitOp(Operation):
+class SplitOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         attrs = {}
         assert len(args) >= 2, "Invalid arguments"
@@ -243,19 +288,48 @@ class SplitOp(Operation):
             output_type = UnrankedTensorType(input_type.element_type)
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
+    def infer_shapes(self, op: Operation):
+        dims = op.operands[0].type.dims.copy()
+        tile_size = op.operands[1].owner().attributes['value'].value
+        axis = op.attributes['axis'].value[0]
+        assert dims[axis] % tile_size == 0
+        dims[axis] = dims[axis] // tile_size
+        dims = [tile_size] + dims
+        op.results[0].type = RankedTensorType(dims, op.operands[0].type.element_type)
 
-class TriOp(Operation):
+
+class TriOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+    
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type
 
 
-class HstackOp(Operation):
+class HstackOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         assert len(args) == 1 and len(args[0]) >= 2
         args = args[0]
         super().__init__(operands=args, result_types=[args[0].type])
 
+    def infer_shapes(self, op: Operation):
+        batches = op.operands[0].type.dims[:-1]
+        elem_type = op.operands[0].type.element_type
+        dim = 0
+        for o in op.operands:
+            assert o.type.dims[:-1] == batches
+            assert o.type.element_type == elem_type
+            dim += o.type.dims[-1]
+        op.results[0].type = RankedTensorType(batches + [dim], elem_type)
 
-class TanhOp(Operation):
+
+class TanhOp(Operation, ShapeInferenceOpInterface):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         super().__init__(operands=args, result_types=[args[0].type])
+    
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type

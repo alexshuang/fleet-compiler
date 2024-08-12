@@ -1,5 +1,7 @@
-from ..dialects import func, tensor
+from fleet_compiler.ir.pattern_rewriter import PatternRewriter
+from ..dialects import func, tosa
 from ..dialects.builtin import *
+from ..dialects.func import *
 from ..pattern_rewriter import *
 from ..pass_manager import *
 
@@ -15,17 +17,15 @@ class InlineFunction(RewritePattern):
 
     @op_rewrite_pattern
     def match_and_rewrite(self, op: func.CallOp, rewriter: PatternRewriter):
-        assert isinstance((module := op.parent_node.parent_node.parent_node), ModuleOp), \
-            "Nested functions are not supported"
-        assert isinstance(block := op.parent_node, Block)
-
+        module = op.parent_node.parent_node if isinstance(op.parent_node, FuncOp) \
+            else op.parent_node
         func_name = op.attributes['callee'].sym_name.value
         func_op = self._get_func_op_by_name(module, func_name)
         new_func_op = func_op.clone()
         inlined_block = new_func_op.regions[0].blocks[0]
 
         # cast ranked tensors to unranked tensors
-        cast_ops = [tensor.CastOp(operand, type)
+        cast_ops = [tosa.CastOp(operand, type)
                     for operand, type in zip(op.operands,
                                              new_func_op.attributes['function_type'].input_types)]
         rewriter.insert_op_before(op, cast_ops)
@@ -52,9 +52,38 @@ class InlineFunction(RewritePattern):
 
         # erase call op & func decl op
         rewriter.erase_op(op)
-        rewriter.erase_op(func_op)
+        # set flag to remove the func op by RemoveUnusedFunction 
+        func_op.attributes['visibility'] = StringAttr("private")
+
+
+class RemoveUnusedFunction(RewritePattern):
+    used_funcs: set[str] | None = None
+
+    def should_remove(self, op: func.FuncOp):
+        if op.attributes['visibility'] != StringAttr("private"):
+            return False
+
+        if not self.used_funcs:
+            assert isinstance(module := op.parent_node, ModuleOp)
+            self.used_funcs = {o.attributes['callee'].sym_name.value
+                               for o in module.operations
+                               if isinstance(o, CallOp)}
+        return op.attributes['sym_name'].value not in self.used_funcs
+
+    @op_rewrite_pattern
+    def match_and_rewrite(self, op: func.FuncOp, rewriter: PatternRewriter) -> bool:
+        if self.should_remove(op):
+            rewriter.erase_op(op)
+
+
+class SetAllPrivateFunctions(RewritePattern):
+    @op_rewrite_pattern
+    def match_and_rewrite(self, op: func.FuncOp, rewriter: PatternRewriter) -> bool:
+        op.attributes['visibility'] = StringAttr("private")
 
 
 class InlineFunctionPass(Pass):
     def run_on_operation(self, op: ModuleOp) -> None:
-        RewritePatternApplier([InlineFunction()]).apply(op)
+        RewritePatternApplier([InlineFunction(),
+                               SetAllPrivateFunctions(),
+                               RemoveUnusedFunction()]).apply(op)

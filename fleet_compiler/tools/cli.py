@@ -34,13 +34,15 @@ from fleet_compiler.ir.pass_manager import PassManager
 from fleet_compiler.ir.transforms.lower_numpy import LowerNumpyPass
 from fleet_compiler.ir.transforms.inline import InlineFunctionPass
 from fleet_compiler.ir.transforms.shape_inference import ShapeInferencePass
+from fleet_compiler.ir.transforms.canonicalize import CanonicalizePass
+from fleet_compiler.ir.transforms.dce import DeadCodeEliminationPass
 
 
 def create_dir(path: str):
     if os.path.isfile(path):
         raise ValueError(f"{path} is an existed file, not directory")
-    elif not os.path.isdir(path):
-        os.makedirs(path)
+    else:
+        os.makedirs(path, exist_ok=True)
 
 
 def save_output(output_path: str, fn: callable):
@@ -90,8 +92,6 @@ def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
     parser.add_argument('input', type=str, help='Input file path')
-    # parser.add_argument('--dump-intermediates-to', type=str,
-    #                     help='path to write translated executable intermediates (*.token,.ast,.ir etc) into')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
@@ -100,13 +100,14 @@ def main():
     parser.add_argument('--only-compile', action='store_true', help='not run')
     parser.add_argument('--validation', action='store_true', help='validate the results')
     parser.add_argument('--opt', action='store_true', help='apply transforms')
+    parser.add_argument('--dump-intermediates-to', type=str, help='dump *.mlir to path')
+    parser.add_argument('--dump-ir-before-pass', action='store_true', help='dump *.mlir')
+    parser.add_argument('--dump-ir-after-pass', action='store_true', help='dump *.mlir')
 
     args = parser.parse_args()
 
-    # has_intermediates_dir = False
-    # if args.dump_intermediates_to:
-    #     create_dir(args.dump_intermediates_to)
-    #     has_intermediates_dir = True
+    if intermediates_dir := args.dump_intermediates_to:
+        create_dir(intermediates_dir)
 
     # output_file_stem = os.path.join(args.output_dir, os.path.splitext(args.input)[0])
     data = open(args.input, "r").read()
@@ -147,10 +148,21 @@ def main():
     module = ASTModuleImporter(ast_module).import_graph()
 
     if args.opt:
-        pm = PassManager()
+        pm = PassManager(intermediates_dir,
+                         args.dump_ir_before_pass, args.dump_ir_after_pass)
+
         pm.add(InlineFunctionPass())
-        pm.add(LowerNumpyPass())
+        pm.add(CanonicalizePass())
+        pm.add(DeadCodeEliminationPass())
+
         pm.add(ShapeInferencePass())
+        pm.add(CanonicalizePass())
+        pm.add(DeadCodeEliminationPass())
+
+        pm.add(LowerNumpyPass())
+        pm.add(CanonicalizePass())
+        pm.add(DeadCodeEliminationPass())
+
         pm.run(module)
 
     if args.emitMLIR:

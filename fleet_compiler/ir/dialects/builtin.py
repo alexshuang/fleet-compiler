@@ -75,7 +75,7 @@ class NoneAttr(Attribute): ...
 
 @dataclass
 class DenseIntOrFPElementsAttr(Attribute):
-    value: list[int | float]
+    value: list[int | float] | int | float
     type: RankedTensorType | UnrankedTensorType
 
 
@@ -113,6 +113,6 @@ class ModuleOp(Operation):
     def operations(self):
         return self.body.blocks[0].operations
 
-    def dump(self):
+    def dump(self, fp = None):
         from ..printer import Printer
-        Printer().print(self)
+        Printer(fp).print(self)

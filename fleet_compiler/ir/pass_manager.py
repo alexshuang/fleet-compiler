@@ -38,13 +38,38 @@ class Pass(ABC):
 
 
 class PassManager:
-    def __init__(self):
+    def __init__(self, dump_intermediates_to: str = None,
+                 dump_ir_before_pass: bool = False,
+                 dump_ir_after_pass: bool = False):
         self.passes = []
+        self.dump_intermediates_to = dump_intermediates_to
+        self.dump_ir_before_pass = dump_ir_before_pass
+        self.dump_ir_after_pass = dump_ir_after_pass
     
     def add(self, p: Pass):
         if p not in self.passes:
             self.passes.append(p)
 
     def run(self, op: ModuleOp):
-        for p in self.passes:
+        for i, p in enumerate(self.passes):
+            if self.dump_ir_before_pass:
+                print(f"------\nBefore {p.name}:")
+                op.dump()
+                print(f"------")
+
+            if self.dump_intermediates_to:
+                fn = f'{self.dump_intermediates_to}/{i:03d}-before-{p.name}'
+                with open(fn, 'w') as fp:
+                    op.dump(fp)
+
             p(op)
+
+            if self.dump_ir_after_pass:
+                print(f"------\nAfter {p.name}:")
+                op.dump()
+                print(f"------")
+
+            if self.dump_intermediates_to:
+                fn = f'{self.dump_intermediates_to}/{i:03d}-after-{p.name}'
+                with open(fn, 'w') as fp:
+                    op.dump(fp)
