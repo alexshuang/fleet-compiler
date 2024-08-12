@@ -21,6 +21,7 @@ fleet_compiler_cli examples/gpt2.py
 3. Dump executable intermediaes AST/MLIR:
 ```
 fleet_compiler_cli examples/gpt2.py --emitAST --emitMLIR --only-compile
+fleet_compiler_cli examples/gpt2.py --emitMLIR --opt --only-compile --dump-intermediates-to dumps
 ```
 
 ## Developers
