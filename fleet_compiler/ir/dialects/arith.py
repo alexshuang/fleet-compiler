@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from ..core import *
 from .builtin import *
+from ..traits import *
 
 
 class ConstantOp(Operation):
     def __init__(self, attr: Attribute, type: IRType):
-        super().__init__(result_types=[type], attributes={'value': attr})
+        super().__init__(result_types=[type], attributes={'value': attr}, traits=[Pure()])
 
 
 class _BinaryOp(Operation):
