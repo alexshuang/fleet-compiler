@@ -58,6 +58,8 @@ class TransposeOp(Operation, ShapeInferenceOpInterface):
             new_dims = [dims[i] for i in axes_val]
         else:
             new_dims = dims[::-1]
+            op.attributes['axes'] = ArrayAttr(list(range(len(new_dims) - 1, -1, -1)),
+                                              ArrayType(len(new_dims), t.element_type))
         op.results[0].type = RankedTensorType(new_dims, t.element_type)
 
 
@@ -100,7 +102,10 @@ class MeanOp(Operation, ShapeInferenceOpInterface):
 
     def infer_shapes(self, op: Operation):
         axis = op.attributes['axis'].value[0]
-        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        dims = op.operands[0].type.dims
+        if axis < 0:
+            axis = len(dims) + axis
+        new_dims = [o if i != axis else 1 for i, o in enumerate(dims)]
         op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
 
@@ -142,8 +147,11 @@ class VarOp(Operation, ShapeInferenceOpInterface):
         super().__init__(operands=operands, result_types=[output_type], attributes=attrs)
 
     def infer_shapes(self, op: Operation):
-        axis = op.attributes['axis'].value
-        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        axis = op.attributes['axis'].value[0]
+        dims = op.operands[0].type.dims
+        if axis < 0:
+            axis = len(dims) + axis
+        new_dims = [o if i != axis else 1 for i, o in enumerate(dims)]
         op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
 
@@ -160,7 +168,7 @@ class SqrtOp(Operation, ShapeInferenceOpInterface):
 class Random_SeedOp(Operation):
     def __init__(self, args: list[Value], kwargs: dict[str, Value]):
         output_type = NoneType()
-        super().__init__(operands=args, result_types=[output_type], traits=[Pure()])
+        super().__init__(operands=args, result_types=[output_type])#, traits=[Pure()])
 
 
 class MaxOp(Operation, ShapeInferenceOpInterface):
@@ -202,7 +210,10 @@ class MaxOp(Operation, ShapeInferenceOpInterface):
 
     def infer_shapes(self, op: Operation):
         axis = op.attributes['axis'].value[0]
-        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        dims = op.operands[0].type.dims
+        if axis < 0:
+            axis = len(dims) + axis
+        new_dims = [o if i != axis else 1 for i, o in enumerate(dims)]
         op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
 
@@ -245,7 +256,10 @@ class SumOp(Operation, ShapeInferenceOpInterface):
 
     def infer_shapes(self, op: Operation):
         axis = op.attributes['axis'].value[0]
-        new_dims = [o if i != axis else 1 for i, o in enumerate(op.operands[0].type.dims)]
+        dims = op.operands[0].type.dims
+        if axis < 0:
+            axis = len(dims) + axis
+        new_dims = [o if i != axis else 1 for i, o in enumerate(dims)]
         op.results[0].type = RankedTensorType(new_dims, op.operands[0].type.element_type)
 
 

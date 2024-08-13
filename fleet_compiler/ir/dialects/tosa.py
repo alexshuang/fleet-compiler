@@ -6,6 +6,7 @@ from fleet_compiler.ir.core import Operation
 from ..core import *
 from .builtin import *
 from ..interfaces import ShapeInferenceOpInterface
+from ..traits import *
 
 
 class _BinaryOp(Operation, ShapeInferenceOpInterface):
@@ -154,6 +155,9 @@ class ReduceSumOp(Operation):
     def __init__(self, input: Value, attrs: dict[str, Attribute]):
         try:
             axis = attrs['axis'].value
+            if isinstance(axis, list):
+                assert len(axis) == 1
+                axis = axis[0]
             dims = input.type.dims.copy()
             dims[axis] = 1
             output_type = RankedTensorType(dims, input.type.element_type)
@@ -166,7 +170,7 @@ class ReduceSumOp(Operation):
 class ConstOp(Operation):
     def __init__(self, attrs: dict[str, Attribute]):
         assert 'value' in attrs, f"value attribute not found"
-        super().__init__(result_types=[attrs['value'].type], attributes=attrs)
+        super().__init__(result_types=[attrs['value'].type], attributes=attrs, traits=[Pure()])
 
 
 class CastOp(Operation):
@@ -180,3 +184,92 @@ class CastOp(Operation):
             RemoveRedundantCast
         )
         return [RemoveRedundantCast()]
+
+
+class TransposeOp(Operation):
+    def __init__(self, input1: Value, perms: Value):
+        input1_type = input1.type
+        if isinstance(input1_type, RankedTensorType):
+            axes = perms.owner().attributes['value'].value
+            dims = input1_type.dims
+            output_dims = [dims[i] for i in axes]
+            output_type = RankedTensorType(output_dims, input1_type.element_type)
+        else:
+            output_type = UnrankedTensorType(input1_type.element_type)
+        super().__init__(operands=[input1, perms], result_types=[output_type])
+
+    def infer_shapes(self, op: Operation):
+        input1_type = op.operands[0].type
+        axes = op.operands[1].owner().attributes['value'].value
+        dims = input1_type.dims
+        output_dims = [dims[i] for i in axes]
+        op.results[0].type = RankedTensorType(output_dims, input1_type.element_type)
+
+
+class TanhOp(Operation, ShapeInferenceOpInterface):
+    def __init__(self, input: Value):
+        super().__init__(operands=[input], result_types=[input.type])
+
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type
+
+
+class ExpOp(Operation, ShapeInferenceOpInterface):
+    def __init__(self, input: Value):
+        super().__init__(operands=[input], result_types=[input.type])
+
+    def infer_shapes(self, op: Operation):
+        if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
+            raise ValueError(f"operand is unranked tensors")
+        op.results[0].type = in_type
+
+
+class ReduceMaxOp(Operation):
+    name = "reduce_max"
+
+    def __init__(self, input: Value, attrs: dict[str, Attribute]):
+        try:
+            axis = attrs['axis'].value[0]
+            dims = input.type.dims.copy()
+            dims[axis] = 1
+            output_type = RankedTensorType(dims, input.type.element_type)
+        except Exception as e:
+            print(f"ERROR: {e}")
+            raise
+        super().__init__(operands=[input], result_types=[output_type], attributes=attrs)
+
+
+class ConcatOp(Operation): #, ShapeInferenceOpInterface):
+    def __init__(self, inputs: Sequence[Value], output_type: IRType, attrs: dict[str, Attribute]):
+        if output_type == None:
+            in_type = inputs[0].type
+            dims = in_type.dims
+            if (axis := attrs['axis'].value) < 0:
+                axis = len(dims) + axis
+            dim = 0
+            for o in inputs:
+                dim += o.type.dims[axis]
+            output_type = RankedTensorType(dims[:-1] + [dim], in_type.element_type)
+        super().__init__(operands=inputs, result_types=[output_type], attributes=attrs)
+    
+    # def infer_shapes(self, op: Operation):
+    #     in_type = inputs[0].type
+    #     dims = in_type.dims
+    #     if (axis := attrs['axis'].value) < 0:
+    #         axis = len(dims) + axis
+    #     dim = 0
+    #     for o in inputs:
+    #         dim += o.type.dims[axis]
+    #     op.results[0].type = RankedTensorType(dims[:-1] + [dim], in_type.element_type)
+
+
+class SliceOp(Operation):
+    def __init__(self, input: Value, attrs: dict[str, Attribute]):
+        in_type = input.type
+        if isinstance(in_type, RankedTensorType):
+            output_type = RankedTensorType(attrs['size'].value, in_type.element_type)
+        else:
+            output_type = UnrankedTensorType(in_type.element_type)
+        super().__init__(operands=[input], result_types=[output_type], attributes=attrs)

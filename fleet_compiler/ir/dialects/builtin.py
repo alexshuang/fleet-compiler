@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 from dataclasses import dataclass, field
 from ..core import *
 
@@ -41,7 +42,7 @@ class UnrankedTensorType(IRType):
 
 @dataclass
 class ArrayType(IRType):
-    dims: list
+    dims: int
     element_type: IntegerType | FloatType
 
 
@@ -75,7 +76,7 @@ class NoneAttr(Attribute): ...
 
 @dataclass
 class DenseIntOrFPElementsAttr(Attribute):
-    value: list[int | float] | int | float
+    value: np.ndarray | list[int | float] | int | float
     type: RankedTensorType | UnrankedTensorType
 
 
