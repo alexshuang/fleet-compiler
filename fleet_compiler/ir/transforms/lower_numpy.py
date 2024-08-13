@@ -118,8 +118,8 @@ class RandomRandnOpLowering(RewritePattern):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: Random_RandnOp, rewriter: PatternRewriter) -> bool:
         shape = [o.owner().attributes['value'].value for o in op.operands]
-        init = np.random.randn(*shape).reshape(-1)
-        const = tosa.ConstOp({'value': DenseIntOrFPElementsAttr(init,
+        init = np.random.randn(*shape)
+        const = tosa.ConstOp({'value': DenseIntOrFPElementsAttr(init.reshape(-1),
                                         RankedTensorType(shape, FloatType(32)))})
         rewriter.replace_op(op, const.results)
         rewriter.erase_op(op)
@@ -144,7 +144,7 @@ class TriOpLowering(RewritePattern):
     def match_and_rewrite(self, op: TriOp, rewriter: PatternRewriter) -> bool:
         const_value = op.operands[0].owner().attributes['value'].value
         value = np.tri(const_value)
-        init = tosa.ConstOp({'value': DenseIntOrFPElementsAttr(value,
+        init = tosa.ConstOp({'value': DenseIntOrFPElementsAttr(value.reshape(-1),
                                             RankedTensorType(value.shape, IntegerType(32, True)))})
         rewriter.replace_op(op, init.results)
         rewriter.erase_op(op)
