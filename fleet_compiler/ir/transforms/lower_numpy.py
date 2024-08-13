@@ -118,7 +118,7 @@ class RandomRandnOpLowering(RewritePattern):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: Random_RandnOp, rewriter: PatternRewriter) -> bool:
         shape = [o.owner().attributes['value'].value for o in op.operands]
-        init = np.random.randn(*shape)
+        init = np.random.randn(*shape).reshape(-1)
         const = tosa.ConstOp({'value': DenseIntOrFPElementsAttr(init,
                                         RankedTensorType(shape, FloatType(32)))})
         rewriter.replace_op(op, const.results)
