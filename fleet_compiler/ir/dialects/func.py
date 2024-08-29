@@ -85,4 +85,4 @@ class CallOp(Operation):
         operands = ','.join([o.name for o in self.operands])
         operand_types = ','.join([p._get_type_str(o.type) for o in self.operands])
         output_types = ','.join([p._get_type_str(o.type) for o in self.results])
-        p._print_string(f"{prefix}{results}func.call @{sym_name}({operands}) : ({operand_types}) -> ({output_types})\n")
+        p._print_string(f"{prefix}{results}\"{self.name}\" @{sym_name}({operands}) : ({operand_types}) -> ({output_types})\n")

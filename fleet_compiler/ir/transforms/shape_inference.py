@@ -5,7 +5,6 @@ from ..pass_manager import *
 
 
 class ShapeInference(RewritePattern):
-    @op_rewrite_pattern
     def match_and_rewrite(self, op: Operation, rewriter: PatternRewriter):
         if hasattr(op, "infer_shapes"):
             op.infer_shapes(op)

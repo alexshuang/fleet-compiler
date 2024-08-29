@@ -36,6 +36,11 @@ from fleet_compiler.ir.transforms.inline import InlineFunctionPass
 from fleet_compiler.ir.transforms.shape_inference import ShapeInferencePass
 from fleet_compiler.ir.transforms.canonicalize import CanonicalizePass
 from fleet_compiler.ir.transforms.dce import DeadCodeEliminationPass
+from fleet_compiler.ir.transforms.convert_tosa_to_vm import ConvertTosaToVmPass
+from fleet_compiler.ir.transforms.convert_tensor_to_vm import ConvertTensorToVmPass
+from fleet_compiler.ir.transforms.convert_math_to_vm import ConvertMathToVmPass
+from fleet_compiler.ir.transforms.convert_arith_to_vm import ConvertArithToVmPass
+from fleet_compiler.ir.transforms.set_target_info import SetTargetInfoPass
 
 
 def create_dir(path: str):
@@ -92,6 +97,7 @@ def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
     parser.add_argument('input', type=str, help='Input file path')
+    parser.add_argument('--target-backend', type=str, help='sycl, cuda, rocm, llvm-cpu, llvm-gpu')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
@@ -103,8 +109,11 @@ def main():
     parser.add_argument('--dump-intermediates-to', type=str, help='dump *.mlir to path')
     parser.add_argument('--dump-ir-before-pass', action='store_true', help='dump *.mlir')
     parser.add_argument('--dump-ir-after-pass', action='store_true', help='dump *.mlir')
+    # parser.add_argument('--ir-elide-elementsattrs-if-larger', type=int, default=20, help='elide numpy array')
 
     args = parser.parse_args()
+
+    # np.set_printoptions(args.ir_elide_elementsattrs_if_larger)
 
     if intermediates_dir := args.dump_intermediates_to:
         create_dir(intermediates_dir)
@@ -162,6 +171,16 @@ def main():
         pm.add(LowerNumpyPass())
         pm.add(CanonicalizePass())
         pm.add(DeadCodeEliminationPass())
+
+        if args.target_backend:
+            pm.add(SetTargetInfoPass(args.target_backend))
+            if args.target_backend in ['sycl', 'cuda', 'rocm']:
+                pm.add(ConvertArithToVmPass())
+                pm.add(ConvertTensorToVmPass())
+                pm.add(ConvertMathToVmPass())
+                pm.add(ConvertTosaToVmPass())
+                pm.add(CanonicalizePass())
+                pm.add(DeadCodeEliminationPass())
 
         pm.run(module)
 

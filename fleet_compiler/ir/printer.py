@@ -154,6 +154,11 @@ class Printer:
             self._print_string(f"dense<{attr.value}>: {self._get_type_str(attr.type)}")
         elif isinstance(attr, ArrayAttr):
             self._print_string(attr.value)
+        elif isinstance(attr, DictAttr):
+            if len(attr.value) > 0:
+                self._print_string("{")
+                self.print_dict(attr.value, self._print_attribute)
+                self._print_string("}")
 
     def _print_type(self, t: IRType):
         supported_type = [IntegerType, FloatType, BoolType, NoneType,
