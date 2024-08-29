@@ -90,7 +90,7 @@ def op_rewrite_pattern(func: callable[RewritePattern, Operation, PatternRewriter
     expected_type = params[1].annotation
 
     def impl(self, op: Operation, rewriter: PatternRewriter):
-        if isinstance(op, expected_type):
+        if type(op) is expected_type:
             return func(self, op, rewriter)
         return False
 

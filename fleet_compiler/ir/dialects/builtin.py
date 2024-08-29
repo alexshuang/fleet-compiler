@@ -46,6 +46,10 @@ class ArrayType(IRType):
     element_type: IntegerType | FloatType
 
 
+@dataclass
+class DictType(IRType): ...
+
+
 ## Attributes
 @dataclass
 class StringAttr(Attribute):
@@ -84,6 +88,12 @@ class DenseIntOrFPElementsAttr(Attribute):
 class ArrayAttr(Attribute):
     value: list
     type: ArrayType
+
+
+@dataclass
+class DictAttr(Attribute):
+    value: dict[str, Attribute]
+    type: DictType = field(init=False, default_factory=DictType)
 
 
 def get_preference_by_type_cls(type: IRType):
