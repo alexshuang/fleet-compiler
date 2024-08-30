@@ -97,7 +97,7 @@ def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
     parser.add_argument('input', type=str, help='Input file path')
-    parser.add_argument('--target-backend', type=str, help='sycl, cuda, rocm, llvm-cpu, llvm-gpu')
+    parser.add_argument('--target-backend', type=str, help='sycl, cuda, llvm-cpu, llvm-gpu')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
@@ -174,7 +174,7 @@ def main():
 
         if args.target_backend:
             pm.add(SetTargetInfoPass(args.target_backend))
-            if args.target_backend in ['sycl', 'cuda', 'rocm']:
+            if args.target_backend in ['sycl', 'cuda']:
                 pm.add(ConvertArithToVmPass())
                 pm.add(ConvertTensorToVmPass())
                 pm.add(ConvertMathToVmPass())

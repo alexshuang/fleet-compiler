@@ -15,7 +15,16 @@ class Const_I32_ZeroOp(ConstOp): ...
 
 class RodataOp(ConstOp): ...
 
-class CallOp(CallOp): ...
+
+class CallOp(CallOp):
+    hasCanonicalizer = True
+
+    def get_canonicalize_patterns(self):
+        from ..transforms.canonicalize_patterns.vm import (
+            ReplaceReciprocalMulWithDiv
+        )
+        return [ReplaceReciprocalMulWithDiv()]
+
 
 class FuncOp(FuncOp): ...
 
