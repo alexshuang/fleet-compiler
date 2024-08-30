@@ -206,7 +206,8 @@ class SplitOpLowering(RewritePattern):
 
         axis = [len(dims) + o if o < 0 else o for o in op.attributes['axis'].value]
         assert len(axis) == 1
-        dim = dims[axis[0]]
+        axis = axis[0]
+        dim = dims[axis]
         assert dim % n_split == 0
 
         tile_dim = dim // n_split
