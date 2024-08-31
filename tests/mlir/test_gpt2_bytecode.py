@@ -120,34 +120,32 @@ print(y)
 # CHECK-NEXT:  -0.52496616]>: tensor<50257x768xf32>} : () -> tensor<50257x768xf32>
 # CHECK-NEXT:   %2980 = "vm.rodata" () {value = dense<[ 0.8408791  -1.97249614 -0.62756831 ...  0.95089149 -2.54648594
 # CHECK-NEXT:  -0.40704988]>: tensor<1024x768xf32>} : () -> tensor<1024x768xf32>
-# CHECK-NEXT:   %2893 = "vm.call" @device.gather(%2979,%2977) : (tensor<50257x768xf32>,tensor<16xi32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2894 = "vm.call" @device.gather(%2980,%2978) : (tensor<1024x768xf32>,tensor<16xi32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2769 = "vm.call" @device.add(%2893,%2894) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2572 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2573 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2574 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2935 = "vm.call" @device.reduce_sum(%2769) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2981 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2968 = "vm.call" @device.cast(%2981) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3118 = "vm.call" @device.div(%2935,%2968) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2936 = "vm.call" @device.reduce_sum(%2769) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2982 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2969 = "vm.call" @device.cast(%2982) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3120 = "vm.call" @device.div(%2936,%2969) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2970 = "vm.call" @device.cast(%3120) : (tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2796 = "vm.call" @device.sub(%2769,%2970) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2816 = "vm.call" @device.mul(%2796,%2796) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2937 = "vm.call" @device.reduce_sum(%2769) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3119 = "vm.call" @device.div(%2937,%2969) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2797 = "vm.call" @device.sub(%2769,%3118) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2698 = "vm.call" @device.splat(%2573) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2818 = "vm.call" @device.mul(%2698,%2797) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2699 = "vm.call" @device.splat(%2572) : (f32) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2770 = "vm.call" @device.add(%3119,%2699) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2724 = "vm.call" @device.sqrt(%2770) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3121 = "vm.call" @device.div(%2818,%2724) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2700 = "vm.call" @device.splat(%2574) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2771 = "vm.call" @device.add(%3121,%2700) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2899 = "vm.call" @device.gather(%2979,%2977) : (tensor<50257x768xf32>,tensor<16xi32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2900 = "vm.call" @device.gather(%2980,%2978) : (tensor<1024x768xf32>,tensor<16xi32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2775 = "vm.call" @device.add(%2899,%2900) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2578 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2579 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2580 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2941 = "vm.call" @device.reduce_sum(%2775) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2981 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3118 = "vm.call" @device.div(%2941,%2981) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2942 = "vm.call" @device.reduce_sum(%2775) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2982 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3120 = "vm.call" @device.div(%2942,%2982) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2974 = "vm.call" @device.cast(%3120) : (tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2802 = "vm.call" @device.sub(%2775,%2974) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2822 = "vm.call" @device.mul(%2802,%2802) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2943 = "vm.call" @device.reduce_sum(%2775) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3119 = "vm.call" @device.div(%2943,%2982) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2803 = "vm.call" @device.sub(%2775,%3118) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2704 = "vm.call" @device.splat(%2579) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2824 = "vm.call" @device.mul(%2704,%2803) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2705 = "vm.call" @device.splat(%2578) : (f32) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2776 = "vm.call" @device.add(%3119,%2705) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2730 = "vm.call" @device.sqrt(%2776) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3121 = "vm.call" @device.div(%2824,%2730) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2706 = "vm.call" @device.splat(%2580) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2777 = "vm.call" @device.add(%3121,%2706) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
 # CHECK-NEXT:   %2983 = "vm.rodata" () {value = dense<[0.58451456 0.68425926 1.38721336 ... 1.50509363 0.53584878 0.91657596]>: tensor<768x2304xf32>} : () -> tensor<768x2304xf32>
 # CHECK-NEXT:   %2984 = "vm.rodata" () {value = dense<[-0.8546148   1.06789871  0.79961198 ... -2.41904842  0.17527923
 # CHECK-NEXT:  -0.1904177 ]>: tensor<2304xf32>} : () -> tensor<2304xf32>
@@ -345,58 +343,58 @@ print(y)
 # CHECK-NEXT:  -2.90584664e-01 -1.66006795e+00  3.82964791e-01 -1.25463083e+00
 # CHECK-NEXT:   7.46177914e-01  2.87266304e+00 -1.57015367e+00 -3.61229384e-01
 # CHECK-NEXT:   7.16172571e-01 -1.76834234e-01 -1.10826025e-01 -4.96778122e-01]>: tensor<768xf32>} : () -> tensor<768xf32>
-# CHECK-NEXT:   %2740 = "vm.call" @device.matmul(%2771,%2983) : (tensor<16x768xf32>,tensor<768x2304xf32>) -> (tensor<16x2304xf32>)
-# CHECK-NEXT:   %2772 = "vm.call" @device.add(%2740,%2984) : (tensor<16x2304xf32>,tensor<2304xf32>) -> (tensor<16x2304xf32>)
-# CHECK-NEXT:   %3048 = "vm.call" @device.slice(%2772) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %3049 = "vm.call" @device.slice(%2772) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %3050 = "vm.call" @device.slice(%2772) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2746 = "vm.call" @device.matmul(%2777,%2983) : (tensor<16x768xf32>,tensor<768x2304xf32>) -> (tensor<16x2304xf32>)
+# CHECK-NEXT:   %2778 = "vm.call" @device.add(%2746,%2984) : (tensor<16x2304xf32>,tensor<2304xf32>) -> (tensor<16x2304xf32>)
+# CHECK-NEXT:   %3048 = "vm.call" @device.slice(%2778) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3049 = "vm.call" @device.slice(%2778) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3050 = "vm.call" @device.slice(%2778) : (tensor<16x2304xf32>) -> (tensor<16x768xf32>)
 # CHECK-NEXT:   %3087 = "vm.call" @device.concat(%3048,%3049,%3050) : (tensor<16x768xf32>,tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<3x16x768xf32>)
 # CHECK-NEXT:   %2987 = "vm.rodata" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2895 = "vm.call" @device.gather(%3087,%2987) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %3051 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3052 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3053 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3054 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3055 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3056 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3057 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3058 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3059 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3060 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3061 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3062 = "vm.call" @device.slice(%2895) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2901 = "vm.call" @device.gather(%3087,%2987) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3051 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3052 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3053 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3054 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3055 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3056 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3057 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3058 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3059 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3060 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3061 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3062 = "vm.call" @device.slice(%2901) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %3088 = "vm.call" @device.concat(%3051,%3052,%3053,%3054,%3055,%3056,%3057,%3058,%3059,%3060,%3061,%3062) : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> (tensor<12x16x64xf32>)
 # CHECK-NEXT:   %2988 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2896 = "vm.call" @device.gather(%3087,%2988) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %3063 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3064 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3065 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3066 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3067 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3068 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3069 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3070 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3071 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3072 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3073 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3074 = "vm.call" @device.slice(%2896) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2902 = "vm.call" @device.gather(%3087,%2988) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3063 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3064 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3065 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3066 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3067 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3068 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3069 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3070 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3071 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3072 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3073 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3074 = "vm.call" @device.slice(%2902) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %3089 = "vm.call" @device.concat(%3063,%3064,%3065,%3066,%3067,%3068,%3069,%3070,%3071,%3072,%3073,%3074) : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> (tensor<12x16x64xf32>)
 # CHECK-NEXT:   %2989 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2897 = "vm.call" @device.gather(%3087,%2989) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %3075 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3076 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3077 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3078 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3079 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3080 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3081 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3082 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3083 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3084 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3085 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3086 = "vm.call" @device.slice(%2897) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2903 = "vm.call" @device.gather(%3087,%2989) : (tensor<3x16x768xf32>,tensor<1xi32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3075 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3076 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3077 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3078 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3079 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3080 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3081 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3082 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3083 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3084 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3085 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3086 = "vm.call" @device.slice(%2903) : (tensor<16x768xf32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %3090 = "vm.call" @device.concat(%3075,%3076,%3077,%3078,%3079,%3080,%3081,%3082,%3083,%3084,%3085,%3086) : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> (tensor<12x16x64xf32>)
-# CHECK-NEXT:   %2587 = "vm.const.i32" () {value = 1: i32} : () -> i32
+# CHECK-NEXT:   %2593 = "vm.const.i32" () {value = 1: i32} : () -> i32
 # CHECK-NEXT:   %2990 = "vm.rodata" () {value = dense<[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 0. 0. 0. 0. 0. 0.
 # CHECK-NEXT:  0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
 # CHECK-NEXT:  1. 1. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 1. 1. 1. 0. 0. 0.
@@ -408,302 +406,300 @@ print(y)
 # CHECK-NEXT:  1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0. 0. 0. 1. 1. 1. 1. 1. 1. 1. 1.
 # CHECK-NEXT:  1. 1. 1. 1. 1. 1. 0. 0. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 0.
 # CHECK-NEXT:  1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.]>: tensor<16x16xi32>} : () -> tensor<16x16xi32>
-# CHECK-NEXT:   %2683 = "vm.call" @device.sub(%2587,%2990) : (i32,tensor<16x16xi32>) -> (i32)
-# CHECK-NEXT:   %2588 = "vm.const.f32" () {value = -1e-10: f32} : () -> f32
-# CHECK-NEXT:   %2684 = "vm.call" @device.mul(%2683,%2588) : (i32,f32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2689 = "vm.call" @device.sub(%2593,%2990) : (i32,tensor<16x16xi32>) -> (i32)
+# CHECK-NEXT:   %2594 = "vm.const.f32" () {value = -1e-10: f32} : () -> f32
+# CHECK-NEXT:   %2690 = "vm.call" @device.mul(%2689,%2594) : (i32,f32) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2991 = "vm.rodata" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2898 = "vm.call" @device.gather(%3088,%2991) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2904 = "vm.call" @device.gather(%3088,%2991) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %2992 = "vm.rodata" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2899 = "vm.call" @device.gather(%3089,%2992) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2905 = "vm.call" @device.gather(%3089,%2992) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %2993 = "vm.rodata" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2900 = "vm.call" @device.gather(%3090,%2993) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2589 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2590 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2685 = "vm.call" @device.div(%2589,%2590) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %2994 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3105 = "vm.call" @device.transpose(%2899,%2994) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2741 = "vm.call" @device.matmul(%2898,%3105) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2725 = "vm.call" @device.sqrt(%2685) : (i32) -> (i32)
-# CHECK-NEXT:   %2701 = "vm.call" @device.splat(%2725) : (i32) -> (i32)
-# CHECK-NEXT:   %3122 = "vm.call" @device.div(%2741,%2701) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2773 = "vm.call" @device.add(%3122,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2956 = "vm.call" @device.reduce_max(%2773) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2798 = "vm.call" @device.sub(%2773,%2956) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3092 = "vm.call" @device.exp(%2798) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2938 = "vm.call" @device.reduce_sum(%3092) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3123 = "vm.call" @device.div(%3092,%2938) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2742 = "vm.call" @device.matmul(%3123,%2900) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2995 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2901 = "vm.call" @device.gather(%3088,%2995) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2996 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2902 = "vm.call" @device.gather(%3089,%2996) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2997 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2903 = "vm.call" @device.gather(%3090,%2997) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2906 = "vm.call" @device.gather(%3090,%2993) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
 # CHECK-NEXT:   %2595 = "vm.const.i32" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2596 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2686 = "vm.call" @device.div(%2595,%2596) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %2998 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3106 = "vm.call" @device.transpose(%2902,%2998) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2743 = "vm.call" @device.matmul(%2901,%3106) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2726 = "vm.call" @device.sqrt(%2686) : (i32) -> (i32)
-# CHECK-NEXT:   %2702 = "vm.call" @device.splat(%2726) : (i32) -> (i32)
-# CHECK-NEXT:   %3124 = "vm.call" @device.div(%2743,%2702) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2774 = "vm.call" @device.add(%3124,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2957 = "vm.call" @device.reduce_max(%2774) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2799 = "vm.call" @device.sub(%2774,%2957) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3093 = "vm.call" @device.exp(%2799) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2939 = "vm.call" @device.reduce_sum(%3093) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3125 = "vm.call" @device.div(%3093,%2939) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2744 = "vm.call" @device.matmul(%3125,%2903) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2999 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2904 = "vm.call" @device.gather(%3088,%2999) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3000 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2905 = "vm.call" @device.gather(%3089,%3000) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3001 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2906 = "vm.call" @device.gather(%3090,%3001) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2601 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2602 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2687 = "vm.call" @device.div(%2601,%2602) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3002 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3107 = "vm.call" @device.transpose(%2905,%3002) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2745 = "vm.call" @device.matmul(%2904,%3107) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2727 = "vm.call" @device.sqrt(%2687) : (i32) -> (i32)
-# CHECK-NEXT:   %2703 = "vm.call" @device.splat(%2727) : (i32) -> (i32)
-# CHECK-NEXT:   %3126 = "vm.call" @device.div(%2745,%2703) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2775 = "vm.call" @device.add(%3126,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2958 = "vm.call" @device.reduce_max(%2775) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2800 = "vm.call" @device.sub(%2775,%2958) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3094 = "vm.call" @device.exp(%2800) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2940 = "vm.call" @device.reduce_sum(%3094) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3127 = "vm.call" @device.div(%3094,%2940) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2746 = "vm.call" @device.matmul(%3127,%2906) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3003 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2907 = "vm.call" @device.gather(%3088,%3003) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3004 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2908 = "vm.call" @device.gather(%3089,%3004) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3005 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2909 = "vm.call" @device.gather(%3090,%3005) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2607 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2608 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2688 = "vm.call" @device.div(%2607,%2608) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3006 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3108 = "vm.call" @device.transpose(%2908,%3006) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2747 = "vm.call" @device.matmul(%2907,%3108) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2728 = "vm.call" @device.sqrt(%2688) : (i32) -> (i32)
-# CHECK-NEXT:   %2704 = "vm.call" @device.splat(%2728) : (i32) -> (i32)
-# CHECK-NEXT:   %3128 = "vm.call" @device.div(%2747,%2704) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2776 = "vm.call" @device.add(%3128,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2959 = "vm.call" @device.reduce_max(%2776) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2801 = "vm.call" @device.sub(%2776,%2959) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3095 = "vm.call" @device.exp(%2801) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2941 = "vm.call" @device.reduce_sum(%3095) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3129 = "vm.call" @device.div(%3095,%2941) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2748 = "vm.call" @device.matmul(%3129,%2909) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3007 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2910 = "vm.call" @device.gather(%3088,%3007) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3008 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2911 = "vm.call" @device.gather(%3089,%3008) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3009 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2912 = "vm.call" @device.gather(%3090,%3009) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2613 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2614 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2689 = "vm.call" @device.div(%2613,%2614) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3010 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3109 = "vm.call" @device.transpose(%2911,%3010) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2749 = "vm.call" @device.matmul(%2910,%3109) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2729 = "vm.call" @device.sqrt(%2689) : (i32) -> (i32)
-# CHECK-NEXT:   %2705 = "vm.call" @device.splat(%2729) : (i32) -> (i32)
-# CHECK-NEXT:   %3130 = "vm.call" @device.div(%2749,%2705) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2777 = "vm.call" @device.add(%3130,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2960 = "vm.call" @device.reduce_max(%2777) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2802 = "vm.call" @device.sub(%2777,%2960) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3096 = "vm.call" @device.exp(%2802) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2942 = "vm.call" @device.reduce_sum(%3096) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3131 = "vm.call" @device.div(%3096,%2942) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2750 = "vm.call" @device.matmul(%3131,%2912) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3011 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2913 = "vm.call" @device.gather(%3088,%3011) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3012 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2914 = "vm.call" @device.gather(%3089,%3012) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3013 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2915 = "vm.call" @device.gather(%3090,%3013) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2619 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2620 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2690 = "vm.call" @device.div(%2619,%2620) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3014 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3110 = "vm.call" @device.transpose(%2914,%3014) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2751 = "vm.call" @device.matmul(%2913,%3110) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2730 = "vm.call" @device.sqrt(%2690) : (i32) -> (i32)
-# CHECK-NEXT:   %2706 = "vm.call" @device.splat(%2730) : (i32) -> (i32)
-# CHECK-NEXT:   %3132 = "vm.call" @device.div(%2751,%2706) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2778 = "vm.call" @device.add(%3132,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2961 = "vm.call" @device.reduce_max(%2778) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2803 = "vm.call" @device.sub(%2778,%2961) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3097 = "vm.call" @device.exp(%2803) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2943 = "vm.call" @device.reduce_sum(%3097) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3133 = "vm.call" @device.div(%3097,%2943) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2752 = "vm.call" @device.matmul(%3133,%2915) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3015 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2916 = "vm.call" @device.gather(%3088,%3015) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3016 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2917 = "vm.call" @device.gather(%3089,%3016) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3017 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2918 = "vm.call" @device.gather(%3090,%3017) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2625 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2626 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2691 = "vm.call" @device.div(%2625,%2626) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3018 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3111 = "vm.call" @device.transpose(%2917,%3018) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2753 = "vm.call" @device.matmul(%2916,%3111) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2691 = "vm.call" @device.div(%2595,%2596) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %2994 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3105 = "vm.call" @device.transpose(%2905,%2994) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2747 = "vm.call" @device.matmul(%2904,%3105) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2731 = "vm.call" @device.sqrt(%2691) : (i32) -> (i32)
 # CHECK-NEXT:   %2707 = "vm.call" @device.splat(%2731) : (i32) -> (i32)
-# CHECK-NEXT:   %3134 = "vm.call" @device.div(%2753,%2707) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2779 = "vm.call" @device.add(%3134,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3122 = "vm.call" @device.div(%2747,%2707) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2779 = "vm.call" @device.add(%3122,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2962 = "vm.call" @device.reduce_max(%2779) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2804 = "vm.call" @device.sub(%2779,%2962) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3098 = "vm.call" @device.exp(%2804) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2944 = "vm.call" @device.reduce_sum(%3098) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3135 = "vm.call" @device.div(%3098,%2944) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2754 = "vm.call" @device.matmul(%3135,%2918) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3019 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2919 = "vm.call" @device.gather(%3088,%3019) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3020 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2920 = "vm.call" @device.gather(%3089,%3020) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3021 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2921 = "vm.call" @device.gather(%3090,%3021) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2631 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2632 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2692 = "vm.call" @device.div(%2631,%2632) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3022 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3112 = "vm.call" @device.transpose(%2920,%3022) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2755 = "vm.call" @device.matmul(%2919,%3112) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3092 = "vm.call" @device.exp(%2804) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2944 = "vm.call" @device.reduce_sum(%3092) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3123 = "vm.call" @device.div(%3092,%2944) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2748 = "vm.call" @device.matmul(%3123,%2906) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2995 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2907 = "vm.call" @device.gather(%3088,%2995) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2996 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2908 = "vm.call" @device.gather(%3089,%2996) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2997 = "vm.rodata" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2909 = "vm.call" @device.gather(%3090,%2997) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2601 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2602 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2692 = "vm.call" @device.div(%2601,%2602) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %2998 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3106 = "vm.call" @device.transpose(%2908,%2998) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2749 = "vm.call" @device.matmul(%2907,%3106) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2732 = "vm.call" @device.sqrt(%2692) : (i32) -> (i32)
 # CHECK-NEXT:   %2708 = "vm.call" @device.splat(%2732) : (i32) -> (i32)
-# CHECK-NEXT:   %3136 = "vm.call" @device.div(%2755,%2708) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2780 = "vm.call" @device.add(%3136,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3124 = "vm.call" @device.div(%2749,%2708) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2780 = "vm.call" @device.add(%3124,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2963 = "vm.call" @device.reduce_max(%2780) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2805 = "vm.call" @device.sub(%2780,%2963) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3099 = "vm.call" @device.exp(%2805) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2945 = "vm.call" @device.reduce_sum(%3099) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3137 = "vm.call" @device.div(%3099,%2945) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2756 = "vm.call" @device.matmul(%3137,%2921) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3023 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2922 = "vm.call" @device.gather(%3088,%3023) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3024 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2923 = "vm.call" @device.gather(%3089,%3024) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3025 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2924 = "vm.call" @device.gather(%3090,%3025) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2637 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2638 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2693 = "vm.call" @device.div(%2637,%2638) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3026 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3113 = "vm.call" @device.transpose(%2923,%3026) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2757 = "vm.call" @device.matmul(%2922,%3113) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3093 = "vm.call" @device.exp(%2805) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2945 = "vm.call" @device.reduce_sum(%3093) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3125 = "vm.call" @device.div(%3093,%2945) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2750 = "vm.call" @device.matmul(%3125,%2909) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2999 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2910 = "vm.call" @device.gather(%3088,%2999) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3000 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2911 = "vm.call" @device.gather(%3089,%3000) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3001 = "vm.rodata" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2912 = "vm.call" @device.gather(%3090,%3001) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2607 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2608 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2693 = "vm.call" @device.div(%2607,%2608) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3002 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3107 = "vm.call" @device.transpose(%2911,%3002) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2751 = "vm.call" @device.matmul(%2910,%3107) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2733 = "vm.call" @device.sqrt(%2693) : (i32) -> (i32)
 # CHECK-NEXT:   %2709 = "vm.call" @device.splat(%2733) : (i32) -> (i32)
-# CHECK-NEXT:   %3138 = "vm.call" @device.div(%2757,%2709) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2781 = "vm.call" @device.add(%3138,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3126 = "vm.call" @device.div(%2751,%2709) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2781 = "vm.call" @device.add(%3126,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2964 = "vm.call" @device.reduce_max(%2781) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2806 = "vm.call" @device.sub(%2781,%2964) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3100 = "vm.call" @device.exp(%2806) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2946 = "vm.call" @device.reduce_sum(%3100) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3139 = "vm.call" @device.div(%3100,%2946) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2758 = "vm.call" @device.matmul(%3139,%2924) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3027 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2925 = "vm.call" @device.gather(%3088,%3027) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3028 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2926 = "vm.call" @device.gather(%3089,%3028) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3029 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2927 = "vm.call" @device.gather(%3090,%3029) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2643 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2644 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2694 = "vm.call" @device.div(%2643,%2644) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3030 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3114 = "vm.call" @device.transpose(%2926,%3030) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2759 = "vm.call" @device.matmul(%2925,%3114) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3094 = "vm.call" @device.exp(%2806) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2946 = "vm.call" @device.reduce_sum(%3094) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3127 = "vm.call" @device.div(%3094,%2946) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2752 = "vm.call" @device.matmul(%3127,%2912) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3003 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2913 = "vm.call" @device.gather(%3088,%3003) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3004 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2914 = "vm.call" @device.gather(%3089,%3004) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3005 = "vm.rodata" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2915 = "vm.call" @device.gather(%3090,%3005) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2613 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2614 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2694 = "vm.call" @device.div(%2613,%2614) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3006 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3108 = "vm.call" @device.transpose(%2914,%3006) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2753 = "vm.call" @device.matmul(%2913,%3108) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2734 = "vm.call" @device.sqrt(%2694) : (i32) -> (i32)
 # CHECK-NEXT:   %2710 = "vm.call" @device.splat(%2734) : (i32) -> (i32)
-# CHECK-NEXT:   %3140 = "vm.call" @device.div(%2759,%2710) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2782 = "vm.call" @device.add(%3140,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3128 = "vm.call" @device.div(%2753,%2710) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2782 = "vm.call" @device.add(%3128,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2965 = "vm.call" @device.reduce_max(%2782) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2807 = "vm.call" @device.sub(%2782,%2965) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3101 = "vm.call" @device.exp(%2807) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2947 = "vm.call" @device.reduce_sum(%3101) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3141 = "vm.call" @device.div(%3101,%2947) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2760 = "vm.call" @device.matmul(%3141,%2927) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3031 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2928 = "vm.call" @device.gather(%3088,%3031) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3032 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2929 = "vm.call" @device.gather(%3089,%3032) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3033 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2930 = "vm.call" @device.gather(%3090,%3033) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2649 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2650 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2695 = "vm.call" @device.div(%2649,%2650) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3034 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3115 = "vm.call" @device.transpose(%2929,%3034) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2761 = "vm.call" @device.matmul(%2928,%3115) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3095 = "vm.call" @device.exp(%2807) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2947 = "vm.call" @device.reduce_sum(%3095) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3129 = "vm.call" @device.div(%3095,%2947) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2754 = "vm.call" @device.matmul(%3129,%2915) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3007 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2916 = "vm.call" @device.gather(%3088,%3007) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3008 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2917 = "vm.call" @device.gather(%3089,%3008) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3009 = "vm.rodata" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2918 = "vm.call" @device.gather(%3090,%3009) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2619 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2620 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2695 = "vm.call" @device.div(%2619,%2620) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3010 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3109 = "vm.call" @device.transpose(%2917,%3010) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2755 = "vm.call" @device.matmul(%2916,%3109) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2735 = "vm.call" @device.sqrt(%2695) : (i32) -> (i32)
 # CHECK-NEXT:   %2711 = "vm.call" @device.splat(%2735) : (i32) -> (i32)
-# CHECK-NEXT:   %3142 = "vm.call" @device.div(%2761,%2711) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2783 = "vm.call" @device.add(%3142,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3130 = "vm.call" @device.div(%2755,%2711) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2783 = "vm.call" @device.add(%3130,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2966 = "vm.call" @device.reduce_max(%2783) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2808 = "vm.call" @device.sub(%2783,%2966) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3102 = "vm.call" @device.exp(%2808) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2948 = "vm.call" @device.reduce_sum(%3102) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3143 = "vm.call" @device.div(%3102,%2948) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2762 = "vm.call" @device.matmul(%3143,%2930) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3035 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2931 = "vm.call" @device.gather(%3088,%3035) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3036 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2932 = "vm.call" @device.gather(%3089,%3036) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3037 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2933 = "vm.call" @device.gather(%3090,%3037) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %2655 = "vm.const.i32" () {value = 768: i32} : () -> i32
-# CHECK-NEXT:   %2656 = "vm.const.i32" () {value = 12: i32} : () -> i32
-# CHECK-NEXT:   %2696 = "vm.call" @device.div(%2655,%2656) : (i32,i32) -> (i32)
-# CHECK-NEXT:   %3038 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
-# CHECK-NEXT:   %3116 = "vm.call" @device.transpose(%2932,%3038) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
-# CHECK-NEXT:   %2763 = "vm.call" @device.matmul(%2931,%3116) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3096 = "vm.call" @device.exp(%2808) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2948 = "vm.call" @device.reduce_sum(%3096) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3131 = "vm.call" @device.div(%3096,%2948) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2756 = "vm.call" @device.matmul(%3131,%2918) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3011 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2919 = "vm.call" @device.gather(%3088,%3011) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3012 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2920 = "vm.call" @device.gather(%3089,%3012) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3013 = "vm.rodata" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2921 = "vm.call" @device.gather(%3090,%3013) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2625 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2626 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2696 = "vm.call" @device.div(%2625,%2626) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3014 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3110 = "vm.call" @device.transpose(%2920,%3014) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2757 = "vm.call" @device.matmul(%2919,%3110) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2736 = "vm.call" @device.sqrt(%2696) : (i32) -> (i32)
 # CHECK-NEXT:   %2712 = "vm.call" @device.splat(%2736) : (i32) -> (i32)
-# CHECK-NEXT:   %3144 = "vm.call" @device.div(%2763,%2712) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2784 = "vm.call" @device.add(%3144,%2684) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3132 = "vm.call" @device.div(%2757,%2712) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2784 = "vm.call" @device.add(%3132,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
 # CHECK-NEXT:   %2967 = "vm.call" @device.reduce_max(%2784) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2809 = "vm.call" @device.sub(%2784,%2967) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %3103 = "vm.call" @device.exp(%2809) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2949 = "vm.call" @device.reduce_sum(%3103) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3145 = "vm.call" @device.div(%3103,%2949) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
-# CHECK-NEXT:   %2764 = "vm.call" @device.matmul(%3145,%2933) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
-# CHECK-NEXT:   %3091 = "vm.call" @device.concat(%2742,%2744,%2746,%2748,%2750,%2752,%2754,%2756,%2758,%2760,%2762,%2764) : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2765 = "vm.call" @device.matmul(%3091,%2985) : (tensor<16x768xf32>,tensor<768x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2785 = "vm.call" @device.add(%2765,%2986) : (tensor<16x768xf32>,tensor<768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2786 = "vm.call" @device.add(%2769,%2785) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2661 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2662 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2663 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2950 = "vm.call" @device.reduce_sum(%2786) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3039 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2971 = "vm.call" @device.cast(%3039) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3146 = "vm.call" @device.div(%2950,%2971) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2951 = "vm.call" @device.reduce_sum(%2786) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3040 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2972 = "vm.call" @device.cast(%3040) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3148 = "vm.call" @device.div(%2951,%2972) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2973 = "vm.call" @device.cast(%3148) : (tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2810 = "vm.call" @device.sub(%2786,%2973) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2846 = "vm.call" @device.mul(%2810,%2810) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2952 = "vm.call" @device.reduce_sum(%2786) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3147 = "vm.call" @device.div(%2952,%2972) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2811 = "vm.call" @device.sub(%2786,%3146) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2713 = "vm.call" @device.splat(%2662) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2848 = "vm.call" @device.mul(%2713,%2811) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2714 = "vm.call" @device.splat(%2661) : (f32) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2787 = "vm.call" @device.add(%3147,%2714) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2737 = "vm.call" @device.sqrt(%2787) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3149 = "vm.call" @device.div(%2848,%2737) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2715 = "vm.call" @device.splat(%2663) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2788 = "vm.call" @device.add(%3149,%2715) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %3097 = "vm.call" @device.exp(%2809) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2949 = "vm.call" @device.reduce_sum(%3097) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3133 = "vm.call" @device.div(%3097,%2949) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2758 = "vm.call" @device.matmul(%3133,%2921) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3015 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2922 = "vm.call" @device.gather(%3088,%3015) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3016 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2923 = "vm.call" @device.gather(%3089,%3016) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3017 = "vm.rodata" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2924 = "vm.call" @device.gather(%3090,%3017) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2631 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2632 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2697 = "vm.call" @device.div(%2631,%2632) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3018 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3111 = "vm.call" @device.transpose(%2923,%3018) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2759 = "vm.call" @device.matmul(%2922,%3111) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2737 = "vm.call" @device.sqrt(%2697) : (i32) -> (i32)
+# CHECK-NEXT:   %2713 = "vm.call" @device.splat(%2737) : (i32) -> (i32)
+# CHECK-NEXT:   %3134 = "vm.call" @device.div(%2759,%2713) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2785 = "vm.call" @device.add(%3134,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2968 = "vm.call" @device.reduce_max(%2785) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2810 = "vm.call" @device.sub(%2785,%2968) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3098 = "vm.call" @device.exp(%2810) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2950 = "vm.call" @device.reduce_sum(%3098) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3135 = "vm.call" @device.div(%3098,%2950) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2760 = "vm.call" @device.matmul(%3135,%2924) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3019 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2925 = "vm.call" @device.gather(%3088,%3019) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3020 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2926 = "vm.call" @device.gather(%3089,%3020) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3021 = "vm.rodata" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2927 = "vm.call" @device.gather(%3090,%3021) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2637 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2638 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2698 = "vm.call" @device.div(%2637,%2638) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3022 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3112 = "vm.call" @device.transpose(%2926,%3022) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2761 = "vm.call" @device.matmul(%2925,%3112) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2738 = "vm.call" @device.sqrt(%2698) : (i32) -> (i32)
+# CHECK-NEXT:   %2714 = "vm.call" @device.splat(%2738) : (i32) -> (i32)
+# CHECK-NEXT:   %3136 = "vm.call" @device.div(%2761,%2714) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2786 = "vm.call" @device.add(%3136,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2969 = "vm.call" @device.reduce_max(%2786) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2811 = "vm.call" @device.sub(%2786,%2969) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3099 = "vm.call" @device.exp(%2811) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2951 = "vm.call" @device.reduce_sum(%3099) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3137 = "vm.call" @device.div(%3099,%2951) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2762 = "vm.call" @device.matmul(%3137,%2927) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3023 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2928 = "vm.call" @device.gather(%3088,%3023) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3024 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2929 = "vm.call" @device.gather(%3089,%3024) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3025 = "vm.rodata" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2930 = "vm.call" @device.gather(%3090,%3025) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2643 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2644 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2699 = "vm.call" @device.div(%2643,%2644) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3026 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3113 = "vm.call" @device.transpose(%2929,%3026) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2763 = "vm.call" @device.matmul(%2928,%3113) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2739 = "vm.call" @device.sqrt(%2699) : (i32) -> (i32)
+# CHECK-NEXT:   %2715 = "vm.call" @device.splat(%2739) : (i32) -> (i32)
+# CHECK-NEXT:   %3138 = "vm.call" @device.div(%2763,%2715) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2787 = "vm.call" @device.add(%3138,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2970 = "vm.call" @device.reduce_max(%2787) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2812 = "vm.call" @device.sub(%2787,%2970) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3100 = "vm.call" @device.exp(%2812) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2952 = "vm.call" @device.reduce_sum(%3100) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3139 = "vm.call" @device.div(%3100,%2952) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2764 = "vm.call" @device.matmul(%3139,%2930) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3027 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2931 = "vm.call" @device.gather(%3088,%3027) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3028 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2932 = "vm.call" @device.gather(%3089,%3028) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3029 = "vm.rodata" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2933 = "vm.call" @device.gather(%3090,%3029) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2649 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2650 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2700 = "vm.call" @device.div(%2649,%2650) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3030 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3114 = "vm.call" @device.transpose(%2932,%3030) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2765 = "vm.call" @device.matmul(%2931,%3114) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2740 = "vm.call" @device.sqrt(%2700) : (i32) -> (i32)
+# CHECK-NEXT:   %2716 = "vm.call" @device.splat(%2740) : (i32) -> (i32)
+# CHECK-NEXT:   %3140 = "vm.call" @device.div(%2765,%2716) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2788 = "vm.call" @device.add(%3140,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2971 = "vm.call" @device.reduce_max(%2788) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2813 = "vm.call" @device.sub(%2788,%2971) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3101 = "vm.call" @device.exp(%2813) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2953 = "vm.call" @device.reduce_sum(%3101) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3141 = "vm.call" @device.div(%3101,%2953) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2766 = "vm.call" @device.matmul(%3141,%2933) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3031 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2934 = "vm.call" @device.gather(%3088,%3031) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3032 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2935 = "vm.call" @device.gather(%3089,%3032) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3033 = "vm.rodata" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2936 = "vm.call" @device.gather(%3090,%3033) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2655 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2656 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2701 = "vm.call" @device.div(%2655,%2656) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3034 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3115 = "vm.call" @device.transpose(%2935,%3034) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2767 = "vm.call" @device.matmul(%2934,%3115) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2741 = "vm.call" @device.sqrt(%2701) : (i32) -> (i32)
+# CHECK-NEXT:   %2717 = "vm.call" @device.splat(%2741) : (i32) -> (i32)
+# CHECK-NEXT:   %3142 = "vm.call" @device.div(%2767,%2717) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2789 = "vm.call" @device.add(%3142,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2972 = "vm.call" @device.reduce_max(%2789) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2814 = "vm.call" @device.sub(%2789,%2972) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3102 = "vm.call" @device.exp(%2814) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2954 = "vm.call" @device.reduce_sum(%3102) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3143 = "vm.call" @device.div(%3102,%2954) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2768 = "vm.call" @device.matmul(%3143,%2936) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3035 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2937 = "vm.call" @device.gather(%3088,%3035) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3036 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2938 = "vm.call" @device.gather(%3089,%3036) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3037 = "vm.rodata" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
+# CHECK-NEXT:   %2939 = "vm.call" @device.gather(%3090,%3037) : (tensor<12x16x64xf32>,tensor<1xi32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %2661 = "vm.const.i32" () {value = 768: i32} : () -> i32
+# CHECK-NEXT:   %2662 = "vm.const.i32" () {value = 12: i32} : () -> i32
+# CHECK-NEXT:   %2702 = "vm.call" @device.div(%2661,%2662) : (i32,i32) -> (i32)
+# CHECK-NEXT:   %3038 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
+# CHECK-NEXT:   %3116 = "vm.call" @device.transpose(%2938,%3038) : (tensor<16x64xf32>,tensor<2xi32>) -> (tensor<64x16xf32>)
+# CHECK-NEXT:   %2769 = "vm.call" @device.matmul(%2937,%3116) : (tensor<16x64xf32>,tensor<64x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2742 = "vm.call" @device.sqrt(%2702) : (i32) -> (i32)
+# CHECK-NEXT:   %2718 = "vm.call" @device.splat(%2742) : (i32) -> (i32)
+# CHECK-NEXT:   %3144 = "vm.call" @device.div(%2769,%2718) : (tensor<16x16xf32>,i32) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2790 = "vm.call" @device.add(%3144,%2690) : (tensor<16x16xf32>,tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2973 = "vm.call" @device.reduce_max(%2790) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2815 = "vm.call" @device.sub(%2790,%2973) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %3103 = "vm.call" @device.exp(%2815) : (tensor<16x16xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2955 = "vm.call" @device.reduce_sum(%3103) : (tensor<16x16xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3145 = "vm.call" @device.div(%3103,%2955) : (tensor<16x16xf32>,tensor<16x1xf32>) -> (tensor<16x16xf32>)
+# CHECK-NEXT:   %2770 = "vm.call" @device.matmul(%3145,%2939) : (tensor<16x16xf32>,tensor<16x64xf32>) -> (tensor<16x64xf32>)
+# CHECK-NEXT:   %3091 = "vm.call" @device.concat(%2748,%2750,%2752,%2754,%2756,%2758,%2760,%2762,%2764,%2766,%2768,%2770) : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2771 = "vm.call" @device.matmul(%3091,%2985) : (tensor<16x768xf32>,tensor<768x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2791 = "vm.call" @device.add(%2771,%2986) : (tensor<16x768xf32>,tensor<768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2792 = "vm.call" @device.add(%2775,%2791) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2667 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2668 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2669 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2956 = "vm.call" @device.reduce_sum(%2792) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3039 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3146 = "vm.call" @device.div(%2956,%3039) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2957 = "vm.call" @device.reduce_sum(%2792) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3040 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3148 = "vm.call" @device.div(%2957,%3040) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2975 = "vm.call" @device.cast(%3148) : (tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2816 = "vm.call" @device.sub(%2792,%2975) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2852 = "vm.call" @device.mul(%2816,%2816) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2958 = "vm.call" @device.reduce_sum(%2792) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3147 = "vm.call" @device.div(%2958,%3040) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2817 = "vm.call" @device.sub(%2792,%3146) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2719 = "vm.call" @device.splat(%2668) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2854 = "vm.call" @device.mul(%2719,%2817) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2720 = "vm.call" @device.splat(%2667) : (f32) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2793 = "vm.call" @device.add(%3147,%2720) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2743 = "vm.call" @device.sqrt(%2793) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3149 = "vm.call" @device.div(%2854,%2743) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2721 = "vm.call" @device.splat(%2669) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2794 = "vm.call" @device.add(%3149,%2721) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
 # CHECK-NEXT:   %3041 = "vm.rodata" () {value = dense<[ 0.83138123  0.13229829 -0.26965598 ... -0.65889418  0.60237776
 # CHECK-NEXT:   0.00700748]>: tensor<768x3072xf32>} : () -> tensor<768x3072xf32>
 # CHECK-NEXT:   %3042 = "vm.rodata" () {value = dense<[-0.42023735 -0.1593114   1.08283664 ... -0.1974762   0.7747443
@@ -902,59 +898,57 @@ print(y)
 # CHECK-NEXT:   4.58689117e-01  1.10159458e+00  1.30925142e+00 -1.37317449e+00
 # CHECK-NEXT:   4.17446288e-02 -2.09853965e+00  4.11933130e-02 -1.43638446e+00
 # CHECK-NEXT:   1.30947347e+00  1.72746032e+00 -6.56058792e-01 -8.89910535e-02]>: tensor<768xf32>} : () -> tensor<768xf32>
-# CHECK-NEXT:   %2766 = "vm.call" @device.matmul(%2788,%3041) : (tensor<16x768xf32>,tensor<768x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2789 = "vm.call" @device.add(%2766,%3042) : (tensor<16x3072xf32>,tensor<3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2670 = "vm.const.f32" () {value = 3.141592653589793: f32} : () -> f32
-# CHECK-NEXT:   %2671 = "vm.const.f32" () {value = 0.5: f32} : () -> f32
-# CHECK-NEXT:   %2716 = "vm.call" @device.splat(%2671) : (f32) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2850 = "vm.call" @device.mul(%2716,%2789) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2672 = "vm.const.i32" () {value = 1: i32} : () -> i32
-# CHECK-NEXT:   %2673 = "vm.const.i32" () {value = 2: i32} : () -> i32
-# CHECK-NEXT:   %2697 = "vm.call" @device.div(%2673,%2670) : (i32,f32) -> (f32)
-# CHECK-NEXT:   %2738 = "vm.call" @device.sqrt(%2697) : (f32) -> (f32)
-# CHECK-NEXT:   %2674 = "vm.const.f32" () {value = 0.044715: f32} : () -> f32
-# CHECK-NEXT:   %2675 = "vm.const.i32" () {value = 3: i32} : () -> i32
-# CHECK-NEXT:   %2717 = "vm.call" @device.splat(%2675) : (i32) -> (i32)
-# CHECK-NEXT:   %2934 = "vm.call" @device.pow(%2789,%2717) : (tensor<16x3072xf32>,i32) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2718 = "vm.call" @device.splat(%2674) : (f32) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2851 = "vm.call" @device.mul(%2718,%2934) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2790 = "vm.call" @device.add(%2789,%2851) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2719 = "vm.call" @device.splat(%2738) : (f32) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2852 = "vm.call" @device.mul(%2719,%2790) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %3104 = "vm.call" @device.tanh(%2852) : (tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2720 = "vm.call" @device.splat(%2672) : (i32) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2791 = "vm.call" @device.add(%2720,%3104) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2853 = "vm.call" @device.mul(%2850,%2791) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
-# CHECK-NEXT:   %2767 = "vm.call" @device.matmul(%2853,%3043) : (tensor<16x3072xf32>,tensor<3072x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2792 = "vm.call" @device.add(%2767,%3044) : (tensor<16x768xf32>,tensor<768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2793 = "vm.call" @device.add(%2786,%2792) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2676 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2677 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2678 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
-# CHECK-NEXT:   %2953 = "vm.call" @device.reduce_sum(%2793) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3045 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2974 = "vm.call" @device.cast(%3045) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3150 = "vm.call" @device.div(%2953,%2974) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2954 = "vm.call" @device.reduce_sum(%2793) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3046 = "vm.rodata" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2975 = "vm.call" @device.cast(%3046) : (tensor<1xi32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3152 = "vm.call" @device.div(%2954,%2975) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2772 = "vm.call" @device.matmul(%2794,%3041) : (tensor<16x768xf32>,tensor<768x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2795 = "vm.call" @device.add(%2772,%3042) : (tensor<16x3072xf32>,tensor<3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2676 = "vm.const.f32" () {value = 3.141592653589793: f32} : () -> f32
+# CHECK-NEXT:   %2677 = "vm.const.f32" () {value = 0.5: f32} : () -> f32
+# CHECK-NEXT:   %2722 = "vm.call" @device.splat(%2677) : (f32) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2856 = "vm.call" @device.mul(%2722,%2795) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2678 = "vm.const.i32" () {value = 1: i32} : () -> i32
+# CHECK-NEXT:   %2679 = "vm.const.i32" () {value = 2: i32} : () -> i32
+# CHECK-NEXT:   %2703 = "vm.call" @device.div(%2679,%2676) : (i32,f32) -> (f32)
+# CHECK-NEXT:   %2744 = "vm.call" @device.sqrt(%2703) : (f32) -> (f32)
+# CHECK-NEXT:   %2680 = "vm.const.f32" () {value = 0.044715: f32} : () -> f32
+# CHECK-NEXT:   %2681 = "vm.const.i32" () {value = 3: i32} : () -> i32
+# CHECK-NEXT:   %2723 = "vm.call" @device.splat(%2681) : (i32) -> (i32)
+# CHECK-NEXT:   %2940 = "vm.call" @device.pow(%2795,%2723) : (tensor<16x3072xf32>,i32) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2724 = "vm.call" @device.splat(%2680) : (f32) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2857 = "vm.call" @device.mul(%2724,%2940) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2796 = "vm.call" @device.add(%2795,%2857) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2725 = "vm.call" @device.splat(%2744) : (f32) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2858 = "vm.call" @device.mul(%2725,%2796) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %3104 = "vm.call" @device.tanh(%2858) : (tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2726 = "vm.call" @device.splat(%2678) : (i32) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2797 = "vm.call" @device.add(%2726,%3104) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2859 = "vm.call" @device.mul(%2856,%2797) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> (tensor<16x3072xf32>)
+# CHECK-NEXT:   %2773 = "vm.call" @device.matmul(%2859,%3043) : (tensor<16x3072xf32>,tensor<3072x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2798 = "vm.call" @device.add(%2773,%3044) : (tensor<16x768xf32>,tensor<768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2799 = "vm.call" @device.add(%2792,%2798) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2682 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2683 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2684 = "vm.const.f32" () {value = 1e-05: f32} : () -> f32
+# CHECK-NEXT:   %2959 = "vm.call" @device.reduce_sum(%2799) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3045 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3150 = "vm.call" @device.div(%2959,%3045) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2960 = "vm.call" @device.reduce_sum(%2799) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3046 = "vm.rodata" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %3152 = "vm.call" @device.div(%2960,%3046) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
 # CHECK-NEXT:   %2976 = "vm.call" @device.cast(%3152) : (tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2812 = "vm.call" @device.sub(%2793,%2976) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2856 = "vm.call" @device.mul(%2812,%2812) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2955 = "vm.call" @device.reduce_sum(%2793) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3151 = "vm.call" @device.div(%2955,%2975) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2813 = "vm.call" @device.sub(%2793,%3150) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2721 = "vm.call" @device.splat(%2677) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2858 = "vm.call" @device.mul(%2721,%2813) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2722 = "vm.call" @device.splat(%2676) : (f32) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2794 = "vm.call" @device.add(%3151,%2722) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %2739 = "vm.call" @device.sqrt(%2794) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
-# CHECK-NEXT:   %3153 = "vm.call" @device.div(%2858,%2739) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2723 = "vm.call" @device.splat(%2678) : (f32) -> (tensor<16x768xf32>)
-# CHECK-NEXT:   %2795 = "vm.call" @device.add(%3153,%2723) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2818 = "vm.call" @device.sub(%2799,%2976) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2862 = "vm.call" @device.mul(%2818,%2818) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2961 = "vm.call" @device.reduce_sum(%2799) : (tensor<16x768xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3151 = "vm.call" @device.div(%2961,%3046) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2819 = "vm.call" @device.sub(%2799,%3150) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2727 = "vm.call" @device.splat(%2683) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2864 = "vm.call" @device.mul(%2727,%2819) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2728 = "vm.call" @device.splat(%2682) : (f32) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2800 = "vm.call" @device.add(%3151,%2728) : (tensor<16x1xf32>,tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %2745 = "vm.call" @device.sqrt(%2800) : (tensor<16x1xf32>) -> (tensor<16x1xf32>)
+# CHECK-NEXT:   %3153 = "vm.call" @device.div(%2864,%2745) : (tensor<16x768xf32>,tensor<16x1xf32>) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2729 = "vm.call" @device.splat(%2684) : (f32) -> (tensor<16x768xf32>)
+# CHECK-NEXT:   %2801 = "vm.call" @device.add(%3153,%2729) : (tensor<16x768xf32>,tensor<16x768xf32>) -> (tensor<16x768xf32>)
 # CHECK-NEXT:   %3047 = "vm.rodata" () {value = dense<[1, 0]>: tensor<2xi32>} : () -> tensor<2xi32>
 # CHECK-NEXT:   %3117 = "vm.call" @device.transpose(%2979,%3047) : (tensor<50257x768xf32>,tensor<2xi32>) -> (tensor<768x50257xf32>)
-# CHECK-NEXT:   %2768 = "vm.call" @device.matmul(%2795,%3117) : (tensor<16x768xf32>,tensor<768x50257xf32>) -> (tensor<16x50257xf32>)
-# CHECK-NEXT:   "vm.call" @print(%2768) : (tensor<16x50257xf32>) -> ()
+# CHECK-NEXT:   %2774 = "vm.call" @device.matmul(%2801,%3117) : (tensor<16x768xf32>,tensor<768x50257xf32>) -> (tensor<16x50257xf32>)
+# CHECK-NEXT:   "vm.call" @print(%2774) : (tensor<16x50257xf32>) -> ()
 # CHECK-NEXT: }) {target_info = {target_backend = sycl}} : () -> ()
