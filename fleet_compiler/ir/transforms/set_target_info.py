@@ -16,6 +16,7 @@ class SetTargetInfo(RewritePattern):
 
 class SetTargetInfoPass(Pass):
     def __init__(self, target_backend: str):
+        super().__init__()
         self.target_info = DictAttr({
             'target_backend': StringAttr(target_backend)
         })
