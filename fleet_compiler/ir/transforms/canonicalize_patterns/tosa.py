@@ -50,6 +50,30 @@ class RemoveRedundantCast(RewritePattern):
                 rewriter.erase_op(op)
                 return True
         
+        '''
+        case 3:
+        %2395 = "tosa.const" () {value = dense<768>: tensor<1xi32>} : () -> tensor<1xi32>
+        %2396 = "tosa.cast" (%2395) : (tensor<1xi32>) -> tensor<16x1xf32>
+        '''
+        def _cast(value, tensor_type):
+            if isinstance(tensor_type, IntegerType):
+                func = int
+            elif isinstance(tensor_type, FloatType):
+                func = float
+            return func(value)
+
+        if (const_op := op.operands[0].owner()).name == "tosa.const":
+            if isinstance((val_attr := const_op.attributes['value']).type, RankedTensorType):
+                if val_attr.type.dims == [1]:
+                    output_type = op.results[0].type
+                    new_value = _cast(val_attr.value, output_type.element_type)
+                    attr = DenseIntOrFPElementsAttr(new_value, output_type)
+                    new_const = tosa.ConstOp({'value': attr})
+                    rewriter.replace_op(op, new_const.results)
+                    rewriter.erase_op(op)
+                    rewriter.erase_op(const_op)
+                    return True
+
         return False
 
 
