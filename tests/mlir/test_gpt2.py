@@ -441,8 +441,7 @@ print(y)
 # CHECK-NEXT:   %2423 = "tosa.transpose" (%1833,%2422) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %1845 = "tosa.matmul" (%1830,%2423) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2379 = "math.sqrt" (%1843) : (i32) -> i32
-# CHECK-NEXT:   %1847 = "tensor.splat" (%2379) : (i32) -> i32
-# CHECK-NEXT:   %1848 = "tosa.reciprocal" (%1847) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %1848 = "tosa.reciprocal" (%2379) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1849 = "tosa.mul" (%1845,%1848) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1850 = "tosa.add" (%1849,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1852 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -469,8 +468,7 @@ print(y)
 # CHECK-NEXT:   %2425 = "tosa.transpose" (%1868,%2424) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %1880 = "tosa.matmul" (%1865,%2425) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2380 = "math.sqrt" (%1878) : (i32) -> i32
-# CHECK-NEXT:   %1882 = "tensor.splat" (%2380) : (i32) -> i32
-# CHECK-NEXT:   %1883 = "tosa.reciprocal" (%1882) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %1883 = "tosa.reciprocal" (%2380) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1884 = "tosa.mul" (%1880,%1883) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1885 = "tosa.add" (%1884,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1887 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -497,8 +495,7 @@ print(y)
 # CHECK-NEXT:   %2427 = "tosa.transpose" (%1903,%2426) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %1915 = "tosa.matmul" (%1900,%2427) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2381 = "math.sqrt" (%1913) : (i32) -> i32
-# CHECK-NEXT:   %1917 = "tensor.splat" (%2381) : (i32) -> i32
-# CHECK-NEXT:   %1918 = "tosa.reciprocal" (%1917) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %1918 = "tosa.reciprocal" (%2381) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1919 = "tosa.mul" (%1915,%1918) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1920 = "tosa.add" (%1919,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1922 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -525,8 +522,7 @@ print(y)
 # CHECK-NEXT:   %2429 = "tosa.transpose" (%1938,%2428) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %1950 = "tosa.matmul" (%1935,%2429) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2382 = "math.sqrt" (%1948) : (i32) -> i32
-# CHECK-NEXT:   %1952 = "tensor.splat" (%2382) : (i32) -> i32
-# CHECK-NEXT:   %1953 = "tosa.reciprocal" (%1952) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %1953 = "tosa.reciprocal" (%2382) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1954 = "tosa.mul" (%1950,%1953) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1955 = "tosa.add" (%1954,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1957 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -553,8 +549,7 @@ print(y)
 # CHECK-NEXT:   %2431 = "tosa.transpose" (%1973,%2430) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %1985 = "tosa.matmul" (%1970,%2431) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2383 = "math.sqrt" (%1983) : (i32) -> i32
-# CHECK-NEXT:   %1987 = "tensor.splat" (%2383) : (i32) -> i32
-# CHECK-NEXT:   %1988 = "tosa.reciprocal" (%1987) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %1988 = "tosa.reciprocal" (%2383) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1989 = "tosa.mul" (%1985,%1988) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1990 = "tosa.add" (%1989,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1992 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -581,8 +576,7 @@ print(y)
 # CHECK-NEXT:   %2433 = "tosa.transpose" (%2008,%2432) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2020 = "tosa.matmul" (%2005,%2433) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2384 = "math.sqrt" (%2018) : (i32) -> i32
-# CHECK-NEXT:   %2022 = "tensor.splat" (%2384) : (i32) -> i32
-# CHECK-NEXT:   %2023 = "tosa.reciprocal" (%2022) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2023 = "tosa.reciprocal" (%2384) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2024 = "tosa.mul" (%2020,%2023) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2025 = "tosa.add" (%2024,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2027 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -609,8 +603,7 @@ print(y)
 # CHECK-NEXT:   %2435 = "tosa.transpose" (%2043,%2434) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2055 = "tosa.matmul" (%2040,%2435) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2385 = "math.sqrt" (%2053) : (i32) -> i32
-# CHECK-NEXT:   %2057 = "tensor.splat" (%2385) : (i32) -> i32
-# CHECK-NEXT:   %2058 = "tosa.reciprocal" (%2057) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2058 = "tosa.reciprocal" (%2385) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2059 = "tosa.mul" (%2055,%2058) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2060 = "tosa.add" (%2059,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2062 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -637,8 +630,7 @@ print(y)
 # CHECK-NEXT:   %2437 = "tosa.transpose" (%2078,%2436) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2090 = "tosa.matmul" (%2075,%2437) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2386 = "math.sqrt" (%2088) : (i32) -> i32
-# CHECK-NEXT:   %2092 = "tensor.splat" (%2386) : (i32) -> i32
-# CHECK-NEXT:   %2093 = "tosa.reciprocal" (%2092) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2093 = "tosa.reciprocal" (%2386) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2094 = "tosa.mul" (%2090,%2093) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2095 = "tosa.add" (%2094,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2097 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -665,8 +657,7 @@ print(y)
 # CHECK-NEXT:   %2439 = "tosa.transpose" (%2113,%2438) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2125 = "tosa.matmul" (%2110,%2439) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2387 = "math.sqrt" (%2123) : (i32) -> i32
-# CHECK-NEXT:   %2127 = "tensor.splat" (%2387) : (i32) -> i32
-# CHECK-NEXT:   %2128 = "tosa.reciprocal" (%2127) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2128 = "tosa.reciprocal" (%2387) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2129 = "tosa.mul" (%2125,%2128) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2130 = "tosa.add" (%2129,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2132 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -693,8 +684,7 @@ print(y)
 # CHECK-NEXT:   %2441 = "tosa.transpose" (%2148,%2440) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2160 = "tosa.matmul" (%2145,%2441) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2388 = "math.sqrt" (%2158) : (i32) -> i32
-# CHECK-NEXT:   %2162 = "tensor.splat" (%2388) : (i32) -> i32
-# CHECK-NEXT:   %2163 = "tosa.reciprocal" (%2162) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2163 = "tosa.reciprocal" (%2388) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2164 = "tosa.mul" (%2160,%2163) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2165 = "tosa.add" (%2164,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2167 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -721,8 +711,7 @@ print(y)
 # CHECK-NEXT:   %2443 = "tosa.transpose" (%2183,%2442) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2195 = "tosa.matmul" (%2180,%2443) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2389 = "math.sqrt" (%2193) : (i32) -> i32
-# CHECK-NEXT:   %2197 = "tensor.splat" (%2389) : (i32) -> i32
-# CHECK-NEXT:   %2198 = "tosa.reciprocal" (%2197) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2198 = "tosa.reciprocal" (%2389) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2199 = "tosa.mul" (%2195,%2198) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2200 = "tosa.add" (%2199,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2202 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -749,8 +738,7 @@ print(y)
 # CHECK-NEXT:   %2445 = "tosa.transpose" (%2218,%2444) : (tensor<16x64xf32>,tensor<2xi32>) -> tensor<64x16xf32>
 # CHECK-NEXT:   %2230 = "tosa.matmul" (%2215,%2445) : (tensor<16x64xf32>,tensor<64x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2390 = "math.sqrt" (%2228) : (i32) -> i32
-# CHECK-NEXT:   %2232 = "tensor.splat" (%2390) : (i32) -> i32
-# CHECK-NEXT:   %2233 = "tosa.reciprocal" (%2232) : (i32) -> tensor<16x16xf32>
+# CHECK-NEXT:   %2233 = "tosa.reciprocal" (%2390) : (i32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2234 = "tosa.mul" (%2230,%2233) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2235 = "tosa.add" (%2234,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2237 = "arith.constant" () {value = -1: i32} : () -> i32
@@ -1010,8 +998,7 @@ print(y)
 # CHECK-NEXT:   %2392 = "math.sqrt" (%2294) : (f32) -> f32
 # CHECK-NEXT:   %2296 = "arith.constant" () {value = 0.044715: f32} : () -> f32
 # CHECK-NEXT:   %2297 = "arith.constant" () {value = 3: i32} : () -> i32
-# CHECK-NEXT:   %2298 = "tensor.splat" (%2297) : (i32) -> i32
-# CHECK-NEXT:   %2299 = "tosa.pow" (%2286,%2298) : (tensor<16x3072xf32>,i32) -> tensor<16x3072xf32>
+# CHECK-NEXT:   %2299 = "tosa.pow" (%2286,%2297) : (tensor<16x3072xf32>,i32) -> tensor<16x3072xf32>
 # CHECK-NEXT:   %2300 = "tensor.splat" (%2296) : (f32) -> tensor<16x3072xf32>
 # CHECK-NEXT:   %2301 = "tosa.mul" (%2300,%2299) {shift = 0: i32} : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> tensor<16x3072xf32>
 # CHECK-NEXT:   %2302 = "tosa.add" (%2286,%2301) : (tensor<16x3072xf32>,tensor<16x3072xf32>) -> tensor<16x3072xf32>

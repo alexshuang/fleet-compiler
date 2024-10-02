@@ -7,6 +7,8 @@ from ..interfaces import ShapeInferenceOpInterface
 
 
 class SplatOp(Operation, ShapeInferenceOpInterface):
+    hasCanonicalizer = True
+
     def __init__(self, input: Value, output_type: Union[RankedTensorType | UnrankedTensorType]):
         super().__init__(operands=[input], result_types=[output_type])
 
@@ -14,6 +16,12 @@ class SplatOp(Operation, ShapeInferenceOpInterface):
         if isinstance(in_type := op.operands[0].type, UnrankedTensorType):
             raise ValueError(f"Invalid operand type: {in_type}")
         op.results[0].type = in_type
+    
+    def get_canonicalize_patterns(self):
+        from ..transforms.canonicalize_patterns.tosa import (
+            RemoveRedundantSplat
+        )
+        return [RemoveRedundantSplat()]
 
 
 class CastOp(Operation, ShapeInferenceOpInterface):

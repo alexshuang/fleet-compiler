@@ -104,3 +104,15 @@ class RemoveRedundantReshape(RewritePattern):
             rewriter.erase_op(op)
             return True
         return False
+
+
+class RemoveRedundantSplat(RewritePattern):
+    def match_and_rewrite(self, op: Operation, rewriter: PatternRewriter):
+        '''
+        %2232 = "tensor.splat" (%2390) : (i32) -> i32
+        '''
+        if op.operands[0].type == op.results[0].type:
+            rewriter.replace_all_uses_with(op.results[0], op.operands[0])
+            rewriter.erase_op(op)
+            return True
+        return False
