@@ -25,7 +25,7 @@ class VmCallOpImpl:
 class PrintOpLowering(RewritePattern, VmCallOpImpl):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: python.PrintOp, rewriter: PatternRewriter) -> bool:
-        return self.convert(op, rewriter, "print")
+        return self.convert(op, rewriter, "python.print")
 
 
 class MatmulOpLowering(RewritePattern, VmCallOpImpl):
