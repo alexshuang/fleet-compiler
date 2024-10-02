@@ -42,6 +42,9 @@ from fleet_compiler.ir.transforms.convert_math_to_vm import ConvertMathToVmPass
 from fleet_compiler.ir.transforms.convert_arith_to_vm import ConvertArithToVmPass
 from fleet_compiler.ir.transforms.set_target_info import SetTargetInfoPass
 
+from fleet_compiler.vm.bytecode import ByteCodeConverter
+from fleet_compiler.vm.vm import VM
+
 
 def create_dir(path: str):
     if os.path.isfile(path):
@@ -97,7 +100,8 @@ def main():
     parser = argparse.ArgumentParser(description='Compile python into AST/MLIR/bytecode')
 
     parser.add_argument('input', type=str, help='Input file path')
-    parser.add_argument('--target-backend', type=str, help='sycl, cuda, llvm-cpu, llvm-gpu')
+    parser.add_argument('--target-backend', type=str, default='python',
+                        help='python, sycl, cuda, llvm-cpu, llvm-gpu')
     parser.add_argument('--emitToken', action='store_true', help='emit *.token')
     parser.add_argument('--emitAST', action='store_true', help='emit *.ast')
     parser.add_argument('--emitMLIR', action='store_true', help='emit *.mlir')
@@ -110,6 +114,7 @@ def main():
     parser.add_argument('--dump-ir-before-pass', action='store_true', help='dump *.mlir')
     parser.add_argument('--dump-ir-after-pass', action='store_true', help='dump *.mlir')
     # parser.add_argument('--ir-elide-elementsattrs-if-larger', type=int, default=20, help='elide numpy array')
+    parser.add_argument('--vm', action='store_true', help='run bytecode with VM')
 
     args = parser.parse_args()
 
@@ -153,6 +158,7 @@ def main():
             save_output(args.output, lambda: ast_dumper(ast_module))
         else:
             ast_dumper(ast_module)
+        return
 
     module = ASTModuleImporter(ast_module).import_graph()
 
@@ -172,15 +178,16 @@ def main():
         pm.add(CanonicalizePass())
         pm.add(DeadCodeEliminationPass())
 
-        if args.target_backend:
-            pm.add(SetTargetInfoPass(args.target_backend))
-            if args.target_backend in ['sycl', 'cuda']:
-                pm.add(ConvertArithToVmPass())
-                pm.add(ConvertTensorToVmPass())
-                pm.add(ConvertMathToVmPass())
-                pm.add(ConvertTosaToVmPass())
-                pm.add(CanonicalizePass())
-                pm.add(DeadCodeEliminationPass())
+        if args.emitByteCode:
+            pm.add(ConvertArithToVmPass())
+            pm.add(ConvertTensorToVmPass())
+            pm.add(ConvertMathToVmPass())
+            pm.add(ConvertTosaToVmPass())
+            pm.add(CanonicalizePass())
+            pm.add(DeadCodeEliminationPass())
+
+            if args.target_backend:
+                pm.add(SetTargetInfoPass(args.target_backend))
 
         pm.run(module)
 
@@ -189,18 +196,26 @@ def main():
             save_output(args.output, lambda: module.dump())
         else:
             module.dump()
+        return
+
+    bc = ByteCodeConverter(module).convert()
+    if args.emitByteCode:
+        print(bc)
 
     if args.only_compile:
         return
 
-    interpreter = Interpreter()
-    interpreter.visit(ast_module)
+    if args.vm:
+        VM(bc).run()
+    else:
+        interpreter = Interpreter()
+        interpreter.visit(ast_module)
 
-    if args.validation:
-        if validate(args.input, ast_module, interpreter):
-            print("validation success!")
-        else:
-            print("validation failed!")
+        if args.validation:
+            if validate(args.input, ast_module, interpreter):
+                print("validation success!")
+            else:
+                print("validation failed!")
 
 
 if __name__ == "__main__":

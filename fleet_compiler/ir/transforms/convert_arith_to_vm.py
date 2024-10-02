@@ -59,9 +59,16 @@ class MulIOpLowering(RewritePattern, VmCallOpImpl):
         return self.convert(op, rewriter, "device.mul")
 
 
+class AddIOpLowering(RewritePattern, VmCallOpImpl):
+    @op_rewrite_pattern
+    def match_and_rewrite(self, op: arith.AddIOp, rewriter: PatternRewriter) -> bool:
+        return self.convert(op, rewriter, "device.add")
+
+
 class ConvertArithToVmPass(Pass):
     def run_on_operation(self, op: ModuleOp) -> None:
         RewritePatternApplier([ConstantOpLowering(),
+                               AddIOpLowering(),
                                SubIOpLowering(),
                                MulIOpLowering(),
                                DivSIOpLowering()]).apply(op)
