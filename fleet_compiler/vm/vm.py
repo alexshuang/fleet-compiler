@@ -18,27 +18,26 @@
 from __future__ import annotations
 from typing import Any, Iterable
 from dataclasses import dataclass, field
+import numpy as np
 
-from .bytecode import ByteCodeModule, OpCode
+from .bytecode import ByteCodeModule, OpCode, TypeCode
 from .dispatch import DispatchHintParser, DispatchInfo, get_dispatch_function
 
 
-@dataclass
 class StackFrame:
-    operand_stack: list = field(default_factory=list)
+    def __init__(self, variable_size) -> None:
+        self.operand_stack = []
+        self.local_variable = [None] * variable_size
 
 
 class VM:
     def __init__(self, bc: ByteCodeModule) -> None:
         self.bc = bc
-        self.stackframe = StackFrame()
+        self.stackframe = StackFrame(self.bc.variable_size)
         self.current_stackframe = self.stackframe # should only main stackframe
     
     def push_operand(self, val: Any):
-        if isinstance(val, Iterable):
-            self.current_stackframe.operand_stack.extend(val)
-        else:
-            self.current_stackframe.operand_stack.append(val)
+        self.current_stackframe.operand_stack.append(val)
 
     def pop_operand(self):
         return self.current_stackframe.operand_stack.pop()
@@ -78,21 +77,133 @@ class VM:
                 self.push_operand(5)
                 idx += 1
             elif self.bc.code[idx] == OpCode.ldc:
-                val = self.bc.consts[self.bc.code[idx+1]]
-                self.push_operand(val)
-                idx += 2
+                tcode = self.bc.code[idx+1]
+                if tcode == TypeCode.scalar:
+                    val = self.bc.consts[self.bc.code[idx+2]]
+                    self.push_operand(val)
+                    idx += 3
+                elif tcode == TypeCode.tensor:
+                    num_ranks = self.bc.code[idx+2]
+                    shape = [self.bc.code[i] for i in range(idx+3, idx+3+num_ranks)]
+                    # element type: idx+3+num_ranks, unused here
+                    val = self.bc.consts[self.bc.code[idx+3+num_ranks+1]]
+                    if isinstance(val, Iterable):
+                        val = np.reshape(val, shape)
+                    else:
+                        val = np.full(shape, val)
+                    self.push_operand(val)
+                    idx += 3+num_ranks+2
+                else:
+                    raise ValueError(f"Unsupported data type: {tcode}")
             elif self.bc.code[idx] == OpCode.invokestatic:
                 hint = self.bc.consts[self.bc.code[idx+1]]
                 disp_info = DispatchHintParser(hint).parse()
                 disp_info.target = self.bc.target
                 self.invoke(disp_info)
                 idx += 2
+            elif self.bc.code[idx] == OpCode.iload:
+                self.push_operand(self.current_stackframe.local_variable[self.bc.code[idx+1]])
+                idx += 2
+            elif self.bc.code[idx] == OpCode.iload_0:
+                self.push_operand(self.current_stackframe.local_variable[0])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.iload_1:
+                self.push_operand(self.current_stackframe.local_variable[1])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.iload_2:
+                self.push_operand(self.current_stackframe.local_variable[2])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.iload_3:
+                self.push_operand(self.current_stackframe.local_variable[3])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fload:
+                self.push_operand(self.current_stackframe.local_variable[self.bc.code[idx+1]])
+                idx += 2
+            elif self.bc.code[idx] == OpCode.fload_0:
+                self.push_operand(self.current_stackframe.local_variable[0])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fload_1:
+                self.push_operand(self.current_stackframe.local_variable[1])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fload_2:
+                self.push_operand(self.current_stackframe.local_variable[2])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fload_3:
+                self.push_operand(self.current_stackframe.local_variable[3])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.aload:
+                self.push_operand(self.current_stackframe.local_variable[self.bc.code[idx+1]])
+                idx += 2
+            elif self.bc.code[idx] == OpCode.aload_0:
+                self.push_operand(self.current_stackframe.local_variable[0])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.aload_1:
+                self.push_operand(self.current_stackframe.local_variable[1])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.aload_2:
+                self.push_operand(self.current_stackframe.local_variable[2])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.aload_3:
+                self.push_operand(self.current_stackframe.local_variable[3])
+                idx += 1
+            elif self.bc.code[idx] == OpCode.astore:
+                self.current_stackframe.local_variable[self.bc.code[idx+1]] = self.pop_operand()
+                idx += 2
+            elif self.bc.code[idx] == OpCode.astore_0:
+                self.current_stackframe.local_variable[0] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.astore_1:
+                self.current_stackframe.local_variable[1] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.astore_2:
+                self.current_stackframe.local_variable[2] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.astore_3:
+                self.current_stackframe.local_variable[3] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.istore:
+                self.current_stackframe.local_variable[self.bc.code[idx+1]] = self.pop_operand()
+                idx += 2
+            elif self.bc.code[idx] == OpCode.istore_0:
+                self.current_stackframe.local_variable[0] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.istore_1:
+                self.current_stackframe.local_variable[1] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.istore_2:
+                self.current_stackframe.local_variable[2] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.istore_3:
+                self.current_stackframe.local_variable[3] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fstore:
+                self.current_stackframe.local_variable[self.bc.code[idx+1]] = self.pop_operand()
+                idx += 2
+            elif self.bc.code[idx] == OpCode.fstore_0:
+                self.current_stackframe.local_variable[0] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fstore_1:
+                self.current_stackframe.local_variable[1] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fstore_2:
+                self.current_stackframe.local_variable[2] = self.pop_operand()
+                idx += 1
+            elif self.bc.code[idx] == OpCode.fstore_3:
+                self.current_stackframe.local_variable[3] = self.pop_operand()
+                idx += 1
             else:
                 raise NotImplementedError(f"opcode: {self.bc.code[idx]}, index: {idx}")
     
     def invoke(self, info: DispatchInfo):
         num_args = len(info.sig[0])
         args = [self.pop_operand() for _ in range(num_args)]
+        # Due to the first-in-last-out stack,
+        # a reversal is required to get the correct order
+        args.reverse()
         func = get_dispatch_function(info)
         out = func(*args)
-        self.push_operand(out)
+        if isinstance(out, list | tuple):
+            for o in out:
+                self.push_operand(o)
+        else:
+            self.push_operand(out)

@@ -8,8 +8,9 @@ from ..dialects.func import FlatSymbolRefAttr
 
 
 class VmCallOpImpl:
-    def convert(self, op: Operation, rewriter: PatternRewriter, sym_name: str = None):
-        attrs = op.attributes.copy()
+    def convert(self, op: Operation, rewriter: PatternRewriter, sym_name: str = None,
+                attrs: dict[str, Attribute] = None):
+        attrs = op.attributes.copy() if attrs is None else attrs
         if not sym_name:
             sym_name = f"device.{op.name.split('.')[-1]}"
         attrs['callee'] = FlatSymbolRefAttr(StringAttr(sym_name))
@@ -55,7 +56,7 @@ class SubOpLowering(RewritePattern, VmCallOpImpl):
 class MulOpLowering(RewritePattern, VmCallOpImpl):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: tosa.MulOp, rewriter: PatternRewriter) -> bool:
-        return self.convert(op, rewriter)
+        return self.convert(op, rewriter, attrs={})
 
 
 class ReciprocalOpLowering(RewritePattern, VmCallOpImpl):
@@ -97,6 +98,12 @@ class CastOpOpLowering(RewritePattern, VmCallOpImpl):
 class TanhOpLowering(RewritePattern, VmCallOpImpl):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: tosa.TanhOp, rewriter: PatternRewriter) -> bool:
+        return self.convert(op, rewriter)
+
+
+class ReshapeOpLowering(RewritePattern, VmCallOpImpl):
+    @op_rewrite_pattern
+    def match_and_rewrite(self, op: tosa.ReshapeOp, rewriter: PatternRewriter) -> bool:
         return self.convert(op, rewriter)
 
 
@@ -145,4 +152,5 @@ class ConvertTosaToVmPass(Pass):
                                ConcatOpLowering(),
                                ExpOpLowering(),
                                TanhOpLowering(),
+                               ReshapeOpLowering(),
                                TransposeOpLowering()]).apply(op)

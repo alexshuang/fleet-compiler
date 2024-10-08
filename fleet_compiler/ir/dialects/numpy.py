@@ -94,7 +94,9 @@ class MeanOp(Operation, ShapeInferenceOpInterface):
             attrs['keepdims'] = BoolAttr(keepdims_value)
 
         if input_dims:
-            output_dims = input_dims[axis_value]
+            output_dims = input_dims.copy()
+            idxs = range(len(output_dims))
+            output_dims[idxs[axis_value[0]]] = 1
             output_type = RankedTensorType(output_dims, input_type.element_type)
         else:
             output_type = UnrankedTensorType(input_type.element_type)
@@ -140,7 +142,9 @@ class VarOp(Operation, ShapeInferenceOpInterface):
             attrs['keepdims'] = BoolAttr(keepdims_value)
 
         if input_dims:
-            output_dims = input_dims[axis_value]
+            output_dims = input_dims.copy()
+            idxs = range(len(output_dims))
+            output_dims[idxs[axis_value[0]]] = 1
             output_type = RankedTensorType(output_dims, input_type.element_type)
         else:
             output_type = UnrankedTensorType(input_type.element_type)
