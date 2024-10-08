@@ -23,7 +23,6 @@ class MeanOpLowering(RewritePattern):
         assert isinstance((axis_attr := op.attributes['axis']), ArrayAttr) and \
                 axis_attr.type.dims == 1, "Not support multi axis mean."
 
-        # reduce_sum_attrs = {'axis': IntegerAttr(axis_attr.value[0], IntegerType(64, True))}
         reduce_sum_attrs = op.attributes
         reduced = tosa.ReduceSumOp(op.operands[0], reduce_sum_attrs)
         rewriter.insert_op_before(op, reduced)
@@ -60,7 +59,6 @@ class VarOpLowering(RewritePattern):
         assert isinstance((axis_attr := op.attributes['axis']), ArrayAttr) and \
                 axis_attr.type.dims == 1, "Not support multi axis mean."
 
-        # reduce_sum_attrs = {'axis': IntegerAttr(axis_attr.value[0], IntegerType(64, True))}
         reduce_sum_attrs = op.attributes
         reduced = tosa.ReduceSumOp(op.operands[0], reduce_sum_attrs)
         rewriter.insert_op_before(op, reduced)
@@ -174,7 +172,6 @@ class ExpOpLowering(RewritePattern):
 class MaxOpLowering(RewritePattern):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: MaxOp, rewriter: PatternRewriter) -> bool:
-        # new_op = tosa.ReduceMaxOp(op.operands[0], {'axis': op.attributes['axis']})
         new_op = tosa.ReduceMaxOp(op.operands[0], op.attributes)
         rewriter.replace_op(op, new_op.results)
         rewriter.erase_op(op)
@@ -184,7 +181,6 @@ class MaxOpLowering(RewritePattern):
 class SumOpLowering(RewritePattern):
     @op_rewrite_pattern
     def match_and_rewrite(self, op: SumOp, rewriter: PatternRewriter) -> bool:
-        # new_op = tosa.ReduceSumOp(op.operands[0], {'axis': op.attributes['axis']})
         new_op = tosa.ReduceSumOp(op.operands[0], op.attributes)
         rewriter.replace_op(op, new_op.results)
         rewriter.erase_op(op)

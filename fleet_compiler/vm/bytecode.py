@@ -245,7 +245,6 @@ class ByteCodeConverter:
             assert (idx := self.var_index_of(op.results[0].name)) >= 0
             add_load_code(op.results[0].type, idx)
         else:
-            import pdb; pdb.set_trace()
             raise NotImplementedError
     
     def _handle_result(self, result: OpResult):
