@@ -132,26 +132,26 @@ print(y)
 # CHECK-NEXT:   %1774 = "arith.constant" () {value = 1e-05: f32} : () -> f32
 # CHECK-NEXT:   %1775 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1776 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2394 = "tosa.reduce_sum" (%1768) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2566 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2397 = "tosa.reciprocal" (%2566) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2394 = "tosa.reduce_sum" (%1768) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2605 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2397 = "tosa.reciprocal" (%2605) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2398 = "tosa.mul" (%2394,%2397) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1778 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1779 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2530 = "tosa.reduce_sum" (%1768) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2567 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2533 = "tosa.reciprocal" (%2567) : (tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2534 = "tosa.mul" (%2530,%2533) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2536 = "tosa.cast" (%2534) : (tensor<16x1xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2537 = "tosa.sub" (%1768,%2536) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2538 = "tosa.mul" (%2537,%2537) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2539 = "tosa.reduce_sum" (%1768) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2540 = "tosa.mul" (%2539,%2533) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2569 = "tosa.reduce_sum" (%1768) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2606 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2572 = "tosa.reciprocal" (%2606) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2573 = "tosa.mul" (%2569,%2572) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2575 = "tosa.cast" (%2573) : (tensor<16x1xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2576 = "tosa.sub" (%1768,%2575) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2577 = "tosa.mul" (%2576,%2576) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2578 = "tosa.reduce_sum" (%2577) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2579 = "tosa.mul" (%2578,%2572) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1781 = "tosa.sub" (%1768,%2398) : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1782 = "tensor.splat" (%1773) : (f32) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1783 = "tosa.mul" (%1782,%1781) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1784 = "tensor.splat" (%1772) : (f32) -> tensor<16x1xf32>
-# CHECK-NEXT:   %1785 = "tosa.add" (%2540,%1784) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %1785 = "tosa.add" (%2579,%1784) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2378 = "math.sqrt" (%1785) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1787 = "tosa.reciprocal" (%2378) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1788 = "tosa.mul" (%1783,%1787) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
@@ -364,55 +364,94 @@ print(y)
 # CHECK-NEXT:   %2487 = "tosa.slice" (%1804) {start = [0, 0],size = [16, 768]} : (tensor<16x2304xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2488 = "tosa.slice" (%1804) {start = [0, 768],size = [16, 768]} : (tensor<16x2304xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2489 = "tosa.slice" (%1804) {start = [0, 1536],size = [16, 768]} : (tensor<16x2304xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2490 = "tosa.concat" (%2487,%2488,%2489) {axis = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<3x16x768xf32>
+# CHECK-NEXT:   %2490 = "tosa.reshape" (%2487) {new_shape = [1, 16, 768]} : (tensor<16x768xf32>) -> tensor<1x16x768xf32>
+# CHECK-NEXT:   %2491 = "tosa.reshape" (%2488) {new_shape = [1, 16, 768]} : (tensor<16x768xf32>) -> tensor<1x16x768xf32>
+# CHECK-NEXT:   %2492 = "tosa.reshape" (%2489) {new_shape = [1, 16, 768]} : (tensor<16x768xf32>) -> tensor<1x16x768xf32>
+# CHECK-NEXT:   %2493 = "tosa.concat" (%2490,%2491,%2492) {axis = 0: i32} : (tensor<1x16x768xf32>,tensor<1x16x768xf32>,tensor<1x16x768xf32>) -> tensor<3x16x768xf32>
 # CHECK-NEXT:   %2339 = "tosa.const" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1810 = "tosa.gather" (%2490,%2339) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %1810 = "tosa.gather" (%2493,%2339) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1811 = "arith.constant" () {value = -1: i32} : () -> i32
-# CHECK-NEXT:   %2491 = "tosa.slice" (%1810) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2492 = "tosa.slice" (%1810) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2493 = "tosa.slice" (%1810) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2494 = "tosa.slice" (%1810) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2495 = "tosa.slice" (%1810) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2496 = "tosa.slice" (%1810) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2497 = "tosa.slice" (%1810) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2498 = "tosa.slice" (%1810) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2499 = "tosa.slice" (%1810) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2500 = "tosa.slice" (%1810) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2501 = "tosa.slice" (%1810) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2502 = "tosa.slice" (%1810) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2503 = "tosa.concat" (%2491,%2492,%2493,%2494,%2495,%2496,%2497,%2498,%2499,%2500,%2501,%2502) {axis = 0: i32} : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> tensor<12x16x64xf32>
+# CHECK-NEXT:   %2494 = "tosa.slice" (%1810) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2495 = "tosa.slice" (%1810) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2496 = "tosa.slice" (%1810) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2497 = "tosa.slice" (%1810) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2498 = "tosa.slice" (%1810) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2499 = "tosa.slice" (%1810) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2500 = "tosa.slice" (%1810) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2501 = "tosa.slice" (%1810) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2502 = "tosa.slice" (%1810) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2503 = "tosa.slice" (%1810) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2504 = "tosa.slice" (%1810) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2505 = "tosa.slice" (%1810) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2506 = "tosa.reshape" (%2494) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2507 = "tosa.reshape" (%2495) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2508 = "tosa.reshape" (%2496) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2509 = "tosa.reshape" (%2497) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2510 = "tosa.reshape" (%2498) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2511 = "tosa.reshape" (%2499) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2512 = "tosa.reshape" (%2500) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2513 = "tosa.reshape" (%2501) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2514 = "tosa.reshape" (%2502) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2515 = "tosa.reshape" (%2503) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2516 = "tosa.reshape" (%2504) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2517 = "tosa.reshape" (%2505) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2518 = "tosa.concat" (%2506,%2507,%2508,%2509,%2510,%2511,%2512,%2513,%2514,%2515,%2516,%2517) {axis = 0: i32} : (tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>) -> tensor<12x16x64xf32>
 # CHECK-NEXT:   %2340 = "tosa.const" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1815 = "tosa.gather" (%2490,%2340) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %1815 = "tosa.gather" (%2493,%2340) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1816 = "arith.constant" () {value = -1: i32} : () -> i32
-# CHECK-NEXT:   %2504 = "tosa.slice" (%1815) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2505 = "tosa.slice" (%1815) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2506 = "tosa.slice" (%1815) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2507 = "tosa.slice" (%1815) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2508 = "tosa.slice" (%1815) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2509 = "tosa.slice" (%1815) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2510 = "tosa.slice" (%1815) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2511 = "tosa.slice" (%1815) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2512 = "tosa.slice" (%1815) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2513 = "tosa.slice" (%1815) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2514 = "tosa.slice" (%1815) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2515 = "tosa.slice" (%1815) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2516 = "tosa.concat" (%2504,%2505,%2506,%2507,%2508,%2509,%2510,%2511,%2512,%2513,%2514,%2515) {axis = 0: i32} : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> tensor<12x16x64xf32>
+# CHECK-NEXT:   %2519 = "tosa.slice" (%1815) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2520 = "tosa.slice" (%1815) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2521 = "tosa.slice" (%1815) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2522 = "tosa.slice" (%1815) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2523 = "tosa.slice" (%1815) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2524 = "tosa.slice" (%1815) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2525 = "tosa.slice" (%1815) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2526 = "tosa.slice" (%1815) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2527 = "tosa.slice" (%1815) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2528 = "tosa.slice" (%1815) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2529 = "tosa.slice" (%1815) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2530 = "tosa.slice" (%1815) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2531 = "tosa.reshape" (%2519) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2532 = "tosa.reshape" (%2520) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2533 = "tosa.reshape" (%2521) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2534 = "tosa.reshape" (%2522) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2535 = "tosa.reshape" (%2523) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2536 = "tosa.reshape" (%2524) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2537 = "tosa.reshape" (%2525) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2538 = "tosa.reshape" (%2526) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2539 = "tosa.reshape" (%2527) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2540 = "tosa.reshape" (%2528) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2541 = "tosa.reshape" (%2529) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2542 = "tosa.reshape" (%2530) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2543 = "tosa.concat" (%2531,%2532,%2533,%2534,%2535,%2536,%2537,%2538,%2539,%2540,%2541,%2542) {axis = 0: i32} : (tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>) -> tensor<12x16x64xf32>
 # CHECK-NEXT:   %2341 = "tosa.const" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1820 = "tosa.gather" (%2490,%2341) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %1820 = "tosa.gather" (%2493,%2341) : (tensor<3x16x768xf32>,tensor<1xi32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %1821 = "arith.constant" () {value = -1: i32} : () -> i32
-# CHECK-NEXT:   %2517 = "tosa.slice" (%1820) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2518 = "tosa.slice" (%1820) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2519 = "tosa.slice" (%1820) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2520 = "tosa.slice" (%1820) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2521 = "tosa.slice" (%1820) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2522 = "tosa.slice" (%1820) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2523 = "tosa.slice" (%1820) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2524 = "tosa.slice" (%1820) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2525 = "tosa.slice" (%1820) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2526 = "tosa.slice" (%1820) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2527 = "tosa.slice" (%1820) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2528 = "tosa.slice" (%1820) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
-# CHECK-NEXT:   %2529 = "tosa.concat" (%2517,%2518,%2519,%2520,%2521,%2522,%2523,%2524,%2525,%2526,%2527,%2528) {axis = 0: i32} : (tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>,tensor<16x64xf32>) -> tensor<12x16x64xf32>
+# CHECK-NEXT:   %2544 = "tosa.slice" (%1820) {start = [0, 0],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2545 = "tosa.slice" (%1820) {start = [0, 64],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2546 = "tosa.slice" (%1820) {start = [0, 128],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2547 = "tosa.slice" (%1820) {start = [0, 192],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2548 = "tosa.slice" (%1820) {start = [0, 256],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2549 = "tosa.slice" (%1820) {start = [0, 320],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2550 = "tosa.slice" (%1820) {start = [0, 384],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2551 = "tosa.slice" (%1820) {start = [0, 448],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2552 = "tosa.slice" (%1820) {start = [0, 512],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2553 = "tosa.slice" (%1820) {start = [0, 576],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2554 = "tosa.slice" (%1820) {start = [0, 640],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2555 = "tosa.slice" (%1820) {start = [0, 704],size = [16, 64]} : (tensor<16x768xf32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2556 = "tosa.reshape" (%2544) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2557 = "tosa.reshape" (%2545) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2558 = "tosa.reshape" (%2546) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2559 = "tosa.reshape" (%2547) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2560 = "tosa.reshape" (%2548) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2561 = "tosa.reshape" (%2549) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2562 = "tosa.reshape" (%2550) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2563 = "tosa.reshape" (%2551) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2564 = "tosa.reshape" (%2552) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2565 = "tosa.reshape" (%2553) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2566 = "tosa.reshape" (%2554) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2567 = "tosa.reshape" (%2555) {new_shape = [1, 16, 64]} : (tensor<16x64xf32>) -> tensor<1x16x64xf32>
+# CHECK-NEXT:   %2568 = "tosa.concat" (%2556,%2557,%2558,%2559,%2560,%2561,%2562,%2563,%2564,%2565,%2566,%2567) {axis = 0: i32} : (tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>,tensor<1x16x64xf32>) -> tensor<12x16x64xf32>
 # CHECK-NEXT:   %1823 = "arith.constant" () {value = 1: i32} : () -> i32
 # CHECK-NEXT:   %2448 = "tosa.const" () {value = dense<[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 0. 0. 0. 0. 0. 0.
 # CHECK-NEXT:  0. 0. 0. 0. 0. 0. 0. 0. 1. 1. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
@@ -429,11 +468,11 @@ print(y)
 # CHECK-NEXT:   %1826 = "arith.constant" () {value = -1e-10: f32} : () -> f32
 # CHECK-NEXT:   %1827 = "arith.muli" (%1825,%1826) : (i32,f32) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2342 = "tosa.const" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1830 = "tosa.gather" (%2503,%2342) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1830 = "tosa.gather" (%2518,%2342) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2343 = "tosa.const" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1833 = "tosa.gather" (%2516,%2343) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1833 = "tosa.gather" (%2543,%2343) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2344 = "tosa.const" () {value = dense<[0]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1836 = "tosa.gather" (%2529,%2344) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1836 = "tosa.gather" (%2568,%2344) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %1841 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %1842 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %1843 = "arith.divsi" (%1841,%1842) : (i32,i32) -> i32
@@ -446,21 +485,21 @@ print(y)
 # CHECK-NEXT:   %1850 = "tosa.add" (%1849,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1852 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1853 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2462 = "tosa.reduce_max" (%1850) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2462 = "tosa.reduce_max" (%1850) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1855 = "tosa.sub" (%1850,%2462) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2450 = "tosa.exp" (%1855) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1857 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1858 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2474 = "tosa.reduce_sum" (%2450) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2474 = "tosa.reduce_sum" (%2450) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1860 = "tosa.reciprocal" (%2474) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1861 = "tosa.mul" (%2450,%1860) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1862 = "tosa.matmul" (%1861,%1836) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2345 = "tosa.const" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1865 = "tosa.gather" (%2503,%2345) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1865 = "tosa.gather" (%2518,%2345) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2346 = "tosa.const" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1868 = "tosa.gather" (%2516,%2346) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1868 = "tosa.gather" (%2543,%2346) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2347 = "tosa.const" () {value = dense<[1]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1871 = "tosa.gather" (%2529,%2347) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1871 = "tosa.gather" (%2568,%2347) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %1876 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %1877 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %1878 = "arith.divsi" (%1876,%1877) : (i32,i32) -> i32
@@ -473,21 +512,21 @@ print(y)
 # CHECK-NEXT:   %1885 = "tosa.add" (%1884,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1887 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1888 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2463 = "tosa.reduce_max" (%1885) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2463 = "tosa.reduce_max" (%1885) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1890 = "tosa.sub" (%1885,%2463) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2451 = "tosa.exp" (%1890) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1892 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1893 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2475 = "tosa.reduce_sum" (%2451) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2475 = "tosa.reduce_sum" (%2451) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1895 = "tosa.reciprocal" (%2475) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1896 = "tosa.mul" (%2451,%1895) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1897 = "tosa.matmul" (%1896,%1871) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2348 = "tosa.const" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1900 = "tosa.gather" (%2503,%2348) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1900 = "tosa.gather" (%2518,%2348) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2349 = "tosa.const" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1903 = "tosa.gather" (%2516,%2349) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1903 = "tosa.gather" (%2543,%2349) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2350 = "tosa.const" () {value = dense<[2]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1906 = "tosa.gather" (%2529,%2350) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1906 = "tosa.gather" (%2568,%2350) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %1911 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %1912 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %1913 = "arith.divsi" (%1911,%1912) : (i32,i32) -> i32
@@ -500,21 +539,21 @@ print(y)
 # CHECK-NEXT:   %1920 = "tosa.add" (%1919,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1922 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1923 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2464 = "tosa.reduce_max" (%1920) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2464 = "tosa.reduce_max" (%1920) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1925 = "tosa.sub" (%1920,%2464) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2452 = "tosa.exp" (%1925) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1927 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1928 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2476 = "tosa.reduce_sum" (%2452) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2476 = "tosa.reduce_sum" (%2452) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1930 = "tosa.reciprocal" (%2476) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1931 = "tosa.mul" (%2452,%1930) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1932 = "tosa.matmul" (%1931,%1906) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2351 = "tosa.const" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1935 = "tosa.gather" (%2503,%2351) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1935 = "tosa.gather" (%2518,%2351) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2352 = "tosa.const" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1938 = "tosa.gather" (%2516,%2352) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1938 = "tosa.gather" (%2543,%2352) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2353 = "tosa.const" () {value = dense<[3]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1941 = "tosa.gather" (%2529,%2353) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1941 = "tosa.gather" (%2568,%2353) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %1946 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %1947 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %1948 = "arith.divsi" (%1946,%1947) : (i32,i32) -> i32
@@ -527,21 +566,21 @@ print(y)
 # CHECK-NEXT:   %1955 = "tosa.add" (%1954,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1957 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1958 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2465 = "tosa.reduce_max" (%1955) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2465 = "tosa.reduce_max" (%1955) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1960 = "tosa.sub" (%1955,%2465) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2453 = "tosa.exp" (%1960) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1962 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1963 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2477 = "tosa.reduce_sum" (%2453) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2477 = "tosa.reduce_sum" (%2453) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1965 = "tosa.reciprocal" (%2477) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1966 = "tosa.mul" (%2453,%1965) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1967 = "tosa.matmul" (%1966,%1941) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2354 = "tosa.const" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1970 = "tosa.gather" (%2503,%2354) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1970 = "tosa.gather" (%2518,%2354) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2355 = "tosa.const" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1973 = "tosa.gather" (%2516,%2355) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1973 = "tosa.gather" (%2543,%2355) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2356 = "tosa.const" () {value = dense<[4]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %1976 = "tosa.gather" (%2529,%2356) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %1976 = "tosa.gather" (%2568,%2356) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %1981 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %1982 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %1983 = "arith.divsi" (%1981,%1982) : (i32,i32) -> i32
@@ -554,21 +593,21 @@ print(y)
 # CHECK-NEXT:   %1990 = "tosa.add" (%1989,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1992 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1993 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2466 = "tosa.reduce_max" (%1990) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2466 = "tosa.reduce_max" (%1990) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %1995 = "tosa.sub" (%1990,%2466) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2454 = "tosa.exp" (%1995) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %1997 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %1998 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2478 = "tosa.reduce_sum" (%2454) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2478 = "tosa.reduce_sum" (%2454) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2000 = "tosa.reciprocal" (%2478) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2001 = "tosa.mul" (%2454,%2000) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2002 = "tosa.matmul" (%2001,%1976) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2357 = "tosa.const" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2005 = "tosa.gather" (%2503,%2357) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2005 = "tosa.gather" (%2518,%2357) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2358 = "tosa.const" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2008 = "tosa.gather" (%2516,%2358) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2008 = "tosa.gather" (%2543,%2358) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2359 = "tosa.const" () {value = dense<[5]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2011 = "tosa.gather" (%2529,%2359) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2011 = "tosa.gather" (%2568,%2359) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2016 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2017 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2018 = "arith.divsi" (%2016,%2017) : (i32,i32) -> i32
@@ -581,21 +620,21 @@ print(y)
 # CHECK-NEXT:   %2025 = "tosa.add" (%2024,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2027 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2028 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2467 = "tosa.reduce_max" (%2025) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2467 = "tosa.reduce_max" (%2025) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2030 = "tosa.sub" (%2025,%2467) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2455 = "tosa.exp" (%2030) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2032 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2033 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2479 = "tosa.reduce_sum" (%2455) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2479 = "tosa.reduce_sum" (%2455) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2035 = "tosa.reciprocal" (%2479) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2036 = "tosa.mul" (%2455,%2035) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2037 = "tosa.matmul" (%2036,%2011) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2360 = "tosa.const" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2040 = "tosa.gather" (%2503,%2360) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2040 = "tosa.gather" (%2518,%2360) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2361 = "tosa.const" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2043 = "tosa.gather" (%2516,%2361) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2043 = "tosa.gather" (%2543,%2361) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2362 = "tosa.const" () {value = dense<[6]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2046 = "tosa.gather" (%2529,%2362) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2046 = "tosa.gather" (%2568,%2362) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2051 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2052 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2053 = "arith.divsi" (%2051,%2052) : (i32,i32) -> i32
@@ -608,21 +647,21 @@ print(y)
 # CHECK-NEXT:   %2060 = "tosa.add" (%2059,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2062 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2063 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2468 = "tosa.reduce_max" (%2060) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2468 = "tosa.reduce_max" (%2060) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2065 = "tosa.sub" (%2060,%2468) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2456 = "tosa.exp" (%2065) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2067 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2068 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2480 = "tosa.reduce_sum" (%2456) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2480 = "tosa.reduce_sum" (%2456) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2070 = "tosa.reciprocal" (%2480) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2071 = "tosa.mul" (%2456,%2070) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2072 = "tosa.matmul" (%2071,%2046) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2363 = "tosa.const" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2075 = "tosa.gather" (%2503,%2363) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2075 = "tosa.gather" (%2518,%2363) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2364 = "tosa.const" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2078 = "tosa.gather" (%2516,%2364) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2078 = "tosa.gather" (%2543,%2364) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2365 = "tosa.const" () {value = dense<[7]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2081 = "tosa.gather" (%2529,%2365) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2081 = "tosa.gather" (%2568,%2365) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2086 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2087 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2088 = "arith.divsi" (%2086,%2087) : (i32,i32) -> i32
@@ -635,21 +674,21 @@ print(y)
 # CHECK-NEXT:   %2095 = "tosa.add" (%2094,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2097 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2098 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2469 = "tosa.reduce_max" (%2095) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2469 = "tosa.reduce_max" (%2095) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2100 = "tosa.sub" (%2095,%2469) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2457 = "tosa.exp" (%2100) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2102 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2103 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2481 = "tosa.reduce_sum" (%2457) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2481 = "tosa.reduce_sum" (%2457) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2105 = "tosa.reciprocal" (%2481) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2106 = "tosa.mul" (%2457,%2105) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2107 = "tosa.matmul" (%2106,%2081) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2366 = "tosa.const" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2110 = "tosa.gather" (%2503,%2366) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2110 = "tosa.gather" (%2518,%2366) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2367 = "tosa.const" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2113 = "tosa.gather" (%2516,%2367) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2113 = "tosa.gather" (%2543,%2367) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2368 = "tosa.const" () {value = dense<[8]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2116 = "tosa.gather" (%2529,%2368) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2116 = "tosa.gather" (%2568,%2368) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2121 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2122 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2123 = "arith.divsi" (%2121,%2122) : (i32,i32) -> i32
@@ -662,21 +701,21 @@ print(y)
 # CHECK-NEXT:   %2130 = "tosa.add" (%2129,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2132 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2133 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2470 = "tosa.reduce_max" (%2130) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2470 = "tosa.reduce_max" (%2130) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2135 = "tosa.sub" (%2130,%2470) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2458 = "tosa.exp" (%2135) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2137 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2138 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2482 = "tosa.reduce_sum" (%2458) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2482 = "tosa.reduce_sum" (%2458) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2140 = "tosa.reciprocal" (%2482) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2141 = "tosa.mul" (%2458,%2140) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2142 = "tosa.matmul" (%2141,%2116) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2369 = "tosa.const" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2145 = "tosa.gather" (%2503,%2369) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2145 = "tosa.gather" (%2518,%2369) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2370 = "tosa.const" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2148 = "tosa.gather" (%2516,%2370) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2148 = "tosa.gather" (%2543,%2370) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2371 = "tosa.const" () {value = dense<[9]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2151 = "tosa.gather" (%2529,%2371) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2151 = "tosa.gather" (%2568,%2371) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2156 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2157 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2158 = "arith.divsi" (%2156,%2157) : (i32,i32) -> i32
@@ -689,21 +728,21 @@ print(y)
 # CHECK-NEXT:   %2165 = "tosa.add" (%2164,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2167 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2168 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2471 = "tosa.reduce_max" (%2165) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2471 = "tosa.reduce_max" (%2165) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2170 = "tosa.sub" (%2165,%2471) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2459 = "tosa.exp" (%2170) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2172 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2173 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2483 = "tosa.reduce_sum" (%2459) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2483 = "tosa.reduce_sum" (%2459) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2175 = "tosa.reciprocal" (%2483) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2176 = "tosa.mul" (%2459,%2175) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2177 = "tosa.matmul" (%2176,%2151) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2372 = "tosa.const" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2180 = "tosa.gather" (%2503,%2372) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2180 = "tosa.gather" (%2518,%2372) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2373 = "tosa.const" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2183 = "tosa.gather" (%2516,%2373) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2183 = "tosa.gather" (%2543,%2373) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2374 = "tosa.const" () {value = dense<[10]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2186 = "tosa.gather" (%2529,%2374) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2186 = "tosa.gather" (%2568,%2374) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2191 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2192 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2193 = "arith.divsi" (%2191,%2192) : (i32,i32) -> i32
@@ -716,21 +755,21 @@ print(y)
 # CHECK-NEXT:   %2200 = "tosa.add" (%2199,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2202 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2203 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2472 = "tosa.reduce_max" (%2200) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2472 = "tosa.reduce_max" (%2200) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2205 = "tosa.sub" (%2200,%2472) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2460 = "tosa.exp" (%2205) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2207 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2208 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2484 = "tosa.reduce_sum" (%2460) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2484 = "tosa.reduce_sum" (%2460) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2210 = "tosa.reciprocal" (%2484) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2211 = "tosa.mul" (%2460,%2210) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2212 = "tosa.matmul" (%2211,%2186) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2375 = "tosa.const" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2215 = "tosa.gather" (%2503,%2375) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2215 = "tosa.gather" (%2518,%2375) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2376 = "tosa.const" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2218 = "tosa.gather" (%2516,%2376) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2218 = "tosa.gather" (%2543,%2376) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2377 = "tosa.const" () {value = dense<[11]>: tensor<1xi32>} : () -> tensor<1xi32>
-# CHECK-NEXT:   %2221 = "tosa.gather" (%2529,%2377) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
+# CHECK-NEXT:   %2221 = "tosa.gather" (%2568,%2377) : (tensor<12x16x64xf32>,tensor<1xi32>) -> tensor<16x64xf32>
 # CHECK-NEXT:   %2226 = "arith.constant" () {value = 768: i32} : () -> i32
 # CHECK-NEXT:   %2227 = "arith.constant" () {value = 12: i32} : () -> i32
 # CHECK-NEXT:   %2228 = "arith.divsi" (%2226,%2227) : (i32,i32) -> i32
@@ -743,12 +782,12 @@ print(y)
 # CHECK-NEXT:   %2235 = "tosa.add" (%2234,%1827) : (tensor<16x16xf32>,tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2237 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2238 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2473 = "tosa.reduce_max" (%2235) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2473 = "tosa.reduce_max" (%2235) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2240 = "tosa.sub" (%2235,%2473) : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2461 = "tosa.exp" (%2240) : (tensor<16x16xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2242 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2243 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2485 = "tosa.reduce_sum" (%2461) {axis = [-1]} : (tensor<16x16xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2485 = "tosa.reduce_sum" (%2461) {axis = [-1],keepdims = true} : (tensor<16x16xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2245 = "tosa.reciprocal" (%2485) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2246 = "tosa.mul" (%2461,%2245) {shift = 0: i32} : (tensor<16x16xf32>,tensor<16x1xf32>) -> tensor<16x16xf32>
 # CHECK-NEXT:   %2247 = "tosa.matmul" (%2246,%2221) : (tensor<16x16xf32>,tensor<16x64xf32>) -> tensor<16x64xf32>
@@ -761,26 +800,26 @@ print(y)
 # CHECK-NEXT:   %2258 = "arith.constant" () {value = 1e-05: f32} : () -> f32
 # CHECK-NEXT:   %2259 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2260 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2400 = "tosa.reduce_sum" (%2254) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2568 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2403 = "tosa.reciprocal" (%2568) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2400 = "tosa.reduce_sum" (%2254) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2607 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2403 = "tosa.reciprocal" (%2607) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2404 = "tosa.mul" (%2400,%2403) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2262 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2263 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2542 = "tosa.reduce_sum" (%2254) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2569 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2545 = "tosa.reciprocal" (%2569) : (tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2546 = "tosa.mul" (%2542,%2545) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2548 = "tosa.cast" (%2546) : (tensor<16x1xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2549 = "tosa.sub" (%2254,%2548) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2550 = "tosa.mul" (%2549,%2549) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2551 = "tosa.reduce_sum" (%2254) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2552 = "tosa.mul" (%2551,%2545) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2581 = "tosa.reduce_sum" (%2254) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2608 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2584 = "tosa.reciprocal" (%2608) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2585 = "tosa.mul" (%2581,%2584) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2587 = "tosa.cast" (%2585) : (tensor<16x1xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2588 = "tosa.sub" (%2254,%2587) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2589 = "tosa.mul" (%2588,%2588) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2590 = "tosa.reduce_sum" (%2589) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2591 = "tosa.mul" (%2590,%2584) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2265 = "tosa.sub" (%2254,%2404) : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2266 = "tensor.splat" (%2257) : (f32) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2267 = "tosa.mul" (%2266,%2265) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2268 = "tensor.splat" (%2256) : (f32) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2269 = "tosa.add" (%2552,%2268) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2269 = "tosa.add" (%2591,%2268) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2391 = "math.sqrt" (%2269) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2271 = "tosa.reciprocal" (%2391) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2272 = "tosa.mul" (%2267,%2271) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
@@ -1016,26 +1055,26 @@ print(y)
 # CHECK-NEXT:   %2318 = "arith.constant" () {value = 1e-05: f32} : () -> f32
 # CHECK-NEXT:   %2319 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2320 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2406 = "tosa.reduce_sum" (%2314) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2570 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2409 = "tosa.reciprocal" (%2570) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2406 = "tosa.reduce_sum" (%2314) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2609 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2409 = "tosa.reciprocal" (%2609) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2410 = "tosa.mul" (%2406,%2409) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2322 = "arith.constant" () {value = -1: i32} : () -> i32
 # CHECK-NEXT:   %2323 = "arith.constant" () {value = true} : () -> i1
-# CHECK-NEXT:   %2554 = "tosa.reduce_sum" (%2314) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2571 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
-# CHECK-NEXT:   %2557 = "tosa.reciprocal" (%2571) : (tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2558 = "tosa.mul" (%2554,%2557) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2560 = "tosa.cast" (%2558) : (tensor<16x1xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2561 = "tosa.sub" (%2314,%2560) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2562 = "tosa.mul" (%2561,%2561) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
-# CHECK-NEXT:   %2563 = "tosa.reduce_sum" (%2314) {axis = -1: i64} : (tensor<16x768xf32>) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2564 = "tosa.mul" (%2563,%2557) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2593 = "tosa.reduce_sum" (%2314) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2610 = "tosa.const" () {value = dense<768.0>: tensor<16x1xf32>} : () -> tensor<16x1xf32>
+# CHECK-NEXT:   %2596 = "tosa.reciprocal" (%2610) : (tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2597 = "tosa.mul" (%2593,%2596) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2599 = "tosa.cast" (%2597) : (tensor<16x1xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2600 = "tosa.sub" (%2314,%2599) : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2601 = "tosa.mul" (%2600,%2600) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
+# CHECK-NEXT:   %2602 = "tosa.reduce_sum" (%2601) {axis = [-1],keepdims = true} : (tensor<16x768xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2603 = "tosa.mul" (%2602,%2596) {shift = 0: i32} : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2325 = "tosa.sub" (%2314,%2410) : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2326 = "tensor.splat" (%2317) : (f32) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2327 = "tosa.mul" (%2326,%2325) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x768xf32>) -> tensor<16x768xf32>
 # CHECK-NEXT:   %2328 = "tensor.splat" (%2316) : (f32) -> tensor<16x1xf32>
-# CHECK-NEXT:   %2329 = "tosa.add" (%2564,%2328) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
+# CHECK-NEXT:   %2329 = "tosa.add" (%2603,%2328) : (tensor<16x1xf32>,tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2393 = "math.sqrt" (%2329) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2331 = "tosa.reciprocal" (%2393) : (tensor<16x1xf32>) -> tensor<16x1xf32>
 # CHECK-NEXT:   %2332 = "tosa.mul" (%2327,%2331) {shift = 0: i32} : (tensor<16x768xf32>,tensor<16x1xf32>) -> tensor<16x768xf32>
