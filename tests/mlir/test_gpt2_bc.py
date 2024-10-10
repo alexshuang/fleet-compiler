@@ -1,4 +1,4 @@
-# RUN: fleet_compiler_cli %s --emitByteCode --opt --only-compile | %FileCheck %s
+# RUN: fleet_compiler_cli %s --compile-to=bc | %FileCheck %s
 
 import numpy as np
 

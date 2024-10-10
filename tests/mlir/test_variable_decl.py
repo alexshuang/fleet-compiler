@@ -1,4 +1,4 @@
-# RUN: fleet_compiler_cli %s --emitMLIR --only-compile | %mlir-opt | %FileCheck %s
+# RUN: fleet_compiler_cli %s --compile-to=ir | %mlir-opt | %FileCheck %s
 
 a = 2
 b = 3.0

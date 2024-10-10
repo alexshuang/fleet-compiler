@@ -1,4 +1,4 @@
-# RUN: fleet_compiler_cli %s --emitMLIR --only-compile --opt | %FileCheck %s
+# RUN: fleet_compiler_cli %s --compile-to=mlir | %FileCheck %s
 
 import numpy as np
 
